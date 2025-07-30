@@ -1,26 +1,17 @@
 import { Suspense } from "react";
-import { useRoutes } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./components/home";
-import routes from "tempo-routes";
 
 function App() {
-  const appRoutes = [
-    {
-      path: "/",
-      element: <Home />,
-    },
-  ];
-
-  const allRoutes = [
-    ...appRoutes,
-    ...(import.meta.env.VITE_TEMPO === "true" ? routes : []),
-  ];
-
-  const element = useRoutes(allRoutes);
-
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      {element}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        {/* Add more routes here as needed */}
+        <Route path="/workflows" element={<div>Workflows Page</div>} />
+        <Route path="/calendar" element={<div>Calendar Page</div>} />
+        <Route path="/settings" element={<div>Settings Page</div>} />
+      </Routes>
     </Suspense>
   );
 }
