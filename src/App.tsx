@@ -6,6 +6,7 @@ import Settings from "./components/Settings";
 import MyWorkflows from "./components/MyWorkflows";
 import FlowTemplates from "./components/FlowTemplates";
 import Analytics from "./components/Analytics";
+import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
 import routes from "tempo-routes";
 
 function App() {
@@ -33,6 +34,10 @@ function App() {
     {
       path: "/analytics",
       element: <Analytics />,
+    },
+    {
+      path: "/workflow/new",
+      element: <WorkflowBuilder />,
     },
   ];
 
