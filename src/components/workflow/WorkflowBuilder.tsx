@@ -364,7 +364,18 @@ const WorkflowBuilder = ({
             <TabsContent value="timeline" className="h-full">
               <div className="p-4 h-full">
                 <VisualProgressTracker
-                  workflow={workflow}
+                  workflowId={workflow.id}
+                  steps={workflow.steps.map((step) => ({
+                    id: step.id,
+                    title: step.title,
+                    status: "pending" as const,
+                    progress: 0,
+                    dependencies: step.dependencies,
+                    resources: [],
+                    dueDate: new Date(Date.now() + step.duration * 60000)
+                      .toISOString()
+                      .split("T")[0],
+                  }))}
                   onUpdateStep={(id, updates) => updateStep(id, updates)}
                 />
               </div>
@@ -438,8 +449,8 @@ const WorkflowBuilder = ({
       {showSuggestions && (
         <div className="w-80 border-l overflow-y-auto">
           <SmartSuggestionPanel
-            workflow={workflow}
-            selectedStepId={selectedStep}
+            workflowId={workflow.id}
+            currentSteps={workflow.steps}
             onApplySuggestion={(suggestion) => {
               // Handle applying suggestion
               console.log("Applying suggestion:", suggestion);
