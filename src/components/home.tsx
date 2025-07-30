@@ -135,11 +135,25 @@ const Home = () => {
             My Workflows
           </Link>
           <Link
+            to="/templates"
+            className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Templates
+          </Link>
+          <Link
             to="/calendar"
             className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground"
           >
             <Calendar className="mr-2 h-4 w-4" />
             Calendar
+          </Link>
+          <Link
+            to="/analytics"
+            className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground"
+          >
+            <BarChart className="mr-2 h-4 w-4" />
+            Analytics
           </Link>
           <Link
             to="/settings"
