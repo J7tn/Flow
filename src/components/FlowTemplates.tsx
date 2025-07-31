@@ -22,8 +22,8 @@ const FlowTemplates = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Workflow Templates</h1>
-          <p className="text-gray-600">Browse our collection of workflow templates to optimize your processes</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Flow Templates</h1>
+          <p className="text-gray-600">Browse our collection of flow templates to optimize your processes</p>
         </div>
         <TemplateBrowser />
       </div>

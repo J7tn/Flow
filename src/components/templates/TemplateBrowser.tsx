@@ -148,9 +148,9 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
       {/* Header */}
       <div className="space-y-4">
         <div>
-          <h1 className="text-3xl font-bold">Workflow Templates</h1>
+          <h1 className="text-3xl font-bold">Flow Templates</h1>
           <p className="text-muted-foreground">
-            Browse and select from hundreds of industry-proven workflow templates
+            Browse and select from hundreds of industry-proven flow templates
           </p>
         </div>
 
@@ -335,12 +335,23 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
                   </div>
                 </div>
 
-                {/* Action Button - Always at bottom */}
-                <div className="pt-4 border-t">
+                {/* Action Buttons - Always at bottom */}
+                <div className="pt-4 border-t space-y-2">
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/templates/${template.id}`);
+                    }}
+                  >
+                    Preview Template
+                  </Button>
                   <Button 
                     className="w-full" 
                     variant="default"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       if (user) {
                         navigate(`/workflow/new?template=${template.id}`);
                       } else {
