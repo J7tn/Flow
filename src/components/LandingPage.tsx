@@ -21,7 +21,7 @@ export function LandingPage() {
   const features = [
     {
       icon: <Zap className="h-8 w-8 text-blue-500" />,
-      title: "Workflow Templates",
+              title: "Flow Templates",
       description: "Access 30+ pre-built templates for app development, game design, manufacturing, and more."
     },
     {
@@ -32,12 +32,12 @@ export function LandingPage() {
     {
       icon: <Wrench className="h-8 w-8 text-purple-500" />,
       title: "Tool Recommendations",
-      description: "Get expert suggestions for the best tools and software for your specific workflow."
+              description: "Get expert suggestions for the best tools and software for your specific flow."
     },
     {
       icon: <TrendingUp className="h-8 w-8 text-orange-500" />,
       title: "Process Optimization",
-      description: "Identify bottlenecks and get AI-powered suggestions to streamline your workflows."
+              description: "Identify bottlenecks and get AI-powered suggestions to streamline your flows."
     },
     {
       icon: <Target className="h-8 w-8 text-red-500" />,
@@ -112,7 +112,7 @@ export function LandingPage() {
        
                      <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
                        From creative projects to personal goals, Flow helps you plan, calculate costs,
-                       optimize workflows, and choose the right tools for any process or project.
+                       optimize flows, and choose the right tools for any process or project.
                      </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -161,7 +161,7 @@ export function LandingPage() {
                      Everything You Need to Optimize Any Process
                    </h2>
                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                     Comprehensive tools and templates to streamline any project or workflow
+                     Comprehensive tools and templates to streamline any project or flow
                    </p>
           </div>
           

@@ -258,30 +258,30 @@ export class SecureApi {
   }
 }
 
-// Workflow-specific API functions
-export const workflowApi = {
-  async getWorkflows(userId?: string) {
-    return SecureApi.get('workflows', { userId });
+// Flow-specific API functions
+export const flowApi = {
+  async getFlows(userId?: string) {
+    return SecureApi.get('flows', { userId });
   },
 
-  async createWorkflow(workflowData: any) {
-    return SecureApi.post('workflows', workflowData);
+  async createFlow(flowData: any) {
+    return SecureApi.post('flows', flowData);
   },
 
-  async updateWorkflow(id: string, workflowData: any) {
-    return SecureApi.put('workflows', id, workflowData);
+  async updateFlow(id: string, flowData: any) {
+    return SecureApi.put('flows', id, flowData);
   },
 
-  async deleteWorkflow(id: string) {
-    return SecureApi.delete('workflows', id);
+  async deleteFlow(id: string) {
+    return SecureApi.delete('flows', id);
   },
 
-  async getWorkflowById(id: string) {
+  async getFlowById(id: string) {
     const userId = await getCurrentUser();
     if (!userId) throw new Error('Authentication required');
 
     const { data, error } = await supabase
-      .from('workflows')
+      .from('flows')
       .select('*')
       .eq('id', id)
       .eq('user_id', userId.id)

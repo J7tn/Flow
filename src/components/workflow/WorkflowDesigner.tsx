@@ -1,5 +1,4 @@
-import React, { useState, useRef } from "react";
-import { motion, useDragControls } from "framer-motion";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -68,7 +67,6 @@ interface FlowStep {
   estimatedTime?: number;
   cost?: number;
   dependencies: string[];
-  position: { x: number; y: number };
 }
 
 const WorkflowDesigner = () => {
@@ -77,44 +75,7 @@ const WorkflowDesigner = () => {
   const [workflowDescription, setWorkflowDescription] = useState("");
   const [workflowGoal, setWorkflowGoal] = useState("");
   const [selectedStep, setSelectedStep] = useState<string | null>(null);
-  const [goalPosition, setGoalPosition] = useState({ x: 50, y: 50 });
-  const [steps, setSteps] = useState<FlowStep[]>([
-    {
-      id: "1",
-      title: "Project Planning",
-      description: "Define project scope and objectives",
-      type: "milestone",
-      status: "pending",
-      estimatedTime: 8,
-      cost: 500,
-      dependencies: [],
-      position: { x: 100, y: 100 },
-    },
-    {
-      id: "2",
-      title: "Research & Analysis",
-      description: "Gather requirements and analyze market",
-      type: "task",
-      status: "pending",
-      assignee: "Alex Johnson",
-      estimatedTime: 16,
-      cost: 1200,
-      dependencies: ["1"],
-      position: { x: 300, y: 100 },
-    },
-    {
-      id: "3",
-      title: "Design Phase",
-      description: "Create wireframes and mockups",
-      type: "task",
-      status: "pending",
-      assignee: "Sarah Chen",
-      estimatedTime: 24,
-      cost: 1800,
-      dependencies: ["2"],
-      position: { x: 500, y: 100 },
-    },
-  ]);
+  const [steps, setSteps] = useState<FlowStep[]>([]);
 
   // AI-powered step suggestions
   const [isGeneratingSteps, setIsGeneratingSteps] = useState(false);
@@ -262,7 +223,6 @@ const WorkflowDesigner = () => {
       type: suggestedStep.type,
       status: "pending",
       dependencies: [],
-      position: { x: Math.random() * 400 + 100, y: Math.random() * 300 + 100 },
     };
     setSteps([...steps, newStep]);
   };
@@ -300,59 +260,8 @@ const WorkflowDesigner = () => {
     return suggestedStep ? suggestedStep.icon : CheckCircle;
   };
 
-  const handleStepDrag = (stepId: string, info: any) => {
-    // Get the canvas container
-    const canvas = document.querySelector('.canvas-container');
-    if (!canvas) return;
-    
-    const canvasRect = canvas.getBoundingClientRect();
-    
-    // Calculate position relative to canvas
-    const newPosition = {
-      x: info.point.x - canvasRect.left,
-      y: info.point.y - canvasRect.top
-    };
-    
-    // Ensure the block stays within canvas bounds
-    const maxX = canvasRect.width - 256; // Card width
-    const maxY = canvasRect.height - 200; // Approximate card height
-    
-    newPosition.x = Math.max(0, Math.min(newPosition.x, maxX));
-    newPosition.y = Math.max(0, Math.min(newPosition.y, maxY));
-    
-    if (stepId === "goal") {
-      setGoalPosition(newPosition);
-    } else {
-      setSteps(steps.map(step => 
-        step.id === stepId ? { ...step, position: newPosition } : step
-      ));
-    }
-  };
-
   const updateGoal = (newGoal: string) => {
     setWorkflowGoal(newGoal);
-    // Update or create goal step
-    const goalStepIndex = steps.findIndex(step => step.type === "goal");
-    if (goalStepIndex >= 0) {
-      // Update existing goal step
-      setSteps(steps.map((step, index) => 
-        index === goalStepIndex 
-          ? { ...step, title: newGoal, description: `Goal: ${newGoal}` }
-          : step
-      ));
-    } else if (newGoal.trim()) {
-      // Create new goal step
-      const newGoalStep: FlowStep = {
-        id: "goal",
-        title: newGoal,
-        description: `Goal: ${newGoal}`,
-        type: "goal",
-        status: "pending",
-        dependencies: [],
-        position: goalPosition,
-      };
-      setSteps([newGoalStep, ...steps]);
-    }
   };
 
   return (
@@ -408,105 +317,200 @@ const WorkflowDesigner = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Left Sidebar - Step Library */}
-          <div className="w-80 border-r bg-gray-50 p-4 overflow-y-auto">
-                         <div className="mb-6">
-               <h3 className="font-semibold mb-3">Add Goal</h3>
-               <div className="space-y-3">
-                 <div>
-                   <label className="text-sm font-medium text-gray-700 mb-2 block">
-                     What is the goal of this flow?
-                   </label>
-                                       <Textarea
-                      value={workflowGoal}
-                      onChange={(e) => updateGoal(e.target.value)}
-                      placeholder="e.g., Launch a new product, Optimize customer onboarding, Create a marketing campaign..."
-                      className="w-full"
-                      rows={3}
-                    />
-                 </div>
-                 <div className="text-xs text-gray-500">
-                   Define a clear, measurable goal to help guide your flow design and track success.
-                 </div>
-                 <Button
-                   onClick={() => generateAISteps(workflowGoal)}
-                   disabled={!workflowGoal.trim() || isGeneratingSteps}
-                   className="w-full"
-                   size="sm"
-                 >
-                   {isGeneratingSteps ? (
-                     <>
-                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                       AI is thinking...
-                     </>
-                   ) : (
-                     <>
-                       <Sparkles className="h-4 w-4 mr-2" />
-                       Generate AI Steps
-                     </>
-                   )}
-                 </Button>
-               </div>
-             </div>
-
-            <Separator className="my-4" />
-
-                         <div className="mb-6">
-               <h3 className="font-semibold mb-3">AI Suggested Steps</h3>
-               <div className="space-y-2">
-                 {isGeneratingSteps ? (
-                   <div className="text-center text-muted-foreground py-4">
-                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                     <p className="text-sm">AI is analyzing your goal and generating intelligent steps...</p>
-                   </div>
-                 ) : suggestedSteps.length > 0 ? (
-                   <>
-                     <div className="flex items-center justify-between mb-3">
-                       <span className="text-sm text-muted-foreground">Generated {suggestedSteps.length} steps</span>
-                       <Button
-                         variant="ghost"
-                         size="sm"
-                         onClick={() => generateAISteps(workflowGoal)}
-                         disabled={!workflowGoal.trim()}
-                       >
-                         <Sparkles className="h-3 w-3 mr-1" />
-                         Regenerate
-                       </Button>
-                     </div>
-                     {suggestedSteps.map((suggestedStep, index) => (
-                       <Button
-                         key={index}
-                         variant="outline"
-                         className="w-full justify-start"
-                         onClick={() => addStep(suggestedStep)}
-                       >
-                         <suggestedStep.icon className={`h-4 w-4 mr-2 ${suggestedStep.color.replace('bg-', 'text-')}`} />
-                         <div className="text-left">
-                           <div className="font-medium">{suggestedStep.title}</div>
-                           <div className="text-xs text-muted-foreground">{suggestedStep.description}</div>
+                 {/* Main Content */}
+         <div className="flex-1 flex overflow-hidden">
+           {/* Center - Flow Canvas */}
+           <div className="flex-1 bg-white relative overflow-auto">
+             <div className="p-6 min-h-full">
+                              <div className="canvas-container w-full h-full min-h-[600px] bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+                 {/* Goal Input Block */}
+                 <div className="mb-8">
+                   <Card className="w-full max-w-2xl mx-auto shadow-lg border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
+                     <CardHeader className="pb-4">
+                       <div className="flex items-center space-x-2 mb-3">
+                         <div className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
+                         <Badge variant="outline" className="text-xs bg-purple-100 text-purple-800 border-purple-300">
+                           Goal
+                         </Badge>
+                       </div>
+                       <div className="space-y-3">
+                         <div>
+                           <label className="text-sm font-medium text-purple-900 mb-2 block">
+                             What is the goal of this flow?
+                           </label>
+                           <Textarea
+                             value={workflowGoal}
+                             onChange={(e) => updateGoal(e.target.value)}
+                             placeholder="e.g., Launch a new product, Optimize customer onboarding, Create a marketing campaign..."
+                             className="w-full border-purple-200 focus:border-purple-400"
+                             rows={3}
+                           />
                          </div>
-                       </Button>
-                     ))}
-                   </>
-                 ) : workflowGoal ? (
-                   <div className="text-center text-muted-foreground py-4">
-                     <Sparkles className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                     <p className="text-sm">Click "Generate AI Steps" to get intelligent suggestions</p>
+                         <div className="flex items-center justify-between">
+                           <div className="text-xs text-purple-700">
+                             Define a clear, measurable goal to help guide your flow design
+                           </div>
+                           <Button
+                             onClick={() => generateAISteps(workflowGoal)}
+                             disabled={!workflowGoal.trim() || isGeneratingSteps}
+                             size="sm"
+                             className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                           >
+                             {isGeneratingSteps ? (
+                               <>
+                                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                 AI is thinking...
+                               </>
+                             ) : (
+                               <>
+                                 <Sparkles className="h-4 w-4 mr-2" />
+                                 Generate AI Steps
+                               </>
+                             )}
+                           </Button>
+                         </div>
+                       </div>
+                     </CardHeader>
+                   </Card>
+                 </div>
+
+                 {/* AI Suggested Steps - Appear below goal */}
+                 {isGeneratingSteps && (
+                   <div className="mb-8">
+                     <Card className="w-full max-w-2xl mx-auto shadow-lg">
+                       <CardContent className="p-6">
+                         <div className="text-center">
+                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-3"></div>
+                           <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
+                         </div>
+                       </CardContent>
+                     </Card>
                    </div>
-                 ) : (
-                   <div className="text-center text-muted-foreground py-4">
-                     <Info className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                     <p className="text-sm">Set a goal and generate AI steps</p>
+                 )}
+
+                 {/* AI Suggested Steps Grid */}
+                 {suggestedSteps.length > 0 && !isGeneratingSteps && (
+                   <div className="mb-8">
+                     <Card className="w-full max-w-6xl mx-auto shadow-lg">
+                       <CardHeader className="pb-4">
+                         <div className="flex items-center justify-between">
+                           <div className="flex items-center space-x-2">
+                             <Sparkles className="h-5 w-5 text-purple-500" />
+                             <h3 className="font-semibold">AI Suggested Steps</h3>
+                             <Badge variant="secondary">{suggestedSteps.length} steps</Badge>
+                           </div>
+                           <Button
+                             variant="outline"
+                             size="sm"
+                             onClick={() => generateAISteps(workflowGoal)}
+                             disabled={!workflowGoal.trim()}
+                           >
+                             <Sparkles className="h-3 w-3 mr-1" />
+                             Regenerate
+                           </Button>
+                         </div>
+                       </CardHeader>
+                       <CardContent className="pt-0">
+                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                           {suggestedSteps.map((suggestedStep, index) => (
+                             <Button
+                               key={index}
+                               variant="outline"
+                               className="h-auto p-4 justify-start text-left hover:shadow-md transition-shadow"
+                               onClick={() => addStep(suggestedStep)}
+                             >
+                               <div className="flex items-start space-x-3 w-full">
+                                 <div className={`p-2 rounded-lg ${suggestedStep.color} bg-opacity-10`}>
+                                   <suggestedStep.icon className={`h-5 w-5 ${suggestedStep.color.replace('bg-', 'text-')}`} />
+                                 </div>
+                                 <div className="flex-1 min-w-0">
+                                   <div className="font-medium text-sm mb-1">{suggestedStep.title}</div>
+                                   <div className="text-xs text-muted-foreground leading-relaxed">{suggestedStep.description}</div>
+                                 </div>
+                               </div>
+                             </Button>
+                           ))}
+                         </div>
+                       </CardContent>
+                     </Card>
+                   </div>
+                 )}
+
+                 {/* Step Blocks Grid */}
+                 {steps.length > 0 && (
+                   <div>
+                     <div className="flex items-center justify-between mb-4">
+                       <h3 className="font-semibold text-lg">Your Flow Steps</h3>
+                       <Badge variant="secondary">{steps.length} steps added</Badge>
+                     </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                       {steps.map((step) => (
+                         <Card 
+                           key={step.id} 
+                           className={`shadow-lg hover:shadow-xl transition-shadow cursor-pointer ${
+                             selectedStep === step.id ? 'ring-2 ring-blue-500' : ''
+                           }`}
+                           onClick={() => setSelectedStep(step.id)}
+                         >
+                           <CardHeader className="pb-2">
+                             <div className="flex items-center justify-between">
+                               <div className="flex items-center space-x-2">
+                                 <div className={`w-3 h-3 rounded-full ${getStepColor(step)}`} />
+                                 <Badge variant="outline" className="text-xs">
+                                   {step.type}
+                                 </Badge>
+                               </div>
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 onClick={(e) => {
+                                   e.stopPropagation();
+                                   deleteStep(step.id);
+                                 }}
+                               >
+                                 <Trash2 className="h-3 w-3" />
+                               </Button>
+                             </div>
+                             <CardTitle className="text-sm">{step.title}</CardTitle>
+                           </CardHeader>
+                           <CardContent className="pt-0">
+                             <CardDescription className="text-xs mb-2">
+                               {step.description || "No description"}
+                             </CardDescription>
+                             <div className="space-y-1 text-xs text-muted-foreground">
+                               {step.assignee && (
+                                 <div className="flex items-center">
+                                   <Users className="h-3 w-3 mr-1" />
+                                   {step.assignee}
+                                 </div>
+                               )}
+                               {step.estimatedTime && (
+                                 <div className="flex items-center">
+                                   <Clock className="h-3 w-3 mr-1" />
+                                   {step.estimatedTime}h
+                                 </div>
+                               )}
+                               {step.cost && (
+                                 <div className="flex items-center">
+                                   <DollarSign className="h-3 w-3 mr-1" />
+                                   ${step.cost}
+                                 </div>
+                               )}
+                             </div>
+                           </CardContent>
+                         </Card>
+                       ))}
+                     </div>
                    </div>
                  )}
                </div>
-             </div>
+            </div>
+          </div>
 
-            <Separator className="my-4" />
-
-                         <div className="mb-6">
+                                {/* Right Sidebar - Step Properties & Flow Statistics */}
+           <div className="w-80 border-l bg-gray-50 p-4 overflow-y-auto">
+             {/* Flow Statistics */}
+             <div className="mb-6">
                <h3 className="font-semibold mb-3">Flow Statistics</h3>
                <div className="space-y-3">
                  <div className="flex items-center justify-between">
@@ -517,7 +521,7 @@ const WorkflowDesigner = () => {
                  </div>
                  <div className="flex items-center justify-between">
                    <span className="text-sm text-muted-foreground">Total Steps</span>
-                   <Badge variant="secondary">{steps.length}</Badge>
+                   <Badge variant="secondary">{steps.filter(step => step.type !== "goal").length}</Badge>
                  </div>
                  <div className="flex items-center justify-between">
                    <span className="text-sm text-muted-foreground">Estimated Time</span>
@@ -530,166 +534,13 @@ const WorkflowDesigner = () => {
                </div>
              </div>
 
-            <Separator className="my-4" />
+             <Separator className="my-4" />
 
-            <div>
-              <h3 className="font-semibold mb-3">Quick Actions</h3>
-              <div className="space-y-2">
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <Copy className="h-4 w-4 mr-2" />
-                  Duplicate Flow
-                </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Flow Settings
-                </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <Play className="h-4 w-4 mr-2" />
-                  Test Flow
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Center - Flow Canvas */}
-          <div className="flex-1 bg-white relative overflow-auto">
-            <div className="p-6 min-h-full">
-                             <div className="canvas-container relative w-full h-full min-h-[600px] bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                                   {/* Goal Block */}
-                  {workflowGoal && (
-                    <motion.div
-                      drag
-                      dragMomentum={false}
-                      dragElastic={0}
-                      dragConstraints={false}
-                      onDragEnd={(event, info) => handleStepDrag("goal", info)}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileDrag={{ scale: 1.05, zIndex: 10 }}
-                      className={`absolute cursor-move ${
-                        selectedStep === "goal" ? 'ring-2 ring-purple-500' : ''
-                      }`}
-                      style={{
-                        left: goalPosition.x,
-                        top: goalPosition.y,
-                      }}
-                      onClick={() => setSelectedStep("goal")}
-                    >
-                     <Card className="w-72 shadow-lg border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
-                       <CardHeader className="pb-2">
-                         <div className="flex items-center justify-between">
-                           <div className="flex items-center space-x-2">
-                             <div className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
-                             <Badge variant="outline" className="text-xs bg-purple-100 text-purple-800 border-purple-300">
-                               Goal
-                             </Badge>
-                           </div>
-                           <Button
-                             variant="ghost"
-                             size="sm"
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               setWorkflowGoal("");
-                               setSteps(steps.filter(step => step.type !== "goal"));
-                             }}
-                           >
-                             <Trash2 className="h-3 w-3" />
-                           </Button>
-                         </div>
-                         <CardTitle className="text-sm font-bold text-purple-900">{workflowGoal}</CardTitle>
-                       </CardHeader>
-                       <CardContent className="pt-0">
-                         <CardDescription className="text-xs mb-2 text-purple-700">
-                           This is the main objective of your workflow
-                         </CardDescription>
-                       </CardContent>
-                     </Card>
-                   </motion.div>
-                 )}
-                 
-                                   {/* Step Blocks */}
-                  {steps.filter(step => step.type !== "goal").map((step) => (
-                    <motion.div
-                      key={step.id}
-                      drag
-                      dragMomentum={false}
-                      dragElastic={0}
-                      dragConstraints={false}
-                      onDragEnd={(event, info) => handleStepDrag(step.id, info)}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileDrag={{ scale: 1.05, zIndex: 10 }}
-                      className={`absolute cursor-move ${
-                        selectedStep === step.id ? 'ring-2 ring-blue-500' : ''
-                      }`}
-                      style={{
-                        left: step.position.x,
-                        top: step.position.y,
-                      }}
-                      onClick={() => setSelectedStep(step.id)}
-                    >
-                     <Card className="w-64 shadow-lg">
-                       <CardHeader className="pb-2">
-                         <div className="flex items-center justify-between">
-                           <div className="flex items-center space-x-2">
-                             <div className={`w-3 h-3 rounded-full ${getStepColor(step)}`} />
-                             <Badge variant="outline" className="text-xs">
-                               {step.type}
-                             </Badge>
-                           </div>
-                           <Button
-                             variant="ghost"
-                             size="sm"
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               deleteStep(step.id);
-                             }}
-                           >
-                             <Trash2 className="h-3 w-3" />
-                           </Button>
-                         </div>
-                         <CardTitle className="text-sm">{step.title}</CardTitle>
-                       </CardHeader>
-                       <CardContent className="pt-0">
-                         <CardDescription className="text-xs mb-2">
-                           {step.description || "No description"}
-                         </CardDescription>
-                         <div className="space-y-1 text-xs text-muted-foreground">
-                           {step.assignee && (
-                             <div className="flex items-center">
-                               <Users className="h-3 w-3 mr-1" />
-                               {step.assignee}
-                             </div>
-                           )}
-                           {step.estimatedTime && (
-                             <div className="flex items-center">
-                               <Clock className="h-3 w-3 mr-1" />
-                               {step.estimatedTime}h
-                             </div>
-                           )}
-                           {step.cost && (
-                             <div className="flex items-center">
-                               <DollarSign className="h-3 w-3 mr-1" />
-                               ${step.cost}
-                             </div>
-                           )}
-                         </div>
-                       </CardContent>
-                     </Card>
-                   </motion.div>
-                 ))}
-               </div>
-            </div>
-          </div>
-
-                     {/* Right Sidebar - Step Properties */}
-           <div className="w-80 border-l bg-gray-50 p-4 overflow-y-auto">
+             {/* Step Properties */}
              {selectedStep ? (
                <div>
                  <div className="flex items-center justify-between mb-4">
-                   <h3 className="font-semibold">
-                     {selectedStep === "goal" ? "Goal Properties" : "Step Properties"}
-                   </h3>
+                   <h3 className="font-semibold">Step Properties</h3>
                    <Button
                      variant="ghost"
                      size="sm"
@@ -699,123 +550,105 @@ const WorkflowDesigner = () => {
                    </Button>
                  </div>
                  
-                 {selectedStep === "goal" ? (
-                   <div className="space-y-4">
+                 <Tabs defaultValue="general" className="w-full">
+                   <TabsList className="grid w-full grid-cols-2">
+                     <TabsTrigger value="general">General</TabsTrigger>
+                     <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                   </TabsList>
+                   <TabsContent value="general" className="space-y-4">
                      <div>
-                       <label className="text-sm font-medium">Goal</label>
-                       <Textarea
-                         value={workflowGoal}
-                         onChange={(e) => updateGoal(e.target.value)}
+                       <label className="text-sm font-medium">Title</label>
+                       <Input
+                         value={steps.find(s => s.id === selectedStep)?.title || ""}
+                         onChange={(e) => updateStep(selectedStep, { title: e.target.value })}
                          className="mt-1"
-                         rows={3}
-                         placeholder="Enter your workflow goal..."
                        />
                      </div>
-                     <div className="text-xs text-muted-foreground">
-                       The goal defines the main objective of your workflow. All steps should contribute to achieving this goal.
+                     <div>
+                       <label className="text-sm font-medium">Description</label>
+                       <Textarea
+                         value={steps.find(s => s.id === selectedStep)?.description || ""}
+                         onChange={(e) => updateStep(selectedStep, { description: e.target.value })}
+                         className="mt-1"
+                         rows={3}
+                       />
                      </div>
-                   </div>
-                 ) : (
-                   <Tabs defaultValue="general" className="w-full">
-                     <TabsList className="grid w-full grid-cols-2">
-                       <TabsTrigger value="general">General</TabsTrigger>
-                       <TabsTrigger value="advanced">Advanced</TabsTrigger>
-                     </TabsList>
-                     <TabsContent value="general" className="space-y-4">
+                     <div>
+                       <label className="text-sm font-medium">Assignee</label>
+                       <Input
+                         value={steps.find(s => s.id === selectedStep)?.assignee || ""}
+                         onChange={(e) => updateStep(selectedStep, { assignee: e.target.value })}
+                         className="mt-1"
+                         placeholder="Enter assignee name"
+                       />
+                     </div>
+                     <div className="grid grid-cols-2 gap-4">
                        <div>
-                         <label className="text-sm font-medium">Title</label>
+                         <label className="text-sm font-medium">Estimated Time (hours)</label>
                          <Input
-                           value={steps.find(s => s.id === selectedStep)?.title || ""}
-                           onChange={(e) => updateStep(selectedStep, { title: e.target.value })}
+                           type="number"
+                           value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
+                           onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
                            className="mt-1"
                          />
                        </div>
                        <div>
-                         <label className="text-sm font-medium">Description</label>
-                         <Textarea
-                           value={steps.find(s => s.id === selectedStep)?.description || ""}
-                           onChange={(e) => updateStep(selectedStep, { description: e.target.value })}
-                           className="mt-1"
-                           rows={3}
-                         />
-                       </div>
-                       <div>
-                         <label className="text-sm font-medium">Assignee</label>
+                         <label className="text-sm font-medium">Cost ($)</label>
                          <Input
-                           value={steps.find(s => s.id === selectedStep)?.assignee || ""}
-                           onChange={(e) => updateStep(selectedStep, { assignee: e.target.value })}
+                           type="number"
+                           value={steps.find(s => s.id === selectedStep)?.cost || ""}
+                           onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
                            className="mt-1"
-                           placeholder="Enter assignee name"
                          />
                        </div>
-                       <div className="grid grid-cols-2 gap-4">
-                         <div>
-                           <label className="text-sm font-medium">Estimated Time (hours)</label>
-                           <Input
-                             type="number"
-                             value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
-                             onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
-                             className="mt-1"
-                           />
-                         </div>
-                         <div>
-                           <label className="text-sm font-medium">Cost ($)</label>
-                           <Input
-                             type="number"
-                             value={steps.find(s => s.id === selectedStep)?.cost || ""}
-                             onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
-                             className="mt-1"
-                           />
-                         </div>
+                     </div>
+                   </TabsContent>
+                   <TabsContent value="advanced" className="space-y-4">
+                     <div>
+                       <label className="text-sm font-medium">Status</label>
+                       <select
+                         value={steps.find(s => s.id === selectedStep)?.status || "pending"}
+                         onChange={(e) => updateStep(selectedStep, { status: e.target.value as FlowStep["status"] })}
+                         className="mt-1 w-full p-2 border rounded-md"
+                       >
+                         <option value="pending">Pending</option>
+                         <option value="in-progress">In Progress</option>
+                         <option value="completed">Completed</option>
+                         <option value="blocked">Blocked</option>
+                       </select>
+                     </div>
+                     <div>
+                       <label className="text-sm font-medium">Dependencies</label>
+                       <div className="mt-1 space-y-2">
+                         {steps
+                           .filter(s => s.id !== selectedStep && s.type !== "goal")
+                           .map(step => (
+                             <label key={step.id} className="flex items-center space-x-2">
+                               <input
+                                 type="checkbox"
+                                 checked={steps.find(s => s.id === selectedStep)?.dependencies.includes(step.id) || false}
+                                 onChange={(e) => {
+                                   const currentStep = steps.find(s => s.id === selectedStep);
+                                   if (currentStep) {
+                                     const newDependencies = e.target.checked
+                                       ? [...currentStep.dependencies, step.id]
+                                       : currentStep.dependencies.filter(id => id !== step.id);
+                                     updateStep(selectedStep, { dependencies: newDependencies });
+                                   }
+                                 }}
+                               />
+                               <span className="text-sm">{step.title}</span>
+                             </label>
+                           ))}
                        </div>
-                     </TabsContent>
-                     <TabsContent value="advanced" className="space-y-4">
-                       <div>
-                         <label className="text-sm font-medium">Status</label>
-                         <select
-                           value={steps.find(s => s.id === selectedStep)?.status || "pending"}
-                           onChange={(e) => updateStep(selectedStep, { status: e.target.value as FlowStep["status"] })}
-                           className="mt-1 w-full p-2 border rounded-md"
-                         >
-                           <option value="pending">Pending</option>
-                           <option value="in-progress">In Progress</option>
-                           <option value="completed">Completed</option>
-                           <option value="blocked">Blocked</option>
-                         </select>
-                       </div>
-                       <div>
-                         <label className="text-sm font-medium">Dependencies</label>
-                         <div className="mt-1 space-y-2">
-                           {steps
-                             .filter(s => s.id !== selectedStep && s.type !== "goal")
-                             .map(step => (
-                               <label key={step.id} className="flex items-center space-x-2">
-                                 <input
-                                   type="checkbox"
-                                   checked={steps.find(s => s.id === selectedStep)?.dependencies.includes(step.id) || false}
-                                   onChange={(e) => {
-                                     const currentStep = steps.find(s => s.id === selectedStep);
-                                     if (currentStep) {
-                                       const newDependencies = e.target.checked
-                                         ? [...currentStep.dependencies, step.id]
-                                         : currentStep.dependencies.filter(id => id !== step.id);
-                                       updateStep(selectedStep, { dependencies: newDependencies });
-                                     }
-                                   }}
-                                 />
-                                 <span className="text-sm">{step.title}</span>
-                               </label>
-                             ))}
-                         </div>
-                       </div>
-                     </TabsContent>
-                   </Tabs>
-                 )}
+                     </div>
+                   </TabsContent>
+                 </Tabs>
                </div>
              ) : (
                <div className="text-center text-muted-foreground py-8">
                  <Info className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                 <p>Select a step or goal to edit its properties</p>
+                 <p>Select a step to edit its properties</p>
                </div>
              )}
            </div>

@@ -1,21 +1,21 @@
-# Flow - Workflow Management Web Application
+# Flow - Flow Management Web Application
 
-A modern, secure workflow management web application built with React, TypeScript, and Supabase. Flow helps teams and individuals create, manage, and track complex workflows with an intuitive interface and powerful analytics.
+A modern, secure flow management web application built with React, TypeScript, and Supabase. Flow helps teams and individuals create, manage, and track complex flows with an intuitive interface and powerful analytics.
 
 ## 🚀 Features
 
 - **🔐 Secure Authentication** - Enterprise-grade security with Supabase Auth
-- **📊 Visual Workflow Builder** - Drag-and-drop interface for creating workflows
+- **📊 Visual Flow Builder** - Drag-and-drop interface for creating flows
 - **📈 Real-time Progress Tracking** - Live updates and progress visualization
-- **🤖 Smart Suggestions** - AI-powered workflow optimization
+- **🤖 Smart Suggestions** - AI-powered flow optimization
 - **📱 Responsive Design** - Works seamlessly across all devices
 - **🔒 Data Protection** - Comprehensive security with Row Level Security
-- **📋 Comprehensive Template Library** - Industry-proven workflow templates with cost analysis, tool recommendations, and optimization suggestions
-- **💰 Cost Calculation Engine** - Automatic cost breakdown and budget planning for any workflow
+- **📋 Comprehensive Template Library** - Industry-proven flow templates with cost analysis, tool recommendations, and optimization suggestions
+- **💰 Cost Calculation Engine** - Automatic cost breakdown and budget planning for any flow
 - **🛠️ Tool Recommendation System** - Curated tool suggestions with pricing, features, and alternatives
 - **📊 Process Optimization** - AI-powered suggestions to improve efficiency, reduce costs, and enhance quality
-- **📅 Calendar Integration** - Schedule and track workflow deadlines
-- **👥 Team Collaboration** - Share workflows and collaborate with team members
+- **📅 Calendar Integration** - Schedule and track flow deadlines
+- **👥 Team Collaboration** - Share flows and collaborate with team members
 
 ## 🛠️ Technology Stack
 
@@ -83,7 +83,7 @@ src/
 ├── components/
 │   ├── auth/           # Authentication components
 │   ├── ui/             # Reusable UI components
-│   ├── workflow/       # Workflow-specific components
+│   ├── workflow/       # Flow-specific components
 │   ├── templates/      # Template browser and detail components
 │   ├── shared/         # Shared layout components
 │   └── security/       # Security-related components

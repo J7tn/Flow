@@ -156,7 +156,7 @@ export const processStepSchema = z.object({
 });
 
 // Template definition
-export const workflowTemplateSchema = z.object({
+export const flowTemplateSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1, 'Template name is required'),
   description: z.string(),
@@ -234,8 +234,8 @@ export const workflowTemplateSchema = z.object({
   })),
 });
 
-// Template instances (user-created workflows from templates)
-export const workflowInstanceSchema = z.object({
+// Template instances (user-created flows from templates)
+export const flowInstanceSchema = z.object({
   id: z.string().uuid(),
   templateId: z.string().uuid(),
   name: z.string(),
@@ -278,5 +278,5 @@ export type ToolCategory = z.infer<typeof toolCategorySchema>;
 export type Tool = z.infer<typeof toolSchema>;
 export type StepType = z.infer<typeof stepTypeSchema>;
 export type ProcessStep = z.infer<typeof processStepSchema>;
-export type WorkflowTemplate = z.infer<typeof workflowTemplateSchema>;
-export type WorkflowInstance = z.infer<typeof workflowInstanceSchema>; 
+export type FlowTemplate = z.infer<typeof flowTemplateSchema>;
+export type FlowInstance = z.infer<typeof flowInstanceSchema>; 

@@ -9,12 +9,13 @@ import { LandingPage } from "./components/LandingPage";
 import Home from "./components/home";
 import Calendar from "./components/Calendar";
 import Settings from "./components/Settings";
-import MyWorkflows from "./components/MyWorkflows";
+import MyFlows from "./components/MyFlows";
 import FlowTemplates from "./components/FlowTemplates";
 import { TemplateDetail } from "./components/templates/TemplateDetail";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
 import WorkflowDesigner from "./components/workflow/WorkflowDesigner";
+
 
 function App() {
   const appRoutes = [
@@ -71,10 +72,10 @@ function App() {
       ),
     },
     {
-      path: "/workflows",
+      path: "/flows",
       element: (
         <ProtectedRoute>
-          <MyWorkflows />
+          <MyFlows />
         </ProtectedRoute>
       ),
     },

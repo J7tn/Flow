@@ -26,7 +26,7 @@ const PermanentDashboard = ({ children }: PermanentDashboardProps) => {
 
   const navItems = [
     { path: "/dashboard", icon: BarChart, label: "Dashboard" },
-    { path: "/workflows", icon: Clock, label: "My Flows" },
+    { path: "/flows", icon: Clock, label: "My Flows" },
     { path: "/templates", icon: FileText, label: "Templates" },
     { path: "/calendar", icon: Calendar, label: "Calendar" },
     { path: "/analytics", icon: BarChart, label: "Analytics" },

@@ -7,10 +7,35 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Build outputs
 node_modules
 dist
 dist-ssr
 *.local
+
+# Environment variables and secrets (CRITICAL - Never commit these!)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+.env.*.development
+.env.*.test
+.env.*.production
+
+# API Keys and Secrets
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.json
+config.json
+credentials.json
+
+# Supabase specific
+.supabase/
+supabase/config.toml
 
 # Editor directories and files
 .vscode/*
@@ -23,12 +48,24 @@ dist-ssr
 *.sln
 *.sw?
 
+# Vite
 !node_modules/.vite
 
+# Project specific
 **/tempobook/dynamic/
 **/tempobook/storyboards/
-
 core
 
+# GitHub
 .github/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
 

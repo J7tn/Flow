@@ -17,8 +17,8 @@ export const nameSchema = z
   .max(100, 'Name must be less than 100 characters')
   .regex(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces');
 
-// Workflow validation schemas
-export const workflowSchema = z.object({
+// Flow validation schemas
+export const flowSchema = z.object({
   title: z
     .string()
     .min(1, 'Title is required')
@@ -140,5 +140,5 @@ export const formatValidationError = (error: z.ZodError): string => {
 };
 
 // Type exports
-export type WorkflowInput = z.infer<typeof workflowSchema>;
+export type FlowInput = z.infer<typeof flowSchema>;
 export type UserProfileInput = z.infer<typeof userProfileSchema>; 
