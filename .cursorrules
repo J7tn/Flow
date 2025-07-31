@@ -1,0 +1,238 @@
+# Cursor Rules for Flow Web Application
+
+## Project Overview
+This is a React TypeScript web application built with Vite, featuring workflow management, analytics, and modern UI components. The app uses Tailwind CSS, shadcn/ui components, Supabase backend, and includes comprehensive testing.
+
+## Technology Stack
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, shadcn/ui components, Framer Motion
+- **Routing**: React Router DOM
+- **Backend**: Supabase
+- **Testing**: Vitest, React Testing Library
+- **Build Tool**: Vite with SWC
+- **Package Manager**: npm
+
+## Code Style & Conventions
+
+### TypeScript
+- Use strict TypeScript practices with proper type definitions
+- Prefer interfaces over types for object shapes
+- Use generic types when appropriate
+- Always define return types for functions
+- Use proper import/export syntax
+
+### React Components
+- Use functional components with hooks
+- Follow the naming convention: PascalCase for components
+- Use proper prop interfaces for component props
+- Implement proper error boundaries where needed
+- Use React.memo() for performance optimization when necessary
+
+### File Structure
+- Components go in `src/components/`
+- UI components in `src/components/ui/`
+- Workflow-specific components in `src/components/workflow/`
+- Utilities in `src/lib/`
+- Types in `src/types/`
+- Tests in `__tests__/` directories or alongside components
+
+### Import Organization
+```typescript
+// 1. React and external libraries
+import React from 'react';
+import { useState, useEffect } from 'react';
+
+// 2. Third-party libraries
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+
+// 3. Internal components and utilities
+import { cn } from '@/lib/utils';
+import { WorkflowBuilder } from '@/components/workflow/WorkflowBuilder';
+
+// 4. Types
+import type { Workflow } from '@/types/supabase';
+```
+
+## Styling Guidelines
+
+### Tailwind CSS
+- Use Tailwind utility classes for styling
+- Leverage the custom color system defined in `tailwind.config.js`
+- Use the `cn()` utility for conditional classes
+- Follow responsive design patterns
+- Use CSS variables for theme colors (defined in the config)
+
+### Component Styling
+- Use shadcn/ui components as the base
+- Extend with custom Tailwind classes
+- Use Framer Motion for animations
+- Maintain consistent spacing and typography
+
+## State Management
+- Use React hooks (useState, useEffect, useContext) for local state
+- Consider React Query for server state management
+- Use proper state lifting patterns
+- Implement proper loading and error states
+
+## API Integration
+- Use Supabase client for database operations
+- Implement proper error handling for API calls
+- Use TypeScript types generated from Supabase
+- Follow RESTful patterns for API design
+
+## Testing
+- Write unit tests for components using Vitest and React Testing Library
+- Test user interactions and component behavior
+- Use proper test data and mocking
+- Maintain good test coverage
+
+## Performance
+- Use React.lazy() for code splitting
+- Implement proper memoization where needed
+- Optimize bundle size with proper imports
+- Use Vite's optimization features
+
+## Accessibility
+- Use semantic HTML elements
+- Implement proper ARIA attributes
+- Ensure keyboard navigation works
+- Test with screen readers
+- Follow WCAG guidelines
+
+## Error Handling
+- Implement proper error boundaries
+- Use try-catch blocks for async operations
+- Provide meaningful error messages
+- Log errors appropriately
+
+## Security
+- Validate all user inputs
+- Sanitize data before rendering
+- Use proper authentication patterns
+- Follow OWASP guidelines
+
+## Code Quality
+- Use ESLint and Prettier for code formatting
+- Write self-documenting code with clear variable names
+- Add JSDoc comments for complex functions
+- Keep functions small and focused
+- Avoid code duplication
+
+## Specific Patterns for This Project
+
+### Workflow Components
+- Use the WorkflowBuilder component for creating workflows
+- Implement proper state management for workflow data
+- Use the SmartSuggestionPanel for AI suggestions
+- Implement VisualProgressTracker for workflow progress
+
+### Routing
+- Use React Router for navigation
+- Implement proper route guards where needed
+- Use lazy loading for route components
+- Handle 404 pages appropriately
+
+### Database Operations
+- Use Supabase client for all database operations
+- Implement proper error handling for database calls
+- Use TypeScript types from Supabase schema
+- Follow proper data validation patterns
+
+## Development Workflow
+- Use feature branches for development
+- Write tests before implementing features
+- Use proper commit messages
+- Review code before merging
+- Keep dependencies updated
+
+## Build and Deployment
+- Use Vite for development and building
+- Optimize for production builds
+- Use environment variables for configuration
+- Implement proper CI/CD pipelines
+
+## Documentation
+- Document complex business logic
+- Keep README files updated
+- Document API endpoints
+- Maintain component documentation
+
+## Common Patterns to Follow
+
+### Component Structure
+```typescript
+interface ComponentProps {
+  // Define props interface
+}
+
+export function ComponentName({ prop1, prop2 }: ComponentProps) {
+  // State and hooks
+  const [state, setState] = useState();
+  
+  // Effects
+  useEffect(() => {
+    // Effect logic
+  }, []);
+  
+  // Event handlers
+  const handleEvent = () => {
+    // Handler logic
+  };
+  
+  // Render
+  return (
+    <div className="component-classes">
+      {/* Component content */}
+    </div>
+  );
+}
+```
+
+### API Calls
+```typescript
+const fetchData = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('table')
+      .select('*');
+    
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+};
+```
+
+### Form Handling
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const formSchema = z.object({
+  // Define schema
+});
+
+export function FormComponent() {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+  });
+  
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    // Handle form submission
+  };
+  
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        {/* Form fields */}
+      </form>
+    </Form>
+  );
+}
+```
+
+Remember to always prioritize code readability, maintainability, and user experience in your implementations. 

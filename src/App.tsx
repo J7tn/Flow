@@ -7,7 +7,6 @@ import MyWorkflows from "./components/MyWorkflows";
 import FlowTemplates from "./components/FlowTemplates";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
-import routes from "tempo-routes";
 
 function App() {
   const appRoutes = [
@@ -41,10 +40,7 @@ function App() {
     },
   ];
 
-  const allRoutes = [
-    ...appRoutes,
-    ...(import.meta.env.VITE_TEMPO === "true" ? routes : []),
-  ];
+  const allRoutes = appRoutes;
 
   const element = useRoutes(allRoutes);
 
