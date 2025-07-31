@@ -28,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
+import PermanentDashboard from "./shared/PermanentDashboard";
 
 const FlowTemplates = () => {
   const navigate = useNavigate();
@@ -561,7 +562,7 @@ const FlowTemplates = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background">
+    <PermanentDashboard>
       <div className="flex-1 p-6">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -968,7 +969,7 @@ const FlowTemplates = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PermanentDashboard>
   );
 };
 

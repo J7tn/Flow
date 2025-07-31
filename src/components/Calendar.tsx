@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Badge } from "./ui/badge";
+import PermanentDashboard from "./shared/PermanentDashboard";
 
 const Calendar = () => {
   const currentDate = new Date();
@@ -60,7 +61,7 @@ const Calendar = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background">
+    <PermanentDashboard>
       <div className="flex-1 p-6">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -170,7 +171,7 @@ const Calendar = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PermanentDashboard>
   );
 };
 

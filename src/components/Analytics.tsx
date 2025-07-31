@@ -20,6 +20,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
+import PermanentDashboard from "./shared/PermanentDashboard";
 
 const Analytics = () => {
   // Mock analytics data
@@ -118,7 +119,7 @@ const Analytics = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-background">
+    <PermanentDashboard>
       <div className="flex-1 p-6">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -454,7 +455,7 @@ const Analytics = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </PermanentDashboard>
   );
 };
 

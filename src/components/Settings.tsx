@@ -19,10 +19,11 @@ import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
+import PermanentDashboard from "./shared/PermanentDashboard";
 
 const Settings = () => {
   return (
-    <div className="flex h-screen bg-background">
+    <PermanentDashboard>
       <div className="flex-1 p-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Settings</h1>
@@ -301,7 +302,7 @@ const Settings = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </PermanentDashboard>
   );
 };
 

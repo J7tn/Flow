@@ -22,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
+import PermanentDashboard from "./shared/PermanentDashboard";
 
 const MyWorkflows = () => {
   const workflows = [
@@ -145,7 +146,7 @@ const MyWorkflows = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background">
+    <PermanentDashboard>
       <div className="flex-1 p-6">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -441,7 +442,7 @@ const MyWorkflows = () => {
           ))}
         </Tabs>
       </div>
-    </div>
+    </PermanentDashboard>
   );
 };
 
