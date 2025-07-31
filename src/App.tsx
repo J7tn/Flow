@@ -4,6 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Login } from "./components/auth/Login";
 import { Signup } from "./components/auth/Signup";
+import { EmailConfirmation } from "./components/auth/EmailConfirmation";
 import Home from "./components/home";
 import Calendar from "./components/Calendar";
 import Settings from "./components/Settings";
@@ -28,6 +29,14 @@ function App() {
       element: (
         <ProtectedRoute requireAuth={false}>
           <Signup />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/confirm-email",
+      element: (
+        <ProtectedRoute requireAuth={false}>
+          <EmailConfirmation />
         </ProtectedRoute>
       ),
     },

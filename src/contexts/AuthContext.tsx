@@ -40,8 +40,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(session?.user ?? null);
       } catch (error) {
         console.error('Error getting initial session:', error);
-        // Set a mock user for development if Supabase is not configured
-        setUser({ id: 'dev-user', email: 'dev@example.com' } as User);
       } finally {
         setLoading(false);
       }
