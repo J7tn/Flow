@@ -1,13 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Star, Clock, DollarSign, Users, TrendingUp, Zap } from 'lucide-react';
+import { Search, Star, Clock, DollarSign, Users, TrendingUp, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { 
   allTemplates, 
   templateCategories,
@@ -246,26 +244,6 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
                       </div>
                     )}
                   </div>
-                </div>
-
-                {/* Optimization Potential */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Automation Potential</span>
-                    <span className="font-medium">
-                      {Math.round(
-                        template.steps.reduce((acc, step) => acc + (step.automationPotential || 0), 0) / 
-                        template.steps.length
-                      )}%
-                    </span>
-                  </div>
-                  <Progress 
-                    value={
-                      template.steps.reduce((acc, step) => acc + (step.automationPotential || 0), 0) / 
-                      template.steps.length
-                    } 
-                    className="h-2"
-                  />
                 </div>
 
                 {/* Top Tools */}

@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   ExternalLink,
   Play,
-  Download,
   Share2,
   Bookmark
 } from 'lucide-react';
@@ -20,8 +19,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { 
   allTemplates, 
   templateCategories,
@@ -421,13 +418,7 @@ export const TemplateDetail: React.FC = () => {
                       {formatCost(template.costAnalysis.totalCost, template.costAnalysis.currency)}
                     </span>
                   </div>
-                  <Progress 
-                    value={100} 
-                    className="h-2"
-                  />
                 </div>
-
-                <Separator />
 
                 <div className="space-y-3">
                   {template.costAnalysis.breakdown.map((item) => (
@@ -447,8 +438,6 @@ export const TemplateDetail: React.FC = () => {
                     </div>
                   ))}
                 </div>
-
-                <Separator />
 
                 <div className="space-y-2">
                   <h4 className="font-medium">Assumptions</h4>
@@ -492,10 +481,6 @@ export const TemplateDetail: React.FC = () => {
                           {formatCost(step.costEstimate.max, step.costEstimate.currency)}
                         </span>
                       </div>
-                      <Progress 
-                        value={(step.costEstimate.max / template.costAnalysis.totalCost) * 100} 
-                        className="h-2"
-                      />
                     </div>
                   ))}
                 </div>

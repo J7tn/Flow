@@ -12,8 +12,6 @@ import FlowTemplates from "./components/FlowTemplates";
 import { TemplateDetail } from "./components/templates/TemplateDetail";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
-import Signup from "./components/Signup";
-import Subscription from "./components/Subscription";
 
 function App() {
   const appRoutes = [
@@ -65,22 +63,22 @@ function App() {
         </ProtectedRoute>
       ),
     },
-              {
-            path: "/templates",
-            element: (
-              <ProtectedRoute>
-                <FlowTemplates />
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "/templates/:id",
-            element: (
-              <ProtectedRoute>
-                <TemplateDetail />
-              </ProtectedRoute>
-            ),
-          },
+    {
+      path: "/templates",
+      element: (
+        <ProtectedRoute>
+          <FlowTemplates />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/templates/:id",
+      element: (
+        <ProtectedRoute>
+          <TemplateDetail />
+        </ProtectedRoute>
+      ),
+    },
     {
       path: "/analytics",
       element: (
@@ -96,14 +94,6 @@ function App() {
           <WorkflowBuilder />
         </ProtectedRoute>
       ),
-    },
-    {
-      path: "/signup",
-      element: <Signup />,
-    },
-    {
-      path: "/subscription",
-      element: <Subscription />,
     },
   ];
 
