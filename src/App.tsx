@@ -7,6 +7,8 @@ import MyWorkflows from "./components/MyWorkflows";
 import FlowTemplates from "./components/FlowTemplates";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
+import Signup from "./components/Signup";
+import Subscription from "./components/Subscription";
 
 function App() {
   const appRoutes = [
@@ -37,6 +39,14 @@ function App() {
     {
       path: "/workflow/new",
       element: <WorkflowBuilder />,
+    },
+    {
+      path: "/signup",
+      element: <Signup />,
+    },
+    {
+      path: "/subscription",
+      element: <Subscription />,
     },
   ];
 
