@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Clock,
   Search,
@@ -8,6 +8,9 @@ import {
   Play,
   Pause,
   Archive,
+  Trash2,
+  Edit,
+  Copy,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -22,10 +25,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
+import { useToast } from "./ui/use-toast";
+import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "./shared/PermanentDashboard";
 
 const MyWorkflows = () => {
-  const workflows = [
+  const navigate = useNavigate();
+  const [workflows, setWorkflows] = useState([
     {
       id: "1",
       title: "Product Launch Campaign",
@@ -112,7 +135,11 @@ const MyWorkflows = () => {
       totalSteps: 10,
       completedSteps: 10,
     },
-  ];
+  ]);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -145,19 +172,41 @@ const MyWorkflows = () => {
     return workflows.filter((workflow) => workflow.status === status);
   };
 
+  const handleDeleteWorkflow = (workflowId: string) => {
+    setWorkflowToDelete(workflowId);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (workflowToDelete) {
+      setWorkflows(prev => prev.filter(workflow => workflow.id !== workflowToDelete));
+      toast({
+        title: "Workflow deleted",
+        description: "The workflow has been successfully deleted.",
+      });
+      setDeleteDialogOpen(false);
+      setWorkflowToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setWorkflowToDelete(null);
+  };
+
   return (
     <PermanentDashboard>
       <div className="flex-1 p-6">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold tracking-tight">My Workflows</h1>
-            <Button>
+            <h1 className="text-3xl font-bold tracking-tight">My Flows</h1>
+            <Button onClick={() => navigate("/workflow/new")}>
               <Plus className="h-4 w-4 mr-2" />
-              New Workflow
+              New Flow
             </Button>
           </div>
           <p className="text-muted-foreground">
-            Manage and track all your active workflows.
+            Manage and track all your active flows.
           </p>
         </div>
 
@@ -206,9 +255,31 @@ const MyWorkflows = () => {
                           {workflow.priority}
                         </Badge>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Copy className="h-4 w-4 mr-2" />
+                            Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteWorkflow(workflow.id)}
+                            className="text-red-600 focus:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                     <CardTitle className="text-lg">{workflow.title}</CardTitle>
                     <CardDescription className="text-sm">
@@ -330,9 +401,31 @@ const MyWorkflows = () => {
                             {workflow.priority}
                           </Badge>
                         </div>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Copy className="h-4 w-4 mr-2" />
+                              Duplicate
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteWorkflow(workflow.id)}
+                              className="text-red-600 focus:text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       <CardTitle className="text-lg">
                         {workflow.title}
@@ -442,6 +535,24 @@ const MyWorkflows = () => {
           ))}
         </Tabs>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Workflow</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this workflow? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDelete}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PermanentDashboard>
   );
 };

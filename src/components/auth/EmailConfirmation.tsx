@@ -84,7 +84,7 @@ export const EmailConfirmation: React.FC = () => {
   }, [searchParams]);
 
   const handleSignIn = () => {
-    navigate('/login');
+    navigate('/dashboard');
   };
 
   const handleGoHome = () => {
@@ -140,7 +140,7 @@ export const EmailConfirmation: React.FC = () => {
                 variant="outline" 
                 className="w-full"
               >
-                Go to Dashboard
+                Go to Home
               </Button>
             </div>
           )}

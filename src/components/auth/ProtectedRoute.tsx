@@ -17,7 +17,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  console.log('ProtectedRoute:', {
+    path: location.pathname,
+    requireAuth,
+    user: user ? 'Authenticated' : 'Not authenticated',
+    loading,
+    redirectTo
+  });
+
   if (loading) {
+    console.log('ProtectedRoute: Loading state, showing spinner');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
@@ -29,14 +38,17 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requireAuth && !user) {
+    console.log('ProtectedRoute: Requiring auth but no user, redirecting to:', redirectTo);
     // Redirect to login page with return URL
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
   if (!requireAuth && user) {
+    console.log('ProtectedRoute: User authenticated but on auth page, redirecting to dashboard');
     // Redirect authenticated users away from auth pages
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
+  console.log('ProtectedRoute: Rendering children');
   return <>{children}</>;
 }; 

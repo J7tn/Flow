@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Star, Clock, DollarSign, Users, TrendingUp, Zap } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Search, Star, Clock, DollarSign, Users, TrendingUp, Zap, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,10 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   allTemplates, 
-  templateCategories,
-  type WorkflowTemplate,
-  type TemplateCategory 
+  templateCategories
 } from '@/data/templates';
+import type { WorkflowTemplate } from '@/types/templates';
 
 interface TemplateBrowserProps {
   onTemplateSelect?: (template: WorkflowTemplate) => void;
@@ -19,10 +19,13 @@ interface TemplateBrowserProps {
 
 export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSelect }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'popularity' | 'rating' | 'duration' | 'cost'>('popularity');
+  const [visibleCount, setVisibleCount] = useState(15);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Filter and sort templates
   const filteredTemplates = useMemo(() => {
@@ -64,6 +67,55 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
     });
 
     return filtered;
+  }, [searchQuery, selectedCategory, selectedDifficulty, sortBy]);
+
+  // Get visible templates based on current count
+  const visibleTemplates = useMemo(() => {
+    return filteredTemplates.slice(0, visibleCount);
+  }, [filteredTemplates, visibleCount]);
+
+  // Check if there are more templates to load
+  const hasMoreTemplates = visibleCount < filteredTemplates.length;
+
+  // Load more templates function
+  const loadMoreTemplates = useCallback(async () => {
+    if (isLoading || !hasMoreTemplates) return;
+
+    setIsLoading(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    setVisibleCount(prev => Math.min(prev + 15, filteredTemplates.length));
+    setIsLoading(false);
+  }, [isLoading, hasMoreTemplates, filteredTemplates.length]);
+
+  // Intersection Observer for infinite scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreTemplates && !isLoading) {
+          loadMoreTemplates();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (sentinel) {
+      observer.observe(sentinel);
+    }
+
+    return () => {
+      if (sentinel) {
+        observer.unobserve(sentinel);
+      }
+    };
+  }, [loadMoreTemplates, hasMoreTemplates, isLoading]);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(15);
   }, [searchQuery, selectedCategory, selectedDifficulty, sortBy]);
 
   const handleTemplateSelect = (template: WorkflowTemplate) => {
@@ -159,16 +211,33 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''} found
+            Showing {visibleTemplates.length} of {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''}
           </p>
+          {hasMoreTemplates && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={loadMoreTemplates}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                'Load More'
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Template Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTemplates.map((template) => (
+          {visibleTemplates.map((template) => (
             <Card 
               key={template.id} 
-              className="hover:shadow-lg transition-shadow cursor-pointer"
+              className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-[450px]"
               onClick={() => handleTemplateSelect(template)}
             >
               <CardHeader className="pb-3">
@@ -196,7 +265,7 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 flex-1 flex flex-col overflow-hidden">
                 {/* Key Metrics */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center space-x-2">
@@ -223,55 +292,83 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
                   </div>
                 </div>
 
-                {/* Cost Breakdown Preview */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Cost Breakdown</span>
-                    <span className="font-medium">
-                      {formatCost(template.costAnalysis.totalCost, template.costAnalysis.currency)}
-                    </span>
+                {/* Scrollable Content Area */}
+                <div className="flex-1 overflow-y-auto space-y-4">
+                  {/* Cost Breakdown Preview */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Cost Breakdown</span>
+                      <span className="font-medium">
+                        {formatCost(template.costAnalysis.totalCost, template.costAnalysis.currency)}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {template.costAnalysis.breakdown.slice(0, 3).map((item) => (
+                        <div key={item.id} className="flex justify-between text-xs text-muted-foreground">
+                          <span className="truncate">{item.name}</span>
+                          <span>{formatCost(item.amount, item.currency)}</span>
+                        </div>
+                      ))}
+                      {template.costAnalysis.breakdown.length > 3 && (
+                        <div className="text-xs text-muted-foreground">
+                          +{template.costAnalysis.breakdown.length - 3} more items
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    {template.costAnalysis.breakdown.slice(0, 3).map((item) => (
-                      <div key={item.id} className="flex justify-between text-xs text-muted-foreground">
-                        <span className="truncate">{item.name}</span>
-                        <span>{formatCost(item.amount, item.currency)}</span>
-                      </div>
-                    ))}
-                    {template.costAnalysis.breakdown.length > 3 && (
-                      <div className="text-xs text-muted-foreground">
-                        +{template.costAnalysis.breakdown.length - 3} more items
-                      </div>
-                    )}
+
+                  {/* Top Tools */}
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Top Tools</div>
+                    <div className="flex flex-wrap gap-1">
+                      {template.recommendedTools.slice(0, 3).map((tool) => (
+                        <Badge key={tool.id} variant="outline" className="text-xs">
+                          {tool.name}
+                        </Badge>
+                      ))}
+                      {template.recommendedTools.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{template.recommendedTools.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Top Tools */}
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Top Tools</div>
-                  <div className="flex flex-wrap gap-1">
-                    {template.recommendedTools.slice(0, 3).map((tool) => (
-                      <Badge key={tool.id} variant="outline" className="text-xs">
-                        {tool.name}
-                      </Badge>
-                    ))}
-                    {template.recommendedTools.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{template.recommendedTools.length - 3} more
-                      </Badge>
-                    )}
-                  </div>
+                {/* Action Button - Always at bottom */}
+                <div className="pt-4 border-t">
+                  <Button 
+                    className="w-full" 
+                    variant="default"
+                    onClick={() => {
+                      if (user) {
+                        navigate(`/workflow/new?template=${template.id}`);
+                      } else {
+                        navigate('/signup', { state: { from: `/templates/${template.id}` } });
+                      }
+                    }}
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    {user ? 'Use Template' : 'Sign Up to Use'}
+                  </Button>
                 </div>
-
-                {/* Action Button */}
-                <Button className="w-full" variant="default">
-                  <Zap className="h-4 w-4 mr-2" />
-                  Use Template
-                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex justify-center py-8">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span className="text-muted-foreground">Loading more templates...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Scroll Sentinel for infinite scrolling */}
+        <div id="scroll-sentinel" className="h-4" />
 
         {/* Empty State */}
         {filteredTemplates.length === 0 && (
@@ -291,6 +388,15 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
             >
               Clear Filters
             </Button>
+          </div>
+        )}
+
+        {/* End of results */}
+        {!hasMoreTemplates && filteredTemplates.length > 0 && (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">
+              You've reached the end of the results
+            </p>
           </div>
         )}
       </div>

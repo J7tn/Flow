@@ -32,16 +32,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('AuthProvider: Initializing authentication...');
+    
     // Get initial session
     const getInitialSession = async () => {
       try {
+        console.log('AuthProvider: Getting initial session...');
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('AuthProvider: Initial session:', session ? 'Found' : 'None');
         setSession(session);
         setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Error getting initial session:', error);
+        console.error('AuthProvider: Error getting initial session:', error);
       } finally {
         setLoading(false);
+        console.log('AuthProvider: Initial loading complete');
       }
     };
 
@@ -49,8 +54,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Listen for auth changes
     try {
+      console.log('AuthProvider: Setting up auth state listener...');
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
+          console.log('AuthProvider: Auth state changed:', event, session ? 'Session found' : 'No session');
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
@@ -59,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return () => subscription.unsubscribe();
     } catch (error) {
-      console.error('Error setting up auth listener:', error);
+      console.error('AuthProvider: Error setting up auth listener:', error);
       setLoading(false);
     }
   }, []);

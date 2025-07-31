@@ -19,14 +19,14 @@ const PermanentDashboard = ({ children }: PermanentDashboardProps) => {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    if (path === "/" && location.pathname === "/") return true;
-    if (path !== "/" && location.pathname.startsWith(path)) return true;
+    if (path === "/dashboard" && location.pathname === "/dashboard") return true;
+    if (path !== "/dashboard" && location.pathname.startsWith(path)) return true;
     return false;
   };
 
   const navItems = [
-    { path: "/", icon: BarChart, label: "Dashboard" },
-    { path: "/workflows", icon: Clock, label: "My Workflows" },
+    { path: "/dashboard", icon: BarChart, label: "Dashboard" },
+    { path: "/workflows", icon: Clock, label: "My Flows" },
     { path: "/templates", icon: FileText, label: "Templates" },
     { path: "/calendar", icon: Calendar, label: "Calendar" },
     { path: "/analytics", icon: BarChart, label: "Analytics" },
@@ -79,7 +79,7 @@ const PermanentDashboard = ({ children }: PermanentDashboardProps) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden">{children}</div>
+      <div className="flex-1 overflow-auto">{children}</div>
     </div>
   );
 };

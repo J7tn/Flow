@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   ArrowLeft, 
   Star, 
@@ -21,14 +22,15 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   allTemplates, 
-  templateCategories,
-  type WorkflowTemplate 
+  templateCategories
 } from '@/data/templates';
+import type { WorkflowTemplate } from '@/types/templates';
 
 export const TemplateDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
+  const { user } = useAuth();
 
   // Find the template by ID
   const template = allTemplates.find(t => t.id === id);
@@ -78,7 +80,11 @@ export const TemplateDetail: React.FC = () => {
   };
 
   const handleUseTemplate = () => {
-    navigate(`/workflow/new?template=${template.id}`);
+    if (user) {
+      navigate(`/workflow/new?template=${template.id}`);
+    } else {
+      navigate('/signup', { state: { from: `/templates/${template.id}` } });
+    }
   };
 
   return (

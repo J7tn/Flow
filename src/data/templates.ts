@@ -493,7 +493,7 @@ export const gameDesignTemplate: WorkflowTemplate = {
         id: createId(),
         name: 'Marketing & PR',
         description: 'Game marketing and promotion',
-        type: 'marketing',
+        type: 'labor',
         amount: 30000,
         currency: 'USD',
         frequency: 'one-time'
@@ -704,11 +704,1090 @@ export const manufacturingTemplate: WorkflowTemplate = {
   ]
 };
 
-// Export all templates
+// Additional Templates for Testing Infinite Scrolling
+
+// Marketing Campaign Template
+export const marketingCampaignTemplate: WorkflowTemplate = {
+  id: createId(),
+  name: 'Digital Marketing Campaign',
+  description: 'Complete digital marketing campaign from strategy to execution and analysis.',
+  category: 'marketing',
+  difficulty: 'intermediate',
+  estimatedDuration: { min: 8, max: 16, unit: 'weeks' },
+  tags: ['digital-marketing', 'social-media', 'content-marketing', 'analytics'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.6,
+  usageCount: 1200,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Market Research & Audience Analysis',
+      description: 'Research target audience, competitors, and market opportunities',
+      type: 'research',
+      order: 0,
+      estimatedDuration: { min: 1, max: 2, unit: 'weeks' },
+      requiredSkills: ['market-research', 'audience-analysis', 'competitive-analysis'],
+      requiredTools: ['google-analytics', 'semrush', 'social-media-analytics'],
+      deliverables: ['Audience personas', 'Competitor analysis', 'Market opportunity report'],
+      acceptanceCriteria: ['Clear target audience defined', 'Competitive landscape mapped'],
+      riskLevel: 'low',
+      costEstimate: { min: 2000, max: 5000, currency: 'USD' },
+      automationPotential: 40
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 25000,
+    currency: 'USD',
+    calculationDate: new Date(),
+    breakdown: [
+      {
+        id: createId(),
+        name: 'Marketing Team',
+        description: 'Marketing specialists and content creators',
+        type: 'labor',
+        amount: 15000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'personnel'
+      },
+      {
+        id: createId(),
+        name: 'Advertising Budget',
+        description: 'Paid advertising and promotion',
+        type: 'advertising',
+        amount: 8000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'advertising'
+      },
+      {
+        id: createId(),
+        name: 'Tools & Software',
+        description: 'Marketing tools and analytics platforms',
+        type: 'licensing',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'tools'
+      }
+    ]
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'HubSpot',
+      category: 'marketing',
+      description: 'All-in-one marketing platform',
+      website: 'https://hubspot.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 45,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Email marketing', 'CRM', 'Analytics', 'Automation'],
+      pros: ['All-in-one solution', 'Easy to use', 'Good analytics', 'Automation'],
+      cons: ['Can be expensive', 'Complex for beginners', 'Limited customization'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Automate Email Sequences',
+      description: 'Set up automated email campaigns to nurture leads',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Use marketing automation tools to create drip campaigns'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Digital marketing market valued at $378 billion in 2023',
+    competition: 'High competition with many agencies and tools available',
+    trends: ['AI-powered marketing', 'Video content', 'Personalization', 'Privacy-first'],
+    challenges: ['Ad fatigue', 'Privacy regulations', 'ROI measurement', 'Content creation']
+  },
+
+  successMetrics: [
+    {
+      name: 'Conversion Rate',
+      description: 'Percentage of visitors who take desired action',
+      target: '2-5%',
+      measurement: 'Analytics platform',
+      frequency: 'weekly'
+    }
+  ],
+
+  risks: [
+    {
+      category: 'business',
+      description: 'Campaign backlash or negative feedback',
+      probability: 'medium',
+      impact: 'high',
+      mitigation: 'Thorough content review and crisis management plan'
+    }
+  ],
+
+  customizationOptions: [
+    {
+      name: 'campaignType',
+      description: 'Type of marketing campaign',
+      type: 'select',
+      defaultValue: 'social-media',
+      options: ['social-media', 'email', 'content', 'paid-advertising'],
+      required: true
+    }
+  ]
+};
+
+// E-commerce Setup Template
+export const ecommerceSetupTemplate: WorkflowTemplate = {
+  id: createId(),
+  name: 'E-commerce Store Setup',
+  description: 'Complete workflow for setting up an online store from platform selection to launch.',
+  category: 'business-operations',
+  difficulty: 'intermediate',
+  estimatedDuration: { min: 4, max: 12, unit: 'weeks' },
+  tags: ['ecommerce', 'online-store', 'shopify', 'woocommerce', 'payment-processing'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.5,
+  usageCount: 2100,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Platform Selection & Setup',
+      description: 'Choose e-commerce platform and set up basic store structure',
+      type: 'setup',
+      order: 0,
+      estimatedDuration: { min: 1, max: 2, unit: 'weeks' },
+      requiredSkills: ['ecommerce-platforms', 'web-design', 'basic-coding'],
+      requiredTools: ['shopify', 'woocommerce', 'squarespace'],
+      deliverables: ['Platform selection', 'Store setup', 'Basic design'],
+      acceptanceCriteria: ['Platform chosen', 'Store structure created', 'Basic design implemented'],
+      riskLevel: 'low',
+      costEstimate: { min: 1000, max: 5000, currency: 'USD' },
+      automationPotential: 70
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 15000,
+    currency: 'USD',
+    calculationDate: new Date(),
+    breakdown: [
+      {
+        id: createId(),
+        name: 'Platform Fees',
+        description: 'Monthly platform subscription and transaction fees',
+        type: 'subscription',
+        amount: 3000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'platform'
+      },
+      {
+        id: createId(),
+        name: 'Design & Development',
+        description: 'Store design and customization',
+        type: 'labor',
+        amount: 8000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'development'
+      },
+      {
+        id: createId(),
+        name: 'Payment Processing',
+        description: 'Payment gateway setup and fees',
+        type: 'subscription',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'payments'
+      },
+      {
+        id: createId(),
+        name: 'Marketing & SEO',
+        description: 'Initial marketing setup and SEO optimization',
+        type: 'labor',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'marketing'
+      }
+    ]
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Shopify',
+      category: 'ecommerce-platform',
+      description: 'Complete e-commerce platform',
+      website: 'https://shopify.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 29,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Store builder', 'Payment processing', 'Inventory management', 'Analytics'],
+      pros: ['Easy to use', 'All-in-one solution', 'Good support', 'Mobile optimized'],
+      cons: ['Transaction fees', 'Limited customization', 'Monthly costs', 'Platform lock-in'],
+      learningCurve: 'beginner',
+      popularity: 10
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'conversion',
+      title: 'Optimize Product Pages',
+      description: 'Improve product page design and copy to increase conversions',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Use A/B testing to optimize product descriptions and images'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'E-commerce market valued at $5.7 trillion globally',
+    competition: 'High competition with millions of online stores',
+    trends: ['Mobile commerce', 'Social commerce', 'Voice shopping', 'AR/VR shopping'],
+    challenges: ['Customer acquisition', 'Cart abandonment', 'Competition', 'Logistics']
+  },
+
+  successMetrics: [
+    {
+      name: 'Conversion Rate',
+      description: 'Percentage of visitors who make a purchase',
+      target: '2-4%',
+      measurement: 'Analytics platform',
+      frequency: 'daily'
+    }
+  ],
+
+  risks: [
+    {
+      category: 'technical',
+      description: 'Platform downtime affecting sales',
+      probability: 'low',
+      impact: 'high',
+      mitigation: 'Choose reliable platform and have backup plans'
+    }
+  ],
+
+  customizationOptions: [
+    {
+      name: 'platform',
+      description: 'E-commerce platform to use',
+      type: 'select',
+      defaultValue: 'shopify',
+      options: ['shopify', 'woocommerce', 'squarespace', 'custom'],
+      required: true
+    }
+  ]
+};
+
+// Content Creation Template
+export const contentCreationTemplate: WorkflowTemplate = {
+  id: createId(),
+  name: 'Content Creation Pipeline',
+  description: 'Systematic approach to creating, publishing, and promoting content across multiple channels.',
+  category: 'creative-projects',
+  difficulty: 'beginner',
+  estimatedDuration: { min: 2, max: 8, unit: 'weeks' },
+  tags: ['content-creation', 'blogging', 'social-media', 'video-production', 'copywriting'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.4,
+  usageCount: 1800,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Content Strategy & Planning',
+      description: 'Define content goals, target audience, and content calendar',
+      type: 'planning',
+      order: 0,
+      estimatedDuration: { min: 1, max: 2, unit: 'weeks' },
+      requiredSkills: ['content-strategy', 'audience-research', 'planning'],
+      requiredTools: ['google-docs', 'trello', 'content-calendar-tools'],
+      deliverables: ['Content strategy document', 'Content calendar', 'Audience personas'],
+      acceptanceCriteria: ['Strategy defined', 'Calendar created', 'Audience identified'],
+      riskLevel: 'low',
+      costEstimate: { min: 500, max: 2000, currency: 'USD' },
+      automationPotential: 50
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 8000,
+    currency: 'USD',
+    calculationDate: new Date(),
+    breakdown: [
+      {
+        id: createId(),
+        name: 'Content Creation',
+        description: 'Writing, design, and production costs',
+        type: 'labor',
+        amount: 5000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'content'
+      },
+      {
+        id: createId(),
+        name: 'Tools & Software',
+        description: 'Content creation and management tools',
+        type: 'licensing',
+        amount: 1500,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'tools'
+      },
+      {
+        id: createId(),
+        name: 'Promotion & Distribution',
+        description: 'Paid promotion and distribution costs',
+        type: 'advertising',
+        amount: 1500,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'marketing'
+      }
+    ]
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Canva',
+      category: 'design',
+      description: 'Graphic design platform',
+      website: 'https://canva.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 12.99,
+        currency: 'USD',
+        notes: 'Per month for Pro'
+      },
+      features: ['Templates', 'Design tools', 'Collaboration', 'Brand kit'],
+      pros: ['Easy to use', 'Free tier available', 'Templates', 'Collaboration'],
+      cons: ['Limited advanced features', 'Internet required', 'Template dependency'],
+      learningCurve: 'beginner',
+      popularity: 9
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Batch Content Creation',
+      description: 'Create multiple pieces of content at once to improve efficiency',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Schedule dedicated time blocks for content creation'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Content marketing industry valued at $400+ billion',
+    competition: 'High competition for audience attention',
+    trends: ['Video content', 'Interactive content', 'AI-generated content', 'Personalization'],
+    challenges: ['Content saturation', 'Algorithm changes', 'Quality vs quantity', 'ROI measurement']
+  },
+
+  successMetrics: [
+    {
+      name: 'Engagement Rate',
+      description: 'Percentage of audience engaging with content',
+      target: '3-6%',
+      measurement: 'Social media analytics',
+      frequency: 'weekly'
+    }
+  ],
+
+  risks: [
+    {
+      category: 'reputation',
+      description: 'Content backlash or negative feedback',
+      probability: 'medium',
+      impact: 'medium',
+      mitigation: 'Content review process and community guidelines'
+    }
+  ],
+
+  customizationOptions: [
+    {
+      name: 'contentType',
+      description: 'Primary type of content to create',
+      type: 'select',
+      defaultValue: 'blog',
+      options: ['blog', 'video', 'social-media', 'podcast'],
+      required: true
+    }
+  ]
+};
+
+// Customer Support Template
+export const customerSupportTemplate: WorkflowTemplate = {
+  id: createId(),
+  name: 'Customer Support System',
+  description: 'Complete customer support workflow from ticket creation to resolution and follow-up.',
+  category: 'customer-service',
+  difficulty: 'beginner',
+  estimatedDuration: { min: 2, max: 6, unit: 'weeks' },
+  tags: ['customer-support', 'help-desk', 'ticketing-system', 'customer-service', 'automation'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.3,
+  usageCount: 950,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Support System Setup',
+      description: 'Choose and configure customer support platform and workflows',
+      type: 'setup',
+      order: 0,
+      estimatedDuration: { min: 1, max: 2, unit: 'weeks' },
+      requiredSkills: ['customer-service', 'system-administration', 'workflow-design'],
+      requiredTools: ['zendesk', 'intercom', 'freshdesk'],
+      deliverables: ['Support platform setup', 'Workflow configuration', 'Team training'],
+      acceptanceCriteria: ['Platform configured', 'Workflows defined', 'Team trained'],
+      riskLevel: 'low',
+      costEstimate: { min: 1000, max: 5000, currency: 'USD' },
+      automationPotential: 80
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 12000,
+    currency: 'USD',
+    calculationDate: new Date(),
+    breakdown: [
+      {
+        id: createId(),
+        name: 'Support Platform',
+        description: 'Help desk software and tools',
+        type: 'subscription',
+        amount: 3000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'software'
+      },
+      {
+        id: createId(),
+        name: 'Support Team',
+        description: 'Customer support staff training and setup',
+        type: 'labor',
+        amount: 6000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'personnel'
+      },
+      {
+        id: createId(),
+        name: 'Knowledge Base',
+        description: 'Documentation and self-service resources',
+        type: 'labor',
+        amount: 3000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'content'
+      }
+    ]
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Zendesk',
+      category: 'help-desk',
+      description: 'Customer service platform',
+      website: 'https://zendesk.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 49,
+        currency: 'USD',
+        notes: 'Per agent per month'
+      },
+      features: ['Ticket management', 'Knowledge base', 'Live chat', 'Analytics'],
+      pros: ['Comprehensive features', 'Good integrations', 'Scalable', 'Analytics'],
+      cons: ['Expensive', 'Complex setup', 'Learning curve', 'Overkill for small teams'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Implement Self-Service',
+      description: 'Create knowledge base and FAQs to reduce support tickets',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Build comprehensive knowledge base with common questions and solutions'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Customer service software market valued at $15+ billion',
+    competition: 'Many established players and new entrants',
+    trends: ['AI chatbots', 'Omnichannel support', 'Self-service', 'Proactive support'],
+    challenges: ['Response time expectations', 'Agent training', 'Technology integration', 'Cost management']
+  },
+
+  successMetrics: [
+    {
+      name: 'Customer Satisfaction',
+      description: 'Average customer satisfaction score',
+      target: '4.5+ out of 5',
+      measurement: 'CSAT surveys',
+      frequency: 'daily'
+    }
+  ],
+
+  risks: [
+    {
+      category: 'reputation',
+      description: 'Poor customer service affecting brand reputation',
+      probability: 'medium',
+      impact: 'high',
+      mitigation: 'Regular training, quality monitoring, and feedback loops'
+    }
+  ],
+
+  customizationOptions: [
+    {
+      name: 'supportChannels',
+      description: 'Support channels to implement',
+      type: 'multi-select',
+      defaultValue: ['email', 'chat'],
+      options: ['email', 'chat', 'phone', 'social-media'],
+      required: true
+    }
+  ]
+};
+
+// HR Recruitment Template
+export const hrRecruitmentTemplate: WorkflowTemplate = {
+  id: createId(),
+  name: 'HR Recruitment Process',
+  description: 'Complete recruitment workflow from job posting to employee onboarding.',
+  category: 'human-resources',
+  difficulty: 'intermediate',
+  estimatedDuration: { min: 4, max: 12, unit: 'weeks' },
+  tags: ['recruitment', 'hiring', 'onboarding', 'hr-processes', 'talent-acquisition'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.6,
+  usageCount: 1100,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Job Analysis & Description',
+      description: 'Analyze job requirements and create detailed job description',
+      type: 'planning',
+      order: 0,
+      estimatedDuration: { min: 1, max: 2, unit: 'weeks' },
+      requiredSkills: ['job-analysis', 'writing', 'hr-knowledge'],
+      requiredTools: ['google-docs', 'job-boards', 'hr-software'],
+      deliverables: ['Job analysis', 'Job description', 'Requirements list'],
+      acceptanceCriteria: ['Job requirements clear', 'Description approved', 'Requirements defined'],
+      riskLevel: 'low',
+      costEstimate: { min: 500, max: 2000, currency: 'USD' },
+      automationPotential: 60
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 15000,
+    currency: 'USD',
+    calculationDate: new Date(),
+    breakdown: [
+      {
+        id: createId(),
+        name: 'Job Board Postings',
+        description: 'Paid job postings and recruitment advertising',
+        type: 'advertising',
+        amount: 3000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'advertising'
+      },
+      {
+        id: createId(),
+        name: 'Recruitment Software',
+        description: 'ATS and recruitment tools',
+        type: 'subscription',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'software'
+      },
+      {
+        id: createId(),
+        name: 'HR Staff Time',
+        description: 'HR team time for recruitment process',
+        type: 'labor',
+        amount: 8000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'personnel'
+      },
+      {
+        id: createId(),
+        name: 'Background Checks',
+        description: 'Candidate background verification',
+        type: 'service',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'verification'
+      }
+    ]
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'BambooHR',
+      category: 'hr-software',
+      description: 'HR management platform',
+      website: 'https://bamboohr.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 6.19,
+        currency: 'USD',
+        notes: 'Per employee per month'
+      },
+      features: ['ATS', 'Onboarding', 'Performance management', 'Time tracking'],
+      pros: ['Easy to use', 'Comprehensive features', 'Good support', 'Affordable'],
+      cons: ['Limited customization', 'Basic reporting', 'Integration limitations'],
+      learningCurve: 'beginner',
+      popularity: 8
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Automate Screening',
+      description: 'Use AI-powered screening to filter candidates automatically',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Implement automated screening tools to reduce manual review time'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'HR software market valued at $30+ billion',
+    competition: 'High competition with many established players',
+    trends: ['AI recruitment', 'Remote hiring', 'Diversity focus', 'Candidate experience'],
+    challenges: ['Talent shortage', 'High turnover', 'Cost per hire', 'Time to fill']
+  },
+
+  successMetrics: [
+    {
+      name: 'Time to Hire',
+      description: 'Average time from job posting to hire',
+      target: '30-45 days',
+      measurement: 'ATS analytics',
+      frequency: 'weekly'
+    }
+  ],
+
+  risks: [
+    {
+      category: 'compliance',
+      description: 'Hiring discrimination or compliance issues',
+      probability: 'medium',
+      impact: 'high',
+      mitigation: 'Regular training, documented processes, and legal review'
+    }
+  ],
+
+  customizationOptions: [
+    {
+      name: 'companySize',
+      description: 'Size of the company',
+      type: 'select',
+      defaultValue: 'small',
+      options: ['small', 'medium', 'large'],
+      required: true
+    }
+  ]
+};
+
+// Financial Planning Template
+export const financialPlanningTemplate: WorkflowTemplate = {
+  id: createId(),
+  name: 'Financial Planning Process',
+  description: 'Comprehensive financial planning workflow for individuals and businesses.',
+  category: 'finance',
+  difficulty: 'advanced',
+  estimatedDuration: { min: 4, max: 12, unit: 'weeks' },
+  tags: ['financial-planning', 'budgeting', 'investment', 'tax-planning', 'risk-management'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.7,
+  usageCount: 750,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Financial Assessment',
+      description: 'Analyze current financial situation, goals, and risk tolerance',
+      type: 'analysis',
+      order: 0,
+      estimatedDuration: { min: 1, max: 2, unit: 'weeks' },
+      requiredSkills: ['financial-analysis', 'risk-assessment', 'goal-setting'],
+      requiredTools: ['financial-software', 'spreadsheets', 'analysis-tools'],
+      deliverables: ['Financial assessment report', 'Goal analysis', 'Risk profile'],
+      acceptanceCriteria: ['Current situation analyzed', 'Goals defined', 'Risk tolerance assessed'],
+      riskLevel: 'low',
+      costEstimate: { min: 1000, max: 5000, currency: 'USD' },
+      automationPotential: 70
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 20000,
+    currency: 'USD',
+    calculationDate: new Date(),
+    breakdown: [
+      {
+        id: createId(),
+        name: 'Financial Advisor',
+        description: 'Professional financial planning services',
+        type: 'labor',
+        amount: 12000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'professional'
+      },
+      {
+        id: createId(),
+        name: 'Financial Software',
+        description: 'Planning and analysis tools',
+        type: 'subscription',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'software'
+      },
+      {
+        id: createId(),
+        name: 'Legal & Tax Services',
+        description: 'Legal and tax planning consultation',
+        type: 'labor',
+        amount: 4000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'professional'
+      },
+      {
+        id: createId(),
+        name: 'Insurance & Protection',
+        description: 'Insurance planning and implementation',
+        type: 'insurance',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'protection'
+      }
+    ]
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Mint',
+      category: 'personal-finance',
+      description: 'Personal finance management app',
+      website: 'https://mint.com',
+      pricing: {
+        model: 'free',
+        notes: 'Free with premium features available'
+      },
+      features: ['Budget tracking', 'Expense categorization', 'Goal setting', 'Investment tracking'],
+      pros: ['Free to use', 'Easy interface', 'Good categorization', 'Goal tracking'],
+      cons: ['Limited investment features', 'Ad-supported', 'Data security concerns', 'Limited customization'],
+      learningCurve: 'beginner',
+      popularity: 8
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Automate Budget Tracking',
+      description: 'Use automated tools to track expenses and income',
+      impact: 'high',
+      effort: 'low',
+      implementation: 'Connect bank accounts and credit cards to financial tracking apps'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Financial planning market valued at $100+ billion',
+    competition: 'High competition with many advisors and tools',
+    trends: ['Robo-advisors', 'ESG investing', 'Digital planning', 'Holistic planning'],
+    challenges: ['Regulatory compliance', 'Market volatility', 'Client education', 'Technology adoption']
+  },
+
+  successMetrics: [
+    {
+      name: 'Goal Achievement',
+      description: 'Percentage of financial goals achieved',
+      target: '80%+',
+      measurement: 'Regular reviews',
+      frequency: 'quarterly'
+    }
+  ],
+
+  risks: [
+    {
+      category: 'financial',
+      description: 'Market volatility affecting investment returns',
+      probability: 'high',
+      impact: 'medium',
+      mitigation: 'Diversification, regular rebalancing, and long-term perspective'
+    }
+  ],
+
+  customizationOptions: [
+    {
+      name: 'planningType',
+      description: 'Type of financial planning',
+      type: 'select',
+      defaultValue: 'personal',
+      options: ['personal', 'business', 'retirement', 'estate'],
+      required: true
+    }
+  ]
+};
+
+// Research Project Template
+export const researchProjectTemplate: WorkflowTemplate = {
+  id: createId(),
+  name: 'Research Project Management',
+  description: 'Systematic approach to conducting research projects from hypothesis to publication.',
+  category: 'research-development',
+  difficulty: 'expert',
+  estimatedDuration: { min: 6, max: 24, unit: 'months' },
+  tags: ['research', 'academic', 'data-analysis', 'publication', 'methodology'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.8,
+  usageCount: 450,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Research Design & Methodology',
+      description: 'Define research question, design methodology, and plan data collection',
+      type: 'planning',
+      order: 0,
+      estimatedDuration: { min: 2, max: 4, unit: 'weeks' },
+      requiredSkills: ['research-design', 'methodology', 'statistics'],
+      requiredTools: ['research-software', 'statistical-tools', 'literature-databases'],
+      deliverables: ['Research proposal', 'Methodology document', 'Data collection plan'],
+      acceptanceCriteria: ['Research question defined', 'Methodology approved', 'Plan finalized'],
+      riskLevel: 'medium',
+      costEstimate: { min: 5000, max: 15000, currency: 'USD' },
+      automationPotential: 50
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 50000,
+    currency: 'USD',
+    calculationDate: new Date(),
+    breakdown: [
+      {
+        id: createId(),
+        name: 'Research Staff',
+        description: 'Researchers and assistants',
+        type: 'labor',
+        amount: 30000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'personnel'
+      },
+      {
+        id: createId(),
+        name: 'Equipment & Software',
+        description: 'Research equipment and analysis software',
+        type: 'equipment',
+        amount: 10000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'equipment'
+      },
+      {
+        id: createId(),
+        name: 'Data Collection',
+        description: 'Survey costs, participant compensation, data access',
+        type: 'data',
+        amount: 8000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'data'
+      },
+      {
+        id: createId(),
+        name: 'Publication & Dissemination',
+        description: 'Journal fees, conference attendance, publication costs',
+        type: 'publication',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'publication'
+      }
+    ]
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'SPSS',
+      category: 'statistical-analysis',
+      description: 'Statistical analysis software',
+      website: 'https://ibm.com/spss',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 99,
+        currency: 'USD',
+        notes: 'Per user per month'
+      },
+      features: ['Statistical analysis', 'Data visualization', 'Predictive analytics', 'Reporting'],
+      pros: ['Comprehensive features', 'Industry standard', 'Good support', 'Advanced analytics'],
+      cons: ['Expensive', 'Steep learning curve', 'Complex interface', 'Limited collaboration'],
+      learningCurve: 'advanced',
+      popularity: 9
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Automate Data Analysis',
+      description: 'Use automated tools for data cleaning and analysis',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Implement automated data processing pipelines and analysis scripts'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Research and development market valued at $2+ trillion globally',
+    competition: 'High competition for funding and publication',
+    trends: ['Open science', 'Big data', 'AI/ML integration', 'Interdisciplinary research'],
+    challenges: ['Funding constraints', 'Publication pressure', 'Reproducibility', 'Ethics compliance']
+  },
+
+  successMetrics: [
+    {
+      name: 'Publication Success',
+      description: 'Number of peer-reviewed publications',
+      target: '1-3 publications',
+      measurement: 'Publication tracking',
+      frequency: 'project completion'
+    }
+  ],
+
+  risks: [
+    {
+      category: 'methodological',
+      description: 'Research methodology flaws affecting results',
+      probability: 'medium',
+      impact: 'high',
+      mitigation: 'Peer review, pilot studies, and statistical consultation'
+    }
+  ],
+
+  customizationOptions: [
+    {
+      name: 'researchType',
+      description: 'Type of research being conducted',
+      type: 'select',
+      defaultValue: 'quantitative',
+      options: ['quantitative', 'qualitative', 'mixed-methods', 'experimental'],
+      required: true
+    }
+  ]
+};
+
+// Export all templates with additional templates
 export const allTemplates: WorkflowTemplate[] = [
   appDevelopmentTemplate,
   gameDesignTemplate,
-  manufacturingTemplate
+  manufacturingTemplate,
+  marketingCampaignTemplate,
+  ecommerceSetupTemplate,
+  contentCreationTemplate,
+  customerSupportTemplate,
+  hrRecruitmentTemplate,
+  financialPlanningTemplate,
+  researchProjectTemplate,
+  // Add more templates to reach 30+ for testing infinite scrolling
+  { ...appDevelopmentTemplate, id: createId(), name: 'Web Application Development', category: 'software-development' },
+  { ...gameDesignTemplate, id: createId(), name: 'Mobile Game Development', category: 'game-design' },
+  { ...manufacturingTemplate, id: createId(), name: 'Electronics Manufacturing', category: 'manufacturing' },
+  { ...marketingCampaignTemplate, id: createId(), name: 'Social Media Marketing', category: 'marketing' },
+  { ...ecommerceSetupTemplate, id: createId(), name: 'Dropshipping Business Setup', category: 'business-operations' },
+  { ...contentCreationTemplate, id: createId(), name: 'Video Content Creation', category: 'creative-projects' },
+  { ...customerSupportTemplate, id: createId(), name: 'Technical Support System', category: 'customer-service' },
+  { ...hrRecruitmentTemplate, id: createId(), name: 'Executive Recruitment', category: 'human-resources' },
+  { ...financialPlanningTemplate, id: createId(), name: 'Business Financial Planning', category: 'finance' },
+  { ...researchProjectTemplate, id: createId(), name: 'Market Research Project', category: 'research-development' },
+  { ...appDevelopmentTemplate, id: createId(), name: 'Desktop Software Development', category: 'software-development' },
+  { ...gameDesignTemplate, id: createId(), name: 'VR Game Development', category: 'game-design' },
+  { ...manufacturingTemplate, id: createId(), name: 'Textile Manufacturing', category: 'manufacturing' },
+  { ...marketingCampaignTemplate, id: createId(), name: 'Email Marketing Campaign', category: 'marketing' },
+  { ...ecommerceSetupTemplate, id: createId(), name: 'Subscription Box Business', category: 'business-operations' },
+  { ...contentCreationTemplate, id: createId(), name: 'Podcast Production', category: 'creative-projects' },
+  { ...customerSupportTemplate, id: createId(), name: 'Live Chat Support', category: 'customer-service' },
+  { ...hrRecruitmentTemplate, id: createId(), name: 'Remote Team Hiring', category: 'human-resources' },
+  { ...financialPlanningTemplate, id: createId(), name: 'Investment Portfolio Planning', category: 'finance' },
+  { ...researchProjectTemplate, id: createId(), name: 'Clinical Research Study', category: 'research-development' },
+  { ...appDevelopmentTemplate, id: createId(), name: 'SaaS Platform Development', category: 'software-development' },
+  { ...gameDesignTemplate, id: createId(), name: 'Educational Game Development', category: 'game-design' },
+  { ...manufacturingTemplate, id: createId(), name: 'Food Manufacturing', category: 'manufacturing' },
+  { ...marketingCampaignTemplate, id: createId(), name: 'Influencer Marketing Campaign', category: 'marketing' },
+  { ...ecommerceSetupTemplate, id: createId(), name: 'B2B E-commerce Platform', category: 'business-operations' },
+  { ...contentCreationTemplate, id: createId(), name: 'Infographic Design', category: 'creative-projects' },
+  { ...customerSupportTemplate, id: createId(), name: 'Multi-language Support', category: 'customer-service' },
+  { ...hrRecruitmentTemplate, id: createId(), name: 'Technical Talent Acquisition', category: 'human-resources' },
+  { ...financialPlanningTemplate, id: createId(), name: 'Retirement Planning', category: 'finance' },
+  { ...researchProjectTemplate, id: createId(), name: 'User Experience Research', category: 'research-development' }
 ];
 
 // Template categories with descriptions

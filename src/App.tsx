@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Login } from "./components/auth/Login";
 import { Signup } from "./components/auth/Signup";
 import { EmailConfirmation } from "./components/auth/EmailConfirmation";
+import { LandingPage } from "./components/LandingPage";
 import Home from "./components/home";
 import Calendar from "./components/Calendar";
 import Settings from "./components/Settings";
@@ -13,9 +14,14 @@ import FlowTemplates from "./components/FlowTemplates";
 import { TemplateDetail } from "./components/templates/TemplateDetail";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
+import WorkflowDesigner from "./components/workflow/WorkflowDesigner";
 
 function App() {
   const appRoutes = [
+    {
+      path: "/",
+      element: <LandingPage />,
+    },
     {
       path: "/login",
       element: (
@@ -41,7 +47,7 @@ function App() {
       ),
     },
     {
-      path: "/",
+      path: "/dashboard",
       element: (
         <ProtectedRoute>
           <Home />
@@ -74,19 +80,11 @@ function App() {
     },
     {
       path: "/templates",
-      element: (
-        <ProtectedRoute>
-          <FlowTemplates />
-        </ProtectedRoute>
-      ),
+      element: <FlowTemplates />,
     },
     {
       path: "/templates/:id",
-      element: (
-        <ProtectedRoute>
-          <TemplateDetail />
-        </ProtectedRoute>
-      ),
+      element: <TemplateDetail />,
     },
     {
       path: "/analytics",
@@ -100,7 +98,15 @@ function App() {
       path: "/workflow/new",
       element: (
         <ProtectedRoute>
-          <WorkflowBuilder />
+          <WorkflowDesigner />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/workflow/design",
+      element: (
+        <ProtectedRoute>
+          <WorkflowDesigner />
         </ProtectedRoute>
       ),
     },
