@@ -1,0 +1,65 @@
+import { useEffect } from 'react';
+
+interface SecurityHeadersProps {
+  children: React.ReactNode;
+}
+
+export const SecurityHeaders: React.FC<SecurityHeadersProps> = ({ children }) => {
+  useEffect(() => {
+    // Set security headers
+    const setSecurityHeaders = () => {
+      // Content Security Policy
+      const csp = [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.tempo.build",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: https: blob:",
+        "connect-src 'self' https://*.supabase.co https://api.tempo.build",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "upgrade-insecure-requests"
+      ].join('; ');
+
+      // Set CSP meta tag
+      let cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+      if (!cspMeta) {
+        cspMeta = document.createElement('meta');
+        cspMeta.setAttribute('http-equiv', 'Content-Security-Policy');
+        document.head.appendChild(cspMeta);
+      }
+      cspMeta.setAttribute('content', csp);
+
+      // Set other security headers via meta tags
+      const securityHeaders = [
+        { name: 'X-Content-Type-Options', value: 'nosniff' },
+        { name: 'X-Frame-Options', value: 'DENY' },
+        { name: 'X-XSS-Protection', value: '1; mode=block' },
+        { name: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { name: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' }
+      ];
+
+      securityHeaders.forEach(header => {
+        let meta = document.querySelector(`meta[name="${header.name}"]`);
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('name', header.name);
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', header.value);
+      });
+    };
+
+    setSecurityHeaders();
+
+    // Cleanup function
+    return () => {
+      // Remove security headers on unmount if needed
+      const securityMetas = document.querySelectorAll('meta[name^="X-"], meta[http-equiv="Content-Security-Policy"]');
+      securityMetas.forEach(meta => meta.remove());
+    };
+  }, []);
+
+  return <>{children}</>;
+}; 
