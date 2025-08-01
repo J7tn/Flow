@@ -100,12 +100,12 @@ export function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-                                   <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-                       Transform Any Project with
-                       <span className="bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-                         {" "}Smart Templates
-                       </span>
-                     </h1>
+                                                 <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                Create your own personal
+                <span className="bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  {" "}flow
+                </span>
+              </h1>
        
                      <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
                        From creative projects to personal goals, Flow helps you plan, calculate costs,
