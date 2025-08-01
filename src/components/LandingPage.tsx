@@ -240,7 +240,7 @@ export function LandingPage() {
                 </Button>
               </Link>
               <Link to="/templates">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-emerald-600 text-lg px-8 py-3">
+                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-emerald-600 text-lg px-8 py-3 font-semibold">
                   Explore Templates
                 </Button>
               </Link>
