@@ -33,6 +33,11 @@ secrets.json
 config.json
 credentials.json
 
+# Chat2API Configuration (contains API keys)
+docker-compose.chat2api.yml
+test-api.ps1
+test-chat.ps1
+
 # Supabase specific
 .supabase/
 supabase/config.toml

@@ -1,0 +1,26 @@
+# Test Chat2API with API key in request
+Write-Host "Testing Chat2API with API key..." -ForegroundColor Green
+
+$headers = @{
+    "Authorization" = "Bearer your-custom-auth-key-here"
+    "Content-Type" = "application/json"
+}
+
+$body = @{
+    model = "gpt-3.5-turbo"
+    messages = @(
+        @{
+            role = "user"
+            content = "Say hello in one word"
+        }
+    )
+    api_key = "your-openai-api-key-here"
+} | ConvertTo-Json -Depth 3
+
+try {
+    $response = Invoke-RestMethod -Uri "http://localhost:5005/v1/chat/completions" -Method Post -Headers $headers -Body $body
+    Write-Host "✅ Chat completion working!" -ForegroundColor Green
+    Write-Host "Response: $($response | ConvertTo-Json -Depth 3)"
+} catch {
+    Write-Host "❌ Chat completion failed: $($_.Exception.Message)" -ForegroundColor Red
+} 

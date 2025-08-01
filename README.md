@@ -59,14 +59,33 @@ A modern, secure flow management web application built with React, TypeScript, a
    ```
 
 4. **Set up AI features (Optional)**
-   To enable AI-powered features, run the Chat2API setup script:
+   To enable AI-powered features, you need to set up the Chat2API service:
+   
+   **Prerequisites:**
+   - Docker Desktop installed and running
+   - OpenAI API key (get one from https://platform.openai.com/account/api-keys)
+   
+   **Setup Steps:**
+   
+   a. Copy the template file:
    ```bash
-   chmod +x scripts/setup-chat2api.sh
-   ./scripts/setup-chat2api.sh
+   cp docker-compose.chat2api.yml.template docker-compose.chat2api.yml
    ```
-   Or manually start the Chat2API service:
+   
+   b. Edit `docker-compose.chat2api.yml` and replace:
+   - `your-openai-api-key-here` with your actual OpenAI API key
+   - `your-custom-auth-key-here` with any custom authorization key you want
+   
+   c. Start the Chat2API service:
    ```bash
    docker-compose -f docker-compose.chat2api.yml up -d
+   ```
+   
+   d. Test the service:
+   ```bash
+   cp test-chat.ps1.template test-chat.ps1
+   # Edit test-chat.ps1 with your actual API keys
+   .\test-chat.ps1
    ```
 
 5. **Start the development server**
@@ -108,6 +127,31 @@ src/
 └── docs/               # Documentation including Chat2API integration
 ```
 
+## 🔒 Security
+
+This project includes several security measures to protect sensitive information:
+
+### Environment Variables
+- All sensitive configuration is stored in `.env` files (already in `.gitignore`)
+- Never commit API keys or secrets to version control
+
+### API Keys and Secrets
+The following files contain sensitive information and are excluded from version control:
+- `docker-compose.chat2api.yml` - Contains OpenAI API key
+- `test-api.ps1` - Contains API keys for testing
+- `test-chat.ps1` - Contains API keys for testing
+
+### Template Files
+Use the provided template files to set up your own configuration:
+- `docker-compose.chat2api.yml.template` - Template for Chat2API configuration
+- `test-chat.ps1.template` - Template for testing scripts
+
+### Best Practices
+1. **Never commit API keys** - Always use template files
+2. **Use environment variables** - Store secrets in `.env` files
+3. **Regular key rotation** - Update API keys periodically
+4. **Access control** - Use custom authorization keys for Chat2API
+
 ## 🤖 AI Features
 
 Flow includes powerful AI capabilities powered by ChatGPT through the [Chat2API](https://github.com/Niansuh/chat2api) service:
@@ -127,10 +171,7 @@ Flow includes powerful AI capabilities powered by ChatGPT through the [Chat2API]
 - **Template Library** - AI-generated template suggestions
 
 ### Setup
-The AI features are optional and can be enabled by running:
-```bash
-./scripts/setup-chat2api.sh
-```
+The AI features are optional and require Docker Desktop and an OpenAI API key. See the [Installation](#-installation) section above for detailed setup instructions.
 
 For detailed documentation, see [Chat2API Integration Guide](docs/CHAT2API_INTEGRATION.md).
 
