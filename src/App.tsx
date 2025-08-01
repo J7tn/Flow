@@ -20,6 +20,7 @@ import { TemplateDetail } from "./components/templates/TemplateDetail";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
 import WorkflowDesigner from "./components/workflow/WorkflowDesigner";
+import SharedFlowViewer from "./components/workflow/SharedFlowViewer";
 import { Toaster } from "./components/ui/toaster";
 
 
@@ -140,6 +141,10 @@ function App() {
           <WorkflowDesigner />
         </ProtectedRoute>
       ),
+    },
+    {
+      path: "/flow/share/:encodedData",
+      element: <SharedFlowViewer />,
     },
   ];
 

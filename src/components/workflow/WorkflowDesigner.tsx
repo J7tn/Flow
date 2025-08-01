@@ -55,6 +55,13 @@ import {
   Shield,
   Sparkles,
   List,
+  Database,
+  Globe,
+  Video,
+  Folder,
+  CheckSquare,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
@@ -89,6 +96,9 @@ const WorkflowDesigner = () => {
   // AI-powered step suggestions
   const [isGeneratingSteps, setIsGeneratingSteps] = useState(false);
   const [suggestedSteps, setSuggestedSteps] = useState<Array<{ title: string; description: string; type: FlowStep["type"]; icon: any; color: string }>>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStepTools, setCurrentStepTools] = useState<Array<{ name: string; description: string; category: string; icon: any; link?: string }>>([]);
+  const [isGeneratingTools, setIsGeneratingTools] = useState(false);
 
   const generateAISteps = async (goal: string) => {
     if (!goal.trim()) return;
@@ -101,10 +111,22 @@ const WorkflowDesigner = () => {
       
       const aiSteps = await generateStepsWithAI(goal);
       setSuggestedSteps(aiSteps);
+      setCurrentStepIndex(0);
+      
+      // Generate tools for the first step
+      if (aiSteps.length > 0) {
+        await generateToolsForStep(aiSteps[0].title, aiSteps[0].description);
+      }
     } catch (error) {
       console.error('Error generating AI steps:', error);
       // Fallback to basic steps
-      setSuggestedSteps(getFallbackSteps(goal));
+      const fallbackSteps = getFallbackSteps(goal);
+      setSuggestedSteps(fallbackSteps);
+      setCurrentStepIndex(0);
+      
+      if (fallbackSteps.length > 0) {
+        await generateToolsForStep(fallbackSteps[0].title, fallbackSteps[0].description);
+      }
     } finally {
       setIsGeneratingSteps(false);
     }
@@ -224,6 +246,110 @@ const WorkflowDesigner = () => {
     ];
   };
 
+  const generateToolsForStep = async (stepTitle: string, stepDescription: string) => {
+    setIsGeneratingTools(true);
+    
+    try {
+      // Simulate AI API call for tool generation
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const tools = await generateToolsWithAI(stepTitle, stepDescription);
+      setCurrentStepTools(tools);
+    } catch (error) {
+      console.error('Error generating tools:', error);
+      setCurrentStepTools(getFallbackTools(stepTitle));
+    } finally {
+      setIsGeneratingTools(false);
+    }
+  };
+
+  const generateToolsWithAI = async (stepTitle: string, stepDescription: string): Promise<Array<{ name: string; description: string; category: string; icon: any; link?: string }>> => {
+    const lowerTitle = stepTitle.toLowerCase();
+    const lowerDesc = stepDescription.toLowerCase();
+    
+    // Generate contextually appropriate tools based on step
+    if (lowerTitle.includes('market') || lowerTitle.includes('research') || lowerDesc.includes('market')) {
+      return [
+        { name: "Google Trends", description: "Analyze search trends and market interest", category: "Research Tools", icon: TrendingUp, link: "https://trends.google.com" },
+        { name: "SEMrush", description: "Competitive analysis and keyword research", category: "Research Tools", icon: Search, link: "https://semrush.com" },
+        { name: "SurveyMonkey", description: "Create customer surveys and feedback forms", category: "Research Tools", icon: MessageSquare, link: "https://surveymonkey.com" },
+        { name: "Typeform", description: "Interactive forms and surveys", category: "Research Tools", icon: FileText, link: "https://typeform.com" },
+        { name: "Hotjar", description: "User behavior analytics and heatmaps", category: "Analytics", icon: BarChart3, link: "https://hotjar.com" },
+        { name: "Google Analytics", description: "Website traffic and user behavior analysis", category: "Analytics", icon: BarChart3, link: "https://analytics.google.com" },
+      ];
+    } else if (lowerTitle.includes('product') || lowerTitle.includes('development') || lowerDesc.includes('product')) {
+      return [
+        { name: "Figma", description: "Design and prototype your product", category: "Design Tools", icon: Palette, link: "https://figma.com" },
+        { name: "Notion", description: "Product documentation and project management", category: "Productivity", icon: FileText, link: "https://notion.so" },
+        { name: "Linear", description: "Issue tracking and project management", category: "Development", icon: Code, link: "https://linear.app" },
+        { name: "GitHub", description: "Code repository and version control", category: "Development", icon: Code, link: "https://github.com" },
+        { name: "Vercel", description: "Deploy and host your application", category: "Development", icon: Upload, link: "https://vercel.com" },
+        { name: "Stripe", description: "Payment processing and billing", category: "Business", icon: DollarSign, link: "https://stripe.com" },
+      ];
+    } else if (lowerTitle.includes('marketing') || lowerTitle.includes('campaign') || lowerDesc.includes('marketing')) {
+      return [
+        { name: "Mailchimp", description: "Email marketing and automation", category: "Email Marketing", icon: Mail, link: "https://mailchimp.com" },
+        { name: "Canva", description: "Create marketing graphics and designs", category: "Design", icon: Palette, link: "https://canva.com" },
+        { name: "Hootsuite", description: "Social media management and scheduling", category: "Social Media", icon: Share2, link: "https://hootsuite.com" },
+        { name: "Buffer", description: "Social media scheduling and analytics", category: "Social Media", icon: BarChart3, link: "https://buffer.com" },
+        { name: "Google Ads", description: "PPC advertising and campaign management", category: "Advertising", icon: DollarSign, link: "https://ads.google.com" },
+        { name: "Facebook Ads", description: "Social media advertising platform", category: "Advertising", icon: Share2, link: "https://business.facebook.com" },
+      ];
+    } else if (lowerTitle.includes('user') || lowerTitle.includes('testing') || lowerDesc.includes('user')) {
+      return [
+        { name: "UserTesting", description: "Remote user testing and feedback", category: "User Research", icon: Users, link: "https://usertesting.com" },
+        { name: "Maze", description: "Usability testing and user research", category: "User Research", icon: Search, link: "https://maze.co" },
+        { name: "Lookback", description: "User research and usability testing", category: "User Research", icon: Eye, link: "https://lookback.io" },
+        { name: "Optimal Workshop", description: "Information architecture and user research", category: "User Research", icon: Map, link: "https://optimalworkshop.com" },
+        { name: "Airtable", description: "Organize user research data", category: "Data Management", icon: Database, link: "https://airtable.com" },
+        { name: "Notion", description: "Document user research findings", category: "Documentation", icon: FileText, link: "https://notion.so" },
+      ];
+    } else if (lowerTitle.includes('launch') || lowerTitle.includes('preparation') || lowerDesc.includes('launch')) {
+      return [
+        { name: "Product Hunt", description: "Launch your product to the community", category: "Launch Platforms", icon: Rocket, link: "https://producthunt.com" },
+        { name: "BetaList", description: "Get early adopters and feedback", category: "Launch Platforms", icon: Users, link: "https://betalist.com" },
+        { name: "Press Kit Builder", description: "Create professional press materials", category: "Marketing", icon: FileText, link: "https://presskit.com" },
+        { name: "LaunchRock", description: "Build landing pages for product launches", category: "Landing Pages", icon: Globe, link: "https://launchrock.com" },
+        { name: "ConvertKit", description: "Email marketing for launch campaigns", category: "Email Marketing", icon: Mail, link: "https://convertkit.com" },
+        { name: "Calendly", description: "Schedule launch interviews and meetings", category: "Scheduling", icon: Calendar, link: "https://calendly.com" },
+      ];
+    } else {
+      // Generic tools for other steps
+      return [
+        { name: "Notion", description: "Project documentation and organization", category: "Productivity", icon: FileText, link: "https://notion.so" },
+        { name: "Trello", description: "Task management and project tracking", category: "Project Management", icon: CheckSquare, link: "https://trello.com" },
+        { name: "Slack", description: "Team communication and collaboration", category: "Communication", icon: MessageSquare, link: "https://slack.com" },
+        { name: "Zoom", description: "Video meetings and presentations", category: "Communication", icon: Video, link: "https://zoom.us" },
+        { name: "Google Drive", description: "File storage and collaboration", category: "Storage", icon: Folder, link: "https://drive.google.com" },
+        { name: "Asana", description: "Project management and team coordination", category: "Project Management", icon: Calendar, link: "https://asana.com" },
+      ];
+    }
+  };
+
+  const getFallbackTools = (stepTitle: string): Array<{ name: string; description: string; category: string; icon: any; link?: string }> => {
+    return [
+      { name: "Notion", description: "Documentation and project management", category: "Productivity", icon: FileText },
+      { name: "Trello", description: "Task management and organization", category: "Project Management", icon: CheckSquare },
+      { name: "Google Docs", description: "Collaborative document editing", category: "Productivity", icon: FileText },
+    ];
+  };
+
+  const moveToNextStep = async () => {
+    if (currentStepIndex < suggestedSteps.length - 1) {
+      const nextIndex = currentStepIndex + 1;
+      setCurrentStepIndex(nextIndex);
+      await generateToolsForStep(suggestedSteps[nextIndex].title, suggestedSteps[nextIndex].description);
+    }
+  };
+
+  const moveToPreviousStep = async () => {
+    if (currentStepIndex > 0) {
+      const prevIndex = currentStepIndex - 1;
+      setCurrentStepIndex(prevIndex);
+      await generateToolsForStep(suggestedSteps[prevIndex].title, suggestedSteps[prevIndex].description);
+    }
+  };
+
   const addStep = (suggestedStep: { title: string; description: string; type: FlowStep["type"]; icon: any; color: string }) => {
     const newStep: FlowStep = {
       id: crypto.randomUUID(),
@@ -301,7 +427,7 @@ const WorkflowDesigner = () => {
         steps: steps.map((step, index) => ({
           id: step.id,
           title: step.title,
-          description: step.description,
+          description: step.description || "",
           order: index,
         })),
         tags: [],
@@ -335,18 +461,35 @@ const WorkflowDesigner = () => {
   const handleShareFlow = async () => {
     setIsSharing(true);
     try {
-      // Generate a shareable link (you might want to save the flow first if not already saved)
-      const flowId = crypto.randomUUID(); // In a real app, this would be the saved flow ID
-      const shareUrl = `${window.location.origin}/flow/${flowId}`;
+      // Generate a shareable link with flow data encoded
+      const flowData = {
+        name: workflowName,
+        description: workflowDescription,
+        goal: workflowGoal,
+        steps: steps,
+        timestamp: Date.now(),
+      };
+      
+      // Create a shareable URL with encoded data
+      const encodedData = btoa(JSON.stringify(flowData));
+      const shareUrl = `${window.location.origin}/flow/share/${encodedData}`;
       setShareLink(shareUrl);
       
       // Copy to clipboard
-      await navigator.clipboard.writeText(shareUrl);
-      
-      toast({
-        title: "Link copied!",
-        description: "Share link has been copied to clipboard",
-      });
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link copied!",
+          description: "Share link has been copied to clipboard",
+        });
+      } catch (clipboardError) {
+        // Fallback for older browsers or if clipboard API is not available
+        console.warn("Clipboard API not available, showing link in dialog");
+        toast({
+          title: "Share link generated",
+          description: "Click the copy button to copy the link",
+        });
+      }
     } catch (error) {
       console.error("Error sharing flow:", error);
       toast({
@@ -361,6 +504,15 @@ const WorkflowDesigner = () => {
 
   // Copy share link to clipboard
   const copyShareLink = async () => {
+    if (!shareLink) {
+      toast({
+        title: "Error",
+        description: "No share link available",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(shareLink);
       toast({
@@ -368,10 +520,17 @@ const WorkflowDesigner = () => {
         description: "Link copied to clipboard",
       });
     } catch (error) {
+      // Fallback: create a temporary input element to copy
+      const tempInput = document.createElement('input');
+      tempInput.value = shareLink;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      
       toast({
-        title: "Error",
-        description: "Failed to copy link",
-        variant: "destructive",
+        title: "Copied!",
+        description: "Link copied to clipboard (fallback method)",
       });
     }
   };
@@ -661,53 +820,123 @@ const WorkflowDesigner = () => {
                    </div>
                  )}
 
-                 {/* AI Suggested Steps Grid */}
-                 {suggestedSteps.length > 0 && !isGeneratingSteps && (
-                   <div className="mb-8">
-                     <Card className="w-full max-w-6xl mx-auto shadow-lg">
-                       <CardHeader className="pb-4">
-                         <div className="flex items-center justify-between">
-                           <div className="flex items-center space-x-2">
-                             <Sparkles className="h-5 w-5 text-purple-500" />
-                             <h3 className="font-semibold">AI Suggested Steps</h3>
-                             <Badge variant="secondary">{suggestedSteps.length} steps</Badge>
-                           </div>
-                           <Button
-                             variant="outline"
-                             size="sm"
-                             onClick={() => generateAISteps(workflowGoal)}
-                             disabled={!workflowGoal.trim()}
-                           >
-                             <Sparkles className="h-3 w-3 mr-1" />
-                             Regenerate
-                           </Button>
-                         </div>
-                       </CardHeader>
-                       <CardContent className="pt-0">
-                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                           {suggestedSteps.map((suggestedStep, index) => (
-                             <Button
-                               key={index}
-                               variant="outline"
-                               className="h-auto p-4 justify-start text-left hover:shadow-md transition-shadow"
-                               onClick={() => addStep(suggestedStep)}
-                             >
-                               <div className="flex items-start space-x-3 w-full">
-                                 <div className={`p-2 rounded-lg ${suggestedStep.color} bg-opacity-10`}>
-                                   <suggestedStep.icon className={`h-5 w-5 ${suggestedStep.color.replace('bg-', 'text-')}`} />
-                                 </div>
-                                 <div className="flex-1 min-w-0">
-                                   <div className="font-medium text-sm mb-1">{suggestedStep.title}</div>
-                                   <div className="text-xs text-muted-foreground leading-relaxed">{suggestedStep.description}</div>
-                                 </div>
-                               </div>
-                             </Button>
-                           ))}
-                         </div>
-                       </CardContent>
-                     </Card>
-                   </div>
-                 )}
+                                   {/* Progressive AI Steps */}
+                  {suggestedSteps.length > 0 && !isGeneratingSteps && (
+                    <div className="mb-8">
+                      <Card className="w-full max-w-6xl mx-auto shadow-lg">
+                        <CardHeader className="pb-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <Sparkles className="h-5 w-5 text-purple-500" />
+                              <h3 className="font-semibold">AI-Guided Flow</h3>
+                              <Badge variant="secondary">Step {currentStepIndex + 1} of {suggestedSteps.length}</Badge>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={moveToPreviousStep}
+                                disabled={currentStepIndex === 0}
+                              >
+                                <ChevronLeft className="h-3 w-3 mr-1" />
+                                Previous
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={moveToNextStep}
+                                disabled={currentStepIndex === suggestedSteps.length - 1}
+                              >
+                                Next
+                                <ChevronRight className="h-3 w-3 ml-1" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => generateAISteps(workflowGoal)}
+                                disabled={!workflowGoal.trim()}
+                              >
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                Regenerate
+                              </Button>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Current Step */}
+                            <div className="lg:col-span-1">
+                              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+                                <div className="flex items-center space-x-3 mb-4">
+                                  <div className={`p-3 rounded-lg ${suggestedSteps[currentStepIndex]?.color} bg-opacity-10`}>
+                                    <suggestedSteps[currentStepIndex]?.icon className={`h-6 w-6 ${suggestedSteps[currentStepIndex]?.color.replace('bg-', 'text-')}`} />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-semibold text-lg">{suggestedSteps[currentStepIndex]?.title}</h4>
+                                    <p className="text-sm text-muted-foreground">{suggestedSteps[currentStepIndex]?.description}</p>
+                                  </div>
+                                </div>
+                                <Button 
+                                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                                  onClick={() => addStep(suggestedSteps[currentStepIndex])}
+                                >
+                                  <Plus className="h-4 w-4 mr-2" />
+                                  Add This Step
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Tools and Resources */}
+                            <div className="lg:col-span-2">
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="font-semibold">Tools & Resources</h4>
+                                  {isGeneratingTools && (
+                                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                                      <span>AI is finding tools...</span>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {!isGeneratingTools && currentStepTools.length > 0 && (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {currentStepTools.map((tool, index) => (
+                                      <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                        <div className="flex items-start space-x-3">
+                                          <div className="p-2 rounded-lg bg-gray-100">
+                                            <tool.icon className="h-5 w-5 text-gray-600" />
+                                          </div>
+                                          <div className="flex-1">
+                                            <div className="flex items-center justify-between mb-1">
+                                              <h5 className="font-medium text-sm">{tool.name}</h5>
+                                              <Badge variant="outline" className="text-xs">{tool.category}</Badge>
+                                            </div>
+                                            <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                            {tool.link && (
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 px-2 text-xs"
+                                                onClick={() => window.open(tool.link, '_blank')}
+                                              >
+                                                Visit Tool
+                                                <ChevronRight className="h-3 w-3 ml-1" />
+                                              </Button>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
 
                  {/* Step Blocks Grid */}
                  {steps.length > 0 && (
@@ -744,10 +973,10 @@ const WorkflowDesigner = () => {
                                  <Trash2 className="h-3 w-3" />
                                </Button>
                              </div>
-                             <CardTitle className="text-sm">{step.title}</CardTitle>
+                             <CardTitle className="text-sm break-words">{step.title}</CardTitle>
                            </CardHeader>
                            <CardContent className="pt-0">
-                             <CardDescription className="text-xs mb-2">
+                             <CardDescription className="text-xs mb-2 break-words overflow-hidden">
                                {step.description || "No description"}
                              </CardDescription>
                              <div className="space-y-1 text-xs text-muted-foreground">
