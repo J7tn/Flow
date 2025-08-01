@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  chat2api:
+    image: niansuh/chat2api:latest
+    container_name: flow-chat2api
+    ports:
+      - "5005:5005"
+    environment:
+      # Security settings
+      - API_PREFIX=flow_ai_2024
+      - AUTHORIZATION=sk-flow-ai-key-2024
+      
+      # Request settings
+      - CHATGPT_BASE_URL=https://chatgpt.com
+      - PROXY_URL=
+      - ARKOSE_TOKEN_URL=
+      
+      # Function settings
+      - HISTORY_DISABLED=false
+      - POW_DIFFICULTY=000032
+      - RETRY_TIMES=3
+      - ENABLE_GATEWAY=true
+      - CONVERSATION_ONLY=false
+    volumes:
+      - chat2api_data:/app/data
+    restart: unless-stopped
+    networks:
+      - flow-network
+
+  # Optional: Add a reverse proxy for better security
+  nginx:
+    image: nginx:alpine
+    container_name: flow-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - chat2api
+    restart: unless-stopped
+    networks:
+      - flow-network
+
+volumes:
+  chat2api_data:
+
+networks:
+  flow-network:
+    driver: bridge 

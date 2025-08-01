@@ -18,7 +18,15 @@ import {
   MoveHorizontal,
   Settings,
   ChevronRight,
+  Sparkles,
+  Brain,
+  Calculator,
+  RefreshCw,
+  AlertCircle,
 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { useChat2API } from "@/lib/hooks/useChat2API";
 import SmartSuggestionPanel from "./SmartSuggestionPanel";
 import VisualProgressTracker from "./VisualProgressTracker";
 import PermanentDashboard from "../shared/PermanentDashboard";
@@ -55,6 +63,26 @@ const WorkflowBuilder = ({
   const [activeTab, setActiveTab] = useState("canvas");
   const [selectedStep, setSelectedStep] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [aiStatus, setAiStatus] = useState<{
+    isGenerating: boolean;
+    error: string | null;
+    costAnalysis: string | null;
+  }>({
+    isGenerating: false,
+    error: null,
+    costAnalysis: null,
+  });
+
+  // Initialize AI hook
+  const {
+    isLoading: aiLoading,
+    error: aiError,
+    generateWorkflowSuggestions,
+    optimizeWorkflow,
+    estimateWorkflowCosts,
+    generateTemplateSuggestions,
+    healthCheck,
+  } = useChat2API();
 
   const templates = [
     { id: "blank", name: "Blank Workflow" },
@@ -111,6 +139,155 @@ const WorkflowBuilder = ({
     // Show success message or redirect
   };
 
+  // AI-powered step generation
+  const generateAISteps = async () => {
+    if (!workflow.title && !workflow.description) {
+      setAiStatus(prev => ({ ...prev, error: "Please provide a workflow title or description first" }));
+      return;
+    }
+
+    setAiStatus(prev => ({ ...prev, isGenerating: true, error: null }));
+    try {
+      const prompt = `Create a workflow for: ${workflow.title || "Untitled"}
+Description: ${workflow.description || "No description provided"}
+Please suggest 3-5 workflow steps that would be appropriate for this type of project.`;
+
+      const response = await generateWorkflowSuggestions(prompt);
+      
+      // Parse the AI response and create new steps
+      const lines = response.split('\n').filter(line => line.trim());
+      const newSteps: WorkflowStep[] = [];
+      
+      lines.forEach((line, index) => {
+        if (line.match(/^\d+\./)) {
+          const title = line.replace(/^\d+\.\s*/, '').trim();
+          if (title) {
+            newSteps.push({
+              id: `ai-step-${Date.now()}-${index}`,
+              title,
+              description: `AI-generated step: ${title}`,
+              type: "task",
+              duration: 60,
+              dependencies: [],
+            });
+          }
+        }
+      });
+
+      if (newSteps.length > 0) {
+        setWorkflow(prev => ({
+          ...prev,
+          steps: [...prev.steps, ...newSteps],
+        }));
+      }
+    } catch (error) {
+      setAiStatus(prev => ({ 
+        ...prev, 
+        error: error instanceof Error ? error.message : "Failed to generate AI steps" 
+      }));
+    } finally {
+      setAiStatus(prev => ({ ...prev, isGenerating: false }));
+    }
+  };
+
+  // AI-powered workflow optimization
+  const optimizeWorkflowWithAI = async () => {
+    if (workflow.steps.length === 0) {
+      setAiStatus(prev => ({ ...prev, error: "No steps to optimize" }));
+      return;
+    }
+
+    setAiStatus(prev => ({ ...prev, isGenerating: true, error: null }));
+    try {
+      const stepTitles = workflow.steps.map(step => step.title);
+      const optimizationResponse = await optimizeWorkflow(stepTitles);
+      
+      // For now, we'll just show the optimization suggestions
+      // In a full implementation, you might want to apply them automatically
+      console.log("AI Optimization suggestions:", optimizationResponse);
+      
+      // You could add a modal or notification to show the optimization suggestions
+      alert("AI optimization suggestions generated! Check the console for details.");
+    } catch (error) {
+      setAiStatus(prev => ({ 
+        ...prev, 
+        error: error instanceof Error ? error.message : "Failed to optimize workflow" 
+      }));
+    } finally {
+      setAiStatus(prev => ({ ...prev, isGenerating: false }));
+    }
+  };
+
+  // AI-powered cost analysis
+  const analyzeCostsWithAI = async () => {
+    if (workflow.steps.length === 0) {
+      setAiStatus(prev => ({ ...prev, error: "No steps to analyze" }));
+      return;
+    }
+
+    setAiStatus(prev => ({ ...prev, isGenerating: true, error: null }));
+    try {
+      const stepTitles = workflow.steps.map(step => step.title);
+      const costAnalysis = await estimateWorkflowCosts(stepTitles);
+      
+      setAiStatus(prev => ({ ...prev, costAnalysis }));
+    } catch (error) {
+      setAiStatus(prev => ({ 
+        ...prev, 
+        error: error instanceof Error ? error.message : "Failed to analyze costs" 
+      }));
+    } finally {
+      setAiStatus(prev => ({ ...prev, isGenerating: false }));
+    }
+  };
+
+  // AI-powered template generation
+  const generateTemplateWithAI = async () => {
+    if (!workflow.title) {
+      setAiStatus(prev => ({ ...prev, error: "Please provide a workflow title first" }));
+      return;
+    }
+
+    setAiStatus(prev => ({ ...prev, isGenerating: true, error: null }));
+    try {
+      const templateResponse = await generateTemplateSuggestions(workflow.title);
+      
+      // Parse the template response and create a new workflow
+      const lines = templateResponse.split('\n').filter(line => line.trim());
+      const newSteps: WorkflowStep[] = [];
+      
+      lines.forEach((line, index) => {
+        if (line.match(/^\d+\./)) {
+          const title = line.replace(/^\d+\.\s*/, '').trim();
+          if (title) {
+            newSteps.push({
+              id: `template-step-${Date.now()}-${index}`,
+              title,
+              description: `Template step: ${title}`,
+              type: "task",
+              duration: 60,
+              dependencies: [],
+            });
+          }
+        }
+      });
+
+      if (newSteps.length > 0) {
+        setWorkflow(prev => ({
+          ...prev,
+          steps: newSteps, // Replace existing steps with template
+        }));
+      }
+    } catch (error) {
+      setAiStatus(prev => ({ 
+        ...prev, 
+        error: error instanceof Error ? error.message : "Failed to generate template" 
+      }));
+    } finally {
+      setAiStatus(prev => ({ ...prev, isGenerating: false }));
+    }
+  };
+
   const selectedStepData = selectedStep
     ? workflow.steps.find((step) => step.id === selectedStep)
     : null;
@@ -144,6 +321,89 @@ const WorkflowBuilder = ({
             </div>
           </div>
 
+          {/* AI Status and Error Display */}
+          {aiStatus.error && (
+            <Alert className="mx-4 mt-2">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{aiStatus.error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* AI Features Bar */}
+          <div className="px-4 py-2 border-b bg-muted/50">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                <Sparkles className="h-3 w-3 mr-1" />
+                AI Features
+              </Badge>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={generateAISteps}
+                disabled={aiStatus.isGenerating || aiLoading}
+              >
+                {aiStatus.isGenerating ? (
+                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                ) : (
+                  <PlusCircle className="h-3 w-3 mr-1" />
+                )}
+                Generate Steps
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={optimizeWorkflowWithAI}
+                disabled={aiStatus.isGenerating || aiLoading || workflow.steps.length === 0}
+              >
+                {aiStatus.isGenerating ? (
+                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                ) : (
+                  <Brain className="h-3 w-3 mr-1" />
+                )}
+                Optimize
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={analyzeCostsWithAI}
+                disabled={aiStatus.isGenerating || aiLoading || workflow.steps.length === 0}
+              >
+                {aiStatus.isGenerating ? (
+                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                ) : (
+                  <Calculator className="h-3 w-3 mr-1" />
+                )}
+                Cost Analysis
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={generateTemplateWithAI}
+                disabled={aiStatus.isGenerating || aiLoading}
+              >
+                {aiStatus.isGenerating ? (
+                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3 w-3 mr-1" />
+                )}
+                Generate Template
+              </Button>
+            </div>
+          </div>
+
+          {/* Cost Analysis Display */}
+          {aiStatus.costAnalysis && (
+            <div className="mx-4 mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <h4 className="font-medium text-sm mb-2 flex items-center">
+                <Calculator className="h-4 w-4 mr-1" />
+                AI Cost Analysis
+              </h4>
+              <p className="text-sm text-green-700 dark:text-green-300 whitespace-pre-wrap">
+                {aiStatus.costAnalysis}
+              </p>
+            </div>
+          )}
+
           {/* Tabs */}
           <Tabs
             value={activeTab}
@@ -167,6 +427,30 @@ const WorkflowBuilder = ({
                       <h2 className="text-2xl font-semibold mb-6">
                         Start Building Your Workflow
                       </h2>
+                      
+                      {/* AI Template Generation */}
+                      <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg max-w-md">
+                        <h3 className="font-medium mb-2 flex items-center">
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          AI-Powered Template
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Let AI generate a custom template based on your workflow title
+                        </p>
+                        <Button
+                          onClick={generateTemplateWithAI}
+                          disabled={aiStatus.isGenerating || aiLoading || !workflow.title}
+                          className="w-full"
+                        >
+                          {aiStatus.isGenerating ? (
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-4 w-4 mr-2" />
+                          )}
+                          Generate AI Template
+                        </Button>
+                      </div>
+
                       <div className="grid grid-cols-2 gap-4 max-w-2xl">
                         {templates.map((template) => (
                           <Card
@@ -194,9 +478,19 @@ const WorkflowBuilder = ({
                         <h2 className="text-xl font-semibold">
                           Workflow Steps
                         </h2>
-                        <Button onClick={addStep} size="sm">
-                          <PlusCircle className="mr-2 h-4 w-4" /> Add Step
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button onClick={generateAISteps} size="sm" variant="outline">
+                            {aiStatus.isGenerating ? (
+                              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            ) : (
+                              <Sparkles className="h-4 w-4 mr-2" />
+                            )}
+                            AI Generate
+                          </Button>
+                          <Button onClick={addStep} size="sm">
+                            <PlusCircle className="mr-2 h-4 w-4" /> Add Step
+                          </Button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -457,9 +751,28 @@ const WorkflowBuilder = ({
             <SmartSuggestionPanel
               workflowId={workflow.id}
               currentSteps={workflow.steps}
+              workflowTitle={workflow.title}
+              workflowDescription={workflow.description}
               onApplySuggestion={(suggestion) => {
                 // Handle applying suggestion
                 console.log("Applying suggestion:", suggestion);
+                
+                // If it's a step suggestion, add it as a new step
+                if (suggestion.type === "step") {
+                  const newStep: WorkflowStep = {
+                    id: `suggestion-${Date.now()}`,
+                    title: suggestion.title,
+                    description: suggestion.description,
+                    type: "task",
+                    duration: 60,
+                    dependencies: [],
+                  };
+                  
+                  setWorkflow(prev => ({
+                    ...prev,
+                    steps: [...prev.steps, newStep],
+                  }));
+                }
               }}
             />
           </div>

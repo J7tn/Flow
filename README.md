@@ -7,7 +7,7 @@ A modern, secure flow management web application built with React, TypeScript, a
 - **🔐 Secure Authentication** - Enterprise-grade security with Supabase Auth
 - **📊 Visual Flow Builder** - Drag-and-drop interface for creating flows
 - **📈 Real-time Progress Tracking** - Live updates and progress visualization
-- **🤖 Smart Suggestions** - AI-powered flow optimization
+- **🤖 AI-Powered Features** - ChatGPT integration for workflow suggestions, optimization, and cost analysis
 - **📱 Responsive Design** - Works seamlessly across all devices
 - **🔒 Data Protection** - Comprehensive security with Row Level Security
 - **📋 Comprehensive Template Library** - Industry-proven flow templates with cost analysis, tool recommendations, and optimization suggestions
@@ -58,12 +58,23 @@ A modern, secure flow management web application built with React, TypeScript, a
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-4. **Start the development server**
+4. **Set up AI features (Optional)**
+   To enable AI-powered features, run the Chat2API setup script:
+   ```bash
+   chmod +x scripts/setup-chat2api.sh
+   ./scripts/setup-chat2api.sh
+   ```
+   Or manually start the Chat2API service:
+   ```bash
+   docker-compose -f docker-compose.chat2api.yml up -d
+   ```
+
+5. **Start the development server**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
+6. **Open your browser**
    Navigate to `http://localhost:5173`
 
 ## 🔧 Available Scripts
@@ -82,17 +93,46 @@ A modern, secure flow management web application built with React, TypeScript, a
 src/
 ├── components/
 │   ├── auth/           # Authentication components
+│   ├── ai/             # AI-powered components
 │   ├── ui/             # Reusable UI components
 │   ├── workflow/       # Flow-specific components
 │   ├── templates/      # Template browser and detail components
 │   ├── shared/         # Shared layout components
 │   └── security/       # Security-related components
 ├── contexts/           # React contexts for state management
-├── lib/                # Utility functions and configurations
+├── lib/
+│   ├── hooks/          # Custom React hooks including useChat2API
+│   └── ...             # Utility functions and configurations
 ├── data/               # Template data and configurations
 ├── types/              # TypeScript type definitions
-└── hooks/              # Custom React hooks
+└── docs/               # Documentation including Chat2API integration
 ```
+
+## 🤖 AI Features
+
+Flow includes powerful AI capabilities powered by ChatGPT through the [Chat2API](https://github.com/Niansuh/chat2api) service:
+
+### AI Assistant Component
+- **Real-time Chat Interface** - Interactive chat with AI for workflow guidance
+- **Streaming Responses** - See AI responses as they're generated
+- **Workflow Suggestions** - Get AI-powered workflow recommendations based on project descriptions
+- **Process Optimization** - AI analysis of existing workflows to suggest improvements
+- **Cost Estimation** - AI-powered cost analysis for workflow steps
+- **Template Generation** - Generate custom workflow templates for different project types
+
+### Integration Points
+- **WorkflowBuilder** - AI suggestions for workflow steps
+- **SmartSuggestionPanel** - AI-powered optimization recommendations
+- **Cost Analysis** - AI-enhanced cost estimation
+- **Template Library** - AI-generated template suggestions
+
+### Setup
+The AI features are optional and can be enabled by running:
+```bash
+./scripts/setup-chat2api.sh
+```
+
+For detailed documentation, see [Chat2API Integration Guide](docs/CHAT2API_INTEGRATION.md).
 
 ## 🔐 Security Features
 
