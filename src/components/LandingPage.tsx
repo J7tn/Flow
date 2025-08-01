@@ -20,32 +20,32 @@ import { Link } from 'react-router-dom';
 export function LandingPage() {
   const features = [
     {
-      icon: <Zap className="h-8 w-8 text-emerald-500" />,
+      icon: <Zap className="h-8 w-8 text-orange-500" />,
               title: "Flow Templates",
       description: "Access 30+ pre-built templates for app development, game design, manufacturing, and more."
     },
     {
-      icon: <Calculator className="h-8 w-8 text-teal-500" />,
+      icon: <Calculator className="h-8 w-8 text-purple-500" />,
       title: "Cost Analysis",
       description: "Calculate detailed costs including labor, tools, time, and overhead for any process."
     },
     {
-      icon: <Wrench className="h-8 w-8 text-emerald-600" />,
+      icon: <Wrench className="h-8 w-8 text-blue-500" />,
       title: "Tool Recommendations",
               description: "Get expert suggestions for the best tools and software for your specific flow."
     },
     {
-      icon: <TrendingUp className="h-8 w-8 text-teal-600" />,
+      icon: <TrendingUp className="h-8 w-8 text-orange-600" />,
       title: "Process Optimization",
               description: "Identify bottlenecks and get AI-powered suggestions to streamline your flows."
     },
     {
-      icon: <Target className="h-8 w-8 text-emerald-700" />,
+      icon: <Target className="h-8 w-8 text-purple-600" />,
       title: "Success Metrics",
       description: "Track key performance indicators and measure the success of your optimized processes."
     },
     {
-      icon: <Shield className="h-8 w-8 text-teal-700" />,
+      icon: <Shield className="h-8 w-8 text-blue-600" />,
       title: "Enterprise Security",
       description: "Bank-level security with Supabase authentication and Row Level Security protection."
     }
@@ -64,7 +64,7 @@ export function LandingPage() {
          ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-100">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100">
       {/* Navigation */}
       <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -81,11 +81,11 @@ export function LandingPage() {
               <Link to="/login">
                 <Button variant="ghost">Sign In</Button>
               </Link>
-              <Link to="/signup">
-                <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
-                  Get Started
-                </Button>
-              </Link>
+                             <Link to="/signup">
+                 <Button className="bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 hover:from-orange-600 hover:via-purple-700 hover:to-blue-700">
+                   Get Started
+                 </Button>
+               </Link>
             </div>
           </div>
         </div>
@@ -102,7 +102,7 @@ export function LandingPage() {
             >
                                    <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
                        Transform Any Project with
-                       <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                       <span className="bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 bg-clip-text text-transparent">
                          {" "}Smart Templates
                        </span>
                      </h1>
@@ -113,12 +113,12 @@ export function LandingPage() {
                      </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/signup">
-                  <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-lg px-8 py-3">
-                    Start Transforming
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
+                                 <Link to="/signup">
+                   <Button size="lg" className="bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 hover:from-orange-600 hover:via-purple-700 hover:to-blue-700 text-lg px-8 py-3">
+                     Start Transforming
+                     <ArrowRight className="ml-2 h-5 w-5" />
+                   </Button>
+                 </Link>
                 <Link to="/templates">
                   <Button size="lg" variant="outline" className="text-lg px-8 py-3">
                     Browse Templates
@@ -219,7 +219,7 @@ export function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-emerald-600 to-teal-600">
+      <section className="py-24 bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -229,18 +229,18 @@ export function LandingPage() {
                                <h2 className="text-4xl font-bold text-white mb-6">
                      Ready to Transform Your Projects?
                    </h2>
-                   <p className="text-xl text-emerald-100 mb-8">
+                   <p className="text-xl text-orange-100 mb-8">
                      Join thousands of creators, learners, and professionals using Flow to streamline their processes and achieve their goals.
                    </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/signup">
-                <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 text-lg px-8 py-3">
+                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8 py-3">
                   Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/templates">
-                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-emerald-600 text-lg px-8 py-3 font-semibold">
+                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-600 text-lg px-8 py-3 font-semibold">
                   Explore Templates
                 </Button>
               </Link>
