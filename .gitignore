@@ -79,3 +79,4 @@ Desktop.ini
 *.temp
 .cache/
 
+*.yml

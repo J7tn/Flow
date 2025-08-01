@@ -11,10 +11,10 @@ import {
   allTemplates, 
   templateCategories
 } from '@/data/templates';
-import type { WorkflowTemplate } from '@/types/templates';
+import type { FlowTemplate } from '@/types/templates';
 
 interface TemplateBrowserProps {
-  onTemplateSelect?: (template: WorkflowTemplate) => void;
+  onTemplateSelect?: (template: FlowTemplate) => void;
 }
 
 export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSelect }) => {
@@ -118,7 +118,7 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
     setVisibleCount(15);
   }, [searchQuery, selectedCategory, selectedDifficulty, sortBy]);
 
-  const handleTemplateSelect = (template: WorkflowTemplate) => {
+  const handleTemplateSelect = (template: FlowTemplate) => {
     if (onTemplateSelect) {
       onTemplateSelect(template);
     } else {

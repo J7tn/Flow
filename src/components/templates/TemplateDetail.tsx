@@ -24,7 +24,7 @@ import {
   allTemplates, 
   templateCategories
 } from '@/data/templates';
-import type { WorkflowTemplate } from '@/types/templates';
+import type { FlowTemplate } from '@/types/templates';
 
 export const TemplateDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();

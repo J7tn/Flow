@@ -1,11 +1,11 @@
-import { WorkflowTemplate } from '@/types/templates';
+import { FlowTemplate } from '@/types/templates';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper function to create UUIDs
 const createId = () => uuidv4();
 
 // Software Development Templates
-export const appDevelopmentTemplate: WorkflowTemplate = {
+export const appDevelopmentTemplate: FlowTemplate = {
   id: createId(),
   name: 'Mobile App Development Pipeline',
   description: 'Complete workflow for developing and launching a mobile application from concept to app store deployment.',
@@ -416,7 +416,7 @@ export const appDevelopmentTemplate: WorkflowTemplate = {
 };
 
 // Game Design Template
-export const gameDesignTemplate: WorkflowTemplate = {
+export const gameDesignTemplate: FlowTemplate = {
   id: createId(),
   name: 'Game Development Pipeline',
   description: 'Complete workflow for developing a video game from concept to release, including design, development, and marketing phases.',
@@ -573,7 +573,7 @@ export const gameDesignTemplate: WorkflowTemplate = {
 };
 
 // Manufacturing Template
-export const manufacturingTemplate: WorkflowTemplate = {
+export const manufacturingTemplate: FlowTemplate = {
   id: createId(),
   name: 'Product Manufacturing Pipeline',
   description: 'Complete workflow from product design to retail distribution, including manufacturing, quality control, and logistics.',
@@ -707,7 +707,7 @@ export const manufacturingTemplate: WorkflowTemplate = {
 // Additional Templates for Testing Infinite Scrolling
 
 // Marketing Campaign Template
-export const marketingCampaignTemplate: WorkflowTemplate = {
+export const marketingCampaignTemplate: FlowTemplate = {
   id: createId(),
   name: 'Digital Marketing Campaign',
   description: 'Complete digital marketing campaign from strategy to execution and analysis.',
@@ -850,7 +850,7 @@ export const marketingCampaignTemplate: WorkflowTemplate = {
 };
 
 // E-commerce Setup Template
-export const ecommerceSetupTemplate: WorkflowTemplate = {
+export const ecommerceSetupTemplate: FlowTemplate = {
   id: createId(),
   name: 'E-commerce Store Setup',
   description: 'Complete workflow for setting up an online store from platform selection to launch.',
@@ -1003,7 +1003,7 @@ export const ecommerceSetupTemplate: WorkflowTemplate = {
 };
 
 // Content Creation Template
-export const contentCreationTemplate: WorkflowTemplate = {
+export const contentCreationTemplate: FlowTemplate = {
   id: createId(),
   name: 'Content Creation Pipeline',
   description: 'Systematic approach to creating, publishing, and promoting content across multiple channels.',
@@ -1146,7 +1146,7 @@ export const contentCreationTemplate: WorkflowTemplate = {
 };
 
 // Customer Support Template
-export const customerSupportTemplate: WorkflowTemplate = {
+export const customerSupportTemplate: FlowTemplate = {
   id: createId(),
   name: 'Customer Support System',
   description: 'Complete customer support workflow from ticket creation to resolution and follow-up.',
@@ -1289,7 +1289,7 @@ export const customerSupportTemplate: WorkflowTemplate = {
 };
 
 // HR Recruitment Template
-export const hrRecruitmentTemplate: WorkflowTemplate = {
+export const hrRecruitmentTemplate: FlowTemplate = {
   id: createId(),
   name: 'HR Recruitment Process',
   description: 'Complete recruitment workflow from job posting to employee onboarding.',
@@ -1442,7 +1442,7 @@ export const hrRecruitmentTemplate: WorkflowTemplate = {
 };
 
 // Financial Planning Template
-export const financialPlanningTemplate: WorkflowTemplate = {
+export const financialPlanningTemplate: FlowTemplate = {
   id: createId(),
   name: 'Financial Planning Process',
   description: 'Comprehensive financial planning workflow for individuals and businesses.',
@@ -1593,7 +1593,7 @@ export const financialPlanningTemplate: WorkflowTemplate = {
 };
 
 // Research Project Template
-export const researchProjectTemplate: WorkflowTemplate = {
+export const researchProjectTemplate: FlowTemplate = {
   id: createId(),
   name: 'Research Project Management',
   description: 'Systematic approach to conducting research projects from hypothesis to publication.',
@@ -1746,7 +1746,7 @@ export const researchProjectTemplate: WorkflowTemplate = {
 };
 
 // Export all templates with additional templates
-export const allTemplates: WorkflowTemplate[] = [
+export const allTemplates: FlowTemplate[] = [
   appDevelopmentTemplate,
   gameDesignTemplate,
   manufacturingTemplate,

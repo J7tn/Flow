@@ -20,6 +20,7 @@ import { TemplateDetail } from "./components/templates/TemplateDetail";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
 import WorkflowDesigner from "./components/workflow/WorkflowDesigner";
+import { Toaster } from "./components/ui/toaster";
 
 
 function App() {
@@ -149,6 +150,7 @@ function App() {
   return (
     <AuthProvider>
       <Suspense fallback={<p>Loading...</p>}>{element}</Suspense>
+      <Toaster />
     </AuthProvider>
   );
 }

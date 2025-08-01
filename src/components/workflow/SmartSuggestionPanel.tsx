@@ -95,14 +95,14 @@ const SmartSuggestionPanel: React.FC<SmartSuggestionPanelProps> = ({
     setIsGenerating(true);
     try {
       // Create a description of the current workflow for AI analysis
-      const workflowDescription = `
+      const workflowSummary = `
         Workflow Title: ${workflowTitle || "Untitled"}
         Workflow Description: ${workflowDescription || "No description"}
         Current Steps: ${currentSteps.map((step, index) => `${index + 1}. ${step.title}: ${step.description}`).join('\n')}
       `;
 
       // Generate workflow suggestions
-      const suggestionsResponse = await generateWorkflowSuggestions(workflowDescription);
+      const suggestionsResponse = await generateWorkflowSuggestions(workflowSummary);
       
       // Generate optimizations
       const optimizationResponse = await optimizeWorkflow(

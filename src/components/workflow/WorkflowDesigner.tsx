@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 import {
   ArrowLeft,
   Plus,
@@ -15,7 +17,6 @@ import {
   Trash2,
   Copy,
   Eye,
-  Download,
   Share2,
   Zap,
   Clock,
@@ -53,9 +54,12 @@ import {
   AlertTriangle,
   Shield,
   Sparkles,
+  List,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
+import { flowApi } from "@/lib/api";
+import { flowSchema, type FlowInput } from "@/lib/validation";
 
 interface FlowStep {
   id: string;
@@ -71,11 +75,16 @@ interface FlowStep {
 
 const WorkflowDesigner = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [workflowName, setWorkflowName] = useState("New Flow");
   const [workflowDescription, setWorkflowDescription] = useState("");
   const [workflowGoal, setWorkflowGoal] = useState("");
   const [selectedStep, setSelectedStep] = useState<string | null>(null);
   const [steps, setSteps] = useState<FlowStep[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareLink, setShareLink] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
 
   // AI-powered step suggestions
   const [isGeneratingSteps, setIsGeneratingSteps] = useState(false);
@@ -217,22 +226,22 @@ const WorkflowDesigner = () => {
 
   const addStep = (suggestedStep: { title: string; description: string; type: FlowStep["type"]; icon: any; color: string }) => {
     const newStep: FlowStep = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       title: suggestedStep.title,
       description: suggestedStep.description,
       type: suggestedStep.type,
       status: "pending",
       dependencies: [],
     };
-    setSteps([...steps, newStep]);
+    setSteps(prev => [...prev, newStep]);
   };
 
   const updateStep = (id: string, updates: Partial<FlowStep>) => {
-    setSteps(steps.map(step => step.id === id ? { ...step, ...updates } : step));
+    setSteps(prev => prev.map(step => step.id === id ? { ...step, ...updates } : step));
   };
 
   const deleteStep = (id: string) => {
-    setSteps(steps.filter(step => step.id !== id));
+    setSteps(prev => prev.filter(step => step.id !== id));
     if (selectedStep === id) {
       setSelectedStep(null);
     }
@@ -262,6 +271,109 @@ const WorkflowDesigner = () => {
 
   const updateGoal = (newGoal: string) => {
     setWorkflowGoal(newGoal);
+  };
+
+  // Save flow functionality
+  const handleSaveFlow = async () => {
+    if (!workflowName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a flow name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (steps.length === 0) {
+      toast({
+        title: "Warning",
+        description: "Please add at least one step to your flow",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const flowData: FlowInput = {
+        title: workflowName,
+        description: workflowDescription,
+        steps: steps.map((step, index) => ({
+          id: step.id,
+          title: step.title,
+          description: step.description,
+          order: index,
+        })),
+        tags: [],
+        isPublic: false,
+      };
+
+      const result = await flowApi.createFlow(flowData);
+      
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Flow saved successfully!",
+        });
+        // Optionally navigate to the saved flow or stay on the page
+      } else {
+        throw new Error(result.error || "Failed to save flow");
+      }
+    } catch (error) {
+      console.error("Error saving flow:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save flow",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Share flow functionality
+  const handleShareFlow = async () => {
+    setIsSharing(true);
+    try {
+      // Generate a shareable link (you might want to save the flow first if not already saved)
+      const flowId = crypto.randomUUID(); // In a real app, this would be the saved flow ID
+      const shareUrl = `${window.location.origin}/flow/${flowId}`;
+      setShareLink(shareUrl);
+      
+      // Copy to clipboard
+      await navigator.clipboard.writeText(shareUrl);
+      
+      toast({
+        title: "Link copied!",
+        description: "Share link has been copied to clipboard",
+      });
+    } catch (error) {
+      console.error("Error sharing flow:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate share link",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  // Copy share link to clipboard
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      toast({
+        title: "Copied!",
+        description: "Link copied to clipboard",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy link",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -297,21 +409,182 @@ const WorkflowDesigner = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
-              <Button variant="outline" size="sm">
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button>
+              <Dialog open={showPreview} onOpenChange={setShowPreview}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Flow Preview</DialogTitle>
+                    <DialogDescription>
+                      Preview of your flow template: {workflowName}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-6">
+                    {/* Flow Overview */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Target className="h-5 w-5 text-blue-500" />
+                          {workflowName}
+                        </CardTitle>
+                        {workflowDescription && (
+                          <CardDescription>{workflowDescription}</CardDescription>
+                        )}
+                      </CardHeader>
+                      {workflowGoal && (
+                        <CardContent>
+                          <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+                            <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
+                            <div>
+                              <h4 className="font-medium text-purple-900 mb-1">Goal</h4>
+                              <p className="text-sm text-purple-700">{workflowGoal}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      )}
+                    </Card>
+
+                    {/* Flow Steps */}
+                    {steps.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <List className="h-5 w-5 text-green-500" />
+                            Flow Steps ({steps.length})
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {steps.map((step, index) => (
+                              <div key={step.id} className="flex items-start gap-4 p-4 border rounded-lg">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-600">
+                                  {index + 1}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-medium">{step.title}</h4>
+                                    <Badge variant="outline" className="text-xs">
+                                      {step.type}
+                                    </Badge>
+                                    <Badge 
+                                      variant={step.status === 'completed' ? 'default' : 'secondary'}
+                                      className="text-xs"
+                                    >
+                                      {step.status}
+                                    </Badge>
+                                  </div>
+                                  {step.description && (
+                                    <p className="text-sm text-muted-foreground mb-2">{step.description}</p>
+                                  )}
+                                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                    {step.estimatedTime && (
+                                      <span className="flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />
+                                        {step.estimatedTime} min
+                                      </span>
+                                    )}
+                                    {step.cost && (
+                                      <span className="flex items-center gap-1">
+                                        <DollarSign className="h-3 w-3" />
+                                        ${step.cost}
+                                      </span>
+                                    )}
+                                    {step.assignee && (
+                                      <span className="flex items-center gap-1">
+                                        <Users className="h-3 w-3" />
+                                        {step.assignee}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Flow Summary */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <BarChart3 className="h-5 w-5 text-orange-500" />
+                          Flow Summary
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="text-center p-4 bg-blue-50 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-600">{steps.length}</div>
+                            <div className="text-sm text-blue-700">Total Steps</div>
+                          </div>
+                          <div className="text-center p-4 bg-green-50 rounded-lg">
+                            <div className="text-2xl font-bold text-green-600">{calculateTotalTime()}</div>
+                            <div className="text-sm text-green-700">Total Time (min)</div>
+                          </div>
+                          <div className="text-center p-4 bg-purple-50 rounded-lg">
+                            <div className="text-2xl font-bold text-purple-600">${calculateTotalCost()}</div>
+                            <div className="text-sm text-purple-700">Total Cost</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleShareFlow}
+                    disabled={isSharing}
+                  >
+                    <Share2 className="h-4 w-4 mr-2" />
+                    {isSharing ? "Generating..." : "Share"}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Share Flow</DialogTitle>
+                    <DialogDescription>
+                      Share this flow with others using the link below.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        value={shareLink}
+                        readOnly
+                        placeholder="Share link will appear here..."
+                        className="flex-1"
+                      />
+                      <Button
+                        onClick={copyShareLink}
+                        disabled={!shareLink}
+                        size="sm"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Anyone with this link can view your flow template.
+                    </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Button 
+                onClick={handleSaveFlow}
+                disabled={isSaving}
+              >
                 <Save className="h-4 w-4 mr-2" />
-                Save Flow
+                {isSaving ? "Saving..." : "Save Flow"}
               </Button>
             </div>
           </div>

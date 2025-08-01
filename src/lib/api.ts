@@ -52,7 +52,12 @@ export class SecureApi {
       const identifier = `${userId}-${table}-get`;
       await this.validateRateLimit(identifier);
 
-      let query = supabase
+      const client = supabase();
+      if (!client) {
+        throw new Error('Supabase client not available');
+      }
+      
+      let query = client
         .from(table)
         .select(options.select || '*');
 
@@ -125,7 +130,12 @@ export class SecureApi {
         updated_at: new Date().toISOString(),
       };
 
-      const { data: result, error } = await supabase
+      const client = supabase();
+      if (!client) {
+        throw new Error('Supabase client not available');
+      }
+
+      const { data: result, error } = await client
         .from(table)
         .insert(secureData)
         .select()
@@ -168,8 +178,13 @@ export class SecureApi {
         data = validatedData;
       }
 
+      const client = supabase();
+      if (!client) {
+        throw new Error('Supabase client not available');
+      }
+
       // Ensure user owns the resource
-      const { data: existing } = await supabase
+      const { data: existing } = await client
         .from(table)
         .select('user_id')
         .eq('id', id)
@@ -184,7 +199,7 @@ export class SecureApi {
         updated_at: new Date().toISOString(),
       };
 
-      const { data: result, error } = await supabase
+      const { data: result, error } = await client
         .from(table)
         .update(secureData)
         .eq('id', id)
@@ -221,8 +236,13 @@ export class SecureApi {
       const identifier = `${userId}-${table}-delete`;
       await this.validateRateLimit(identifier);
 
+      const client = supabase();
+      if (!client) {
+        throw new Error('Supabase client not available');
+      }
+
       // Ensure user owns the resource
-      const { data: existing } = await supabase
+      const { data: existing } = await client
         .from(table)
         .select('user_id')
         .eq('id', id)
@@ -232,7 +252,7 @@ export class SecureApi {
         throw new Error('Access denied');
       }
 
-      const { error } = await supabase
+      const { error } = await client
         .from(table)
         .delete()
         .eq('id', id)
@@ -280,7 +300,10 @@ export const flowApi = {
     const userId = await getCurrentUser();
     if (!userId) throw new Error('Authentication required');
 
-    const { data, error } = await supabase
+    const client = supabase();
+    if (!client) throw new Error('Supabase client not available');
+
+    const { data, error } = await client
       .from('flows')
       .select('*')
       .eq('id', id)
@@ -298,7 +321,10 @@ export const userApi = {
     const userId = await getCurrentUser();
     if (!userId) throw new Error('Authentication required');
 
-    const { data, error } = await supabase
+    const client = supabase();
+    if (!client) throw new Error('Supabase client not available');
+
+    const { data, error } = await client
       .from('profiles')
       .select('*')
       .eq('id', userId.id)
@@ -312,7 +338,10 @@ export const userApi = {
     const userId = await getCurrentUser();
     if (!userId) throw new Error('Authentication required');
 
-    const { data, error } = await supabase
+    const client = supabase();
+    if (!client) throw new Error('Supabase client not available');
+
+    const { data, error } = await client
       .from('profiles')
       .update(profileData)
       .eq('id', userId.id)
