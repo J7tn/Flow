@@ -67,3 +67,8 @@ Date:   Thu Jul 31 23:03:10 2025 -0700
  volumes:[m
    chat2api_data:[m
  [m
+[33m67ee764[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m df
+[33m7cab794[m Update .gitignore
+[33m0ebf716[m Create tatus
+[33m33d6225[m Update docker-compose.chat2api.yml
+[33mf207223[m Merge branch 'main' of https://github.com/J7tn/Flow
