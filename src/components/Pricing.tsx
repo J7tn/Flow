@@ -12,13 +12,14 @@ export function Pricing() {
       name: "Free",
       price: "$0",
       period: "forever",
-      description: "Perfect for individuals and small projects",
+      description: "Perfect for individuals and personal projects",
       features: [
-        "5 templates per month",
+        "Unlimited projects",
+        "Unlimited saved templates",
         "Basic cost analysis",
         "Standard support",
-        "1 project at a time",
-        "Basic tool recommendations"
+        "Basic tool recommendations",
+        "Export to PDF"
       ],
       popular: false,
       buttonText: "Get Started Free",
@@ -28,39 +29,20 @@ export function Pricing() {
       name: "Pro",
       price: "$9",
       period: "per month",
-      description: "Ideal for growing teams and businesses",
+      description: "For teams that need to collaborate",
       features: [
-        "Unlimited templates",
+        "Everything in Free",
+        "Up to 20 team members",
+        "Team collaboration features",
         "Advanced cost analysis",
         "Priority support",
-        "Unlimited projects",
         "AI-powered optimization",
-        "Team collaboration",
         "Custom workflows",
-        "Export to PDF"
+        "Advanced analytics"
       ],
       popular: true,
       buttonText: "Start Pro Trial",
       buttonVariant: "default" as const
-    },
-    {
-      name: "Enterprise",
-      price: "$29",
-      period: "per month",
-      description: "For large organizations with advanced needs",
-      features: [
-        "Everything in Pro",
-        "Advanced analytics",
-        "Custom integrations",
-        "Dedicated support",
-        "SSO authentication",
-        "Advanced security",
-        "API access",
-        "Custom branding"
-      ],
-      popular: false,
-      buttonText: "Contact Sales",
-      buttonVariant: "outline" as const
     }
   ];
 
@@ -111,7 +93,7 @@ export function Pricing() {
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.name}
@@ -181,10 +163,10 @@ export function Pricing() {
               className="bg-gray-50 p-6 rounded-lg"
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Can I change my plan anytime?
+                What's the difference between Free and Pro?
               </h3>
               <p className="text-gray-600">
-                Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately.
+                Free users get unlimited projects and templates, but can't add team members. Pro users can collaborate with up to 20 team members and get additional features like advanced analytics and priority support.
               </p>
             </motion.div>
             
@@ -195,10 +177,10 @@ export function Pricing() {
               className="bg-gray-50 p-6 rounded-lg"
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Is there a free trial?
+                Can I upgrade to Pro later?
               </h3>
               <p className="text-gray-600">
-                Yes! All paid plans come with a 14-day free trial. No credit card required to start.
+                Yes! You can upgrade to Pro at any time. Your existing projects and templates will be preserved, and you'll immediately gain access to team collaboration features.
               </p>
             </motion.div>
             
@@ -209,10 +191,10 @@ export function Pricing() {
               className="bg-gray-50 p-6 rounded-lg"
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                What payment methods do you accept?
+                Is there a free trial for Pro?
               </h3>
               <p className="text-gray-600">
-                We accept all major credit cards, PayPal, and bank transfers for annual plans.
+                Yes! Pro comes with a 14-day free trial. No credit card required to start exploring team features.
               </p>
             </motion.div>
           </div>
