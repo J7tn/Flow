@@ -39,6 +39,10 @@ test-api.ps1
 test-chat.ps1
 setup-env.bat
 
+# YAML files (configuration files that may contain secrets)
+*.yml
+*.yaml
+
 # Supabase specific
 .supabase/
 supabase/config.toml
