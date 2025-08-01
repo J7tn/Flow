@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   PlusCircle,
@@ -26,6 +26,8 @@ import { Progress } from "./ui/progress";
 import PermanentDashboard from "./shared/PermanentDashboard";
 
 const Home = () => {
+  const [activeTab, setActiveTab] = useState("recent");
+
   // Mock data for flows
   const recentFlows = [
     {
@@ -185,14 +187,20 @@ const Home = () => {
             </Card>
           </div>
 
-          <Tabs defaultValue="recent" className="mb-8">
+          <Tabs 
+            defaultValue="recent" 
+            className="mb-8"
+            onValueChange={setActiveTab}
+          >
             <div className="flex items-center justify-between mb-4">
               <TabsList>
                 <TabsTrigger value="recent">Recent Flows</TabsTrigger>
                 <TabsTrigger value="templates">Templates</TabsTrigger>
               </TabsList>
-              <Button variant="outline" size="sm">
-                View All
+              <Button variant="outline" size="sm" asChild>
+                <Link to={activeTab === "templates" ? "/saved-templates" : "/flows"}>
+                  View All
+                </Link>
               </Button>
             </div>
 

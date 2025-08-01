@@ -24,7 +24,14 @@ export const EmailConfirmation: React.FC = () => {
 
         if (accessToken && refreshToken) {
           // Direct session confirmation
-          const { error } = await supabase.auth.setSession({
+          const client = supabase();
+          if (!client) {
+            setStatus('error');
+            setMessage('Authentication service unavailable.');
+            return;
+          }
+          
+          const { error } = await client.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
@@ -37,7 +44,14 @@ export const EmailConfirmation: React.FC = () => {
           setMessage('Your email has been successfully confirmed! You can now sign in to your account.');
         } else if (type === 'signup' && token) {
           // Email confirmation with token
-          const { error } = await supabase.auth.verifyOtp({
+          const client = supabase();
+          if (!client) {
+            setStatus('error');
+            setMessage('Authentication service unavailable.');
+            return;
+          }
+          
+          const { error } = await client.auth.verifyOtp({
             token_hash: token,
             type: 'signup',
           });
@@ -50,7 +64,14 @@ export const EmailConfirmation: React.FC = () => {
           setMessage('Your email has been successfully confirmed! You can now sign in to your account.');
         } else if (type === 'recovery' && token) {
           // Password recovery confirmation
-          const { error } = await supabase.auth.verifyOtp({
+          const client = supabase();
+          if (!client) {
+            setStatus('error');
+            setMessage('Authentication service unavailable.');
+            return;
+          }
+          
+          const { error } = await client.auth.verifyOtp({
             token_hash: token,
             type: 'recovery',
           });
@@ -63,7 +84,14 @@ export const EmailConfirmation: React.FC = () => {
           setMessage('Your password has been successfully reset! You can now sign in with your new password.');
         } else {
           // Try to get the current session to see if user is already confirmed
-          const { data: { session } } = await supabase.auth.getSession();
+          const client = supabase();
+          if (!client) {
+            setStatus('error');
+            setMessage('Authentication service unavailable.');
+            return;
+          }
+          
+          const { data: { session } } = await client.auth.getSession();
           
           if (session?.user?.email_confirmed_at) {
             setStatus('success');

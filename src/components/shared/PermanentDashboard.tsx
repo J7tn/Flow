@@ -38,9 +38,11 @@ const PermanentDashboard = ({ children }: PermanentDashboardProps) => {
       {/* Permanent Sidebar */}
       <div className="w-64 border-r bg-card p-4 flex flex-col">
         <div className="flex items-center mb-8">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center mr-2">
-            <span className="text-primary-foreground font-bold">F</span>
-          </div>
+          <img 
+            src="/logo.JPG" 
+            alt="Flow Logo" 
+            className="w-8 h-8 mr-2"
+          />
           <h1 className="text-xl font-bold">Flow</h1>
         </div>
 

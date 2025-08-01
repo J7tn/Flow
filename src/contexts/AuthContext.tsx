@@ -38,7 +38,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const getInitialSession = async () => {
       try {
         console.log('AuthProvider: Getting initial session...');
-        const { data: { session } } = await supabase.auth.getSession();
+        const client = supabase();
+        if (!client) {
+          console.log('AuthProvider: Supabase not available, skipping authentication');
+          setLoading(false);
+          return;
+        }
+        
+        const { data: { session } } = await client.auth.getSession();
         console.log('AuthProvider: Initial session:', session ? 'Found' : 'None');
         setSession(session);
         setUser(session?.user ?? null);
@@ -55,7 +62,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Listen for auth changes
     try {
       console.log('AuthProvider: Setting up auth state listener...');
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      const client = supabase();
+      if (!client) {
+        console.log('AuthProvider: Supabase not available, skipping auth listener');
+        setLoading(false);
+        return;
+      }
+      
+      const { data: { subscription } } = client.auth.onAuthStateChange(
         async (event, session) => {
           console.log('AuthProvider: Auth state changed:', event, session ? 'Session found' : 'No session');
           setSession(session);
@@ -73,7 +87,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const client = supabase();
+      if (!client) {
+        return { error: { message: 'Authentication service unavailable' } as AuthError };
+      }
+      
+      const { error } = await client.auth.signInWithPassword({
         email,
         password,
       });
@@ -86,7 +105,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const client = supabase();
+      if (!client) {
+        return { error: { message: 'Authentication service unavailable' } as AuthError };
+      }
+      
+      const { error } = await client.auth.signUp({
         email,
         password,
       });
@@ -99,7 +123,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      const client = supabase();
+      if (!client) return;
+      
+      await client.auth.signOut();
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -107,7 +134,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const resetPassword = async (email: string) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const client = supabase();
+      if (!client) {
+        return { error: { message: 'Authentication service unavailable' } as AuthError };
+      }
+      
+      const { error } = await client.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       return { error };

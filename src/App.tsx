@@ -11,6 +11,7 @@ import Calendar from "./components/Calendar";
 import Settings from "./components/Settings";
 import MyFlows from "./components/MyFlows";
 import FlowTemplates from "./components/FlowTemplates";
+import SavedTemplates from "./components/SavedTemplates";
 import { TemplateDetail } from "./components/templates/TemplateDetail";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
@@ -82,6 +83,14 @@ function App() {
     {
       path: "/templates",
       element: <FlowTemplates />,
+    },
+    {
+      path: "/saved-templates",
+      element: (
+        <ProtectedRoute>
+          <SavedTemplates />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/templates/:id",

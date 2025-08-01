@@ -1,46 +1,61 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Initialize Supabase client only when needed
+let supabaseInstance: any = null;
 
-console.log('Supabase config:', {
-  hasUrl: !!supabaseUrl,
-  hasKey: !!supabaseAnonKey,
-  urlLength: supabaseUrl?.length || 0,
-  keyLength: supabaseAnonKey?.length || 0
-});
+const getSupabaseConfig = () => {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables:', {
-    VITE_SUPABASE_URL: supabaseUrl ? 'Present' : 'Missing',
-    VITE_SUPABASE_ANON_KEY: supabaseAnonKey ? 'Present' : 'Missing'
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase environment variables not found. Authentication features will be disabled.');
+    return null;
+  }
+
+  return { supabaseUrl, supabaseAnonKey };
+};
+
+const createSupabaseClient = () => {
+  const config = getSupabaseConfig();
+  
+  if (!config) {
+    return null;
+  }
+
+  return createClient(config.supabaseUrl, config.supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'flow-web-app',
+      },
+    },
   });
-  throw new Error('Missing Supabase environment variables. Please check your .env file.');
-}
+};
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce',
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'flow-web-app',
-    },
-  },
-});
+export const supabase = () => {
+  if (!supabaseInstance) {
+    supabaseInstance = createSupabaseClient();
+  }
+  return supabaseInstance;
+};
 
 // Security helper functions
 export const getCurrentUser = async () => {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const client = supabase();
+    if (!client) return null;
+    
+    const { data: { user }, error } = await client.auth.getUser();
     if (error) {
       console.error('Error getting current user:', error);
       return null;
@@ -54,7 +69,10 @@ export const getCurrentUser = async () => {
 
 export const getCurrentSession = async () => {
   try {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const client = supabase();
+    if (!client) return null;
+    
+    const { data: { session }, error } = await client.auth.getSession();
     if (error) {
       console.error('Error getting current session:', error);
       return null;
