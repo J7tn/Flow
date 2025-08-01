@@ -6,8 +6,8 @@ if not exist .env (
     echo Creating .env file...
     (
         echo # Supabase Configuration ^(REQUIRED^)
-        echo VITE_SUPABASE_URL=https://xkelgvdcgtobgexigyol.supabase.co
-        echo VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrZWxndmRjZ3RvYmdleGlneW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5MzE5NTIsImV4cCI6MjA2OTUwNzk1Mn0.g_S-3UqPxq7ONitZ6x2acuWHf1oSYrBG2-6WCsoLZ6E
+        echo VITE_SUPABASE_URL=your_supabase_project_url_here
+        echo VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
         echo.
         echo # Chat2API Configuration
         echo VITE_CHAT2API_URL=http://localhost:5005
@@ -26,6 +26,11 @@ if not exist .env (
         echo VITE_BASE_PATH=/
     ) > .env
     echo Created .env file successfully!
+    echo.
+    echo ⚠️  IMPORTANT: You need to update the .env file with your actual Supabase credentials:
+    echo    - Replace 'your_supabase_project_url_here' with your Supabase project URL
+    echo    - Replace 'your_supabase_anon_key_here' with your Supabase anon key
+    echo.
 ) else (
     echo .env file already exists.
     
@@ -47,10 +52,11 @@ echo.
 echo Environment setup complete!
 echo.
 echo Next steps:
-echo 1. Install Docker Desktop for Windows
-echo 2. Start Docker Desktop
-echo 3. Run: docker-compose -f docker-compose.chat2api.yml up -d
-echo 4. Start your Flow app: npm run dev
+echo 1. Update .env file with your actual Supabase credentials
+echo 2. Install Docker Desktop for Windows
+echo 3. Start Docker Desktop
+echo 4. Run: docker-compose -f docker-compose.chat2api.yml up -d
+echo 5. Start your Flow app: npm run dev
 echo.
 echo For detailed instructions, see DOCKER_SETUP_GUIDE.md
 pause 

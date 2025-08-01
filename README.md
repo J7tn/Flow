@@ -57,6 +57,13 @@ A modern, secure flow management web application built with React, TypeScript, a
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
+   
+   Or use the setup script (Windows):
+   ```bash
+   cp setup-env.bat.template setup-env.bat
+   # Edit setup-env.bat with your actual Supabase credentials
+   .\setup-env.bat
+   ```
 
 4. **Set up AI features (Optional)**
    To enable AI-powered features, you need to set up the Chat2API service:
@@ -140,11 +147,13 @@ The following files contain sensitive information and are excluded from version 
 - `docker-compose.chat2api.yml` - Contains OpenAI API key
 - `test-api.ps1` - Contains API keys for testing
 - `test-chat.ps1` - Contains API keys for testing
+- `setup-env.bat` - Contains environment setup script
 
 ### Template Files
 Use the provided template files to set up your own configuration:
 - `docker-compose.chat2api.yml.template` - Template for Chat2API configuration
 - `test-chat.ps1.template` - Template for testing scripts
+- `setup-env.bat.template` - Template for environment setup script
 
 ### Best Practices
 1. **Never commit API keys** - Always use template files

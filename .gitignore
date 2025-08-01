@@ -37,6 +37,7 @@ credentials.json
 docker-compose.chat2api.yml
 test-api.ps1
 test-chat.ps1
+setup-env.bat
 
 # Supabase specific
 .supabase/
