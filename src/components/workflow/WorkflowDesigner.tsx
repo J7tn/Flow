@@ -365,11 +365,27 @@ const WorkflowDesigner = () => {
     }
   };
 
-  const handleCategorySelect = async (category: string) => {
-    setSelectedCategory(category);
-    if (suggestedSteps[currentStepIndex]) {
-      const step = suggestedSteps[currentStepIndex];
-      await generateToolsForStep(step.title, step.description, category);
+  const handleCategorySelect = async (category: string, stepId?: string) => {
+    if (stepId) {
+      // Handle category selection for a specific step
+      setSteps(prev => prev.map(step => 
+        step.id === stepId 
+          ? { ...step, selectedCategory: category }
+          : step
+      ));
+      
+      // Generate tools for this specific step with the selected category
+      const step = steps.find(s => s.id === stepId);
+      if (step) {
+        await generateToolsForStep(step.title, step.description, category);
+      }
+    } else {
+      // Handle category selection for AI suggestions (global)
+      setSelectedCategory(category);
+      if (suggestedSteps[currentStepIndex]) {
+        const step = suggestedSteps[currentStepIndex];
+        await generateToolsForStep(step.title, step.description, category);
+      }
     }
   };
 
@@ -447,6 +463,41 @@ const WorkflowDesigner = () => {
   const calculateTotalTime = () => {
     return steps.reduce((total, step) => total + (step.estimatedTime || 0), 0);
   };
+
+  const getNextStatus = (currentStatus: FlowStep["status"]) => {
+    switch (currentStatus) {
+      case "pending":
+        return "in-progress";
+      case "in-progress":
+        return "completed";
+      case "completed":
+        return "blocked";
+      case "blocked":
+        return "pending";
+      default:
+        return "pending";
+    }
+  };
+
+  // Add category buttons within each step block
+  const renderCategoryButtons = (step: FlowStep) => (
+    <div className="mt-4 space-y-2">
+      <div className="text-sm font-medium text-gray-700 mb-2">Tools & Resources:</div>
+      <div className="flex flex-wrap gap-2">
+        {["all", "management", "productivity", "communication", "storage"].map((category) => (
+          <Button
+            key={category}
+            variant={step.selectedCategory === category ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleCategorySelect(category, step.id)}
+            className="text-xs capitalize"
+          >
+            {category === "all" ? "All Tools" : category}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
 
 
 
@@ -1061,87 +1112,86 @@ const WorkflowDesigner = () => {
                      <div className="space-y-6">
                        {steps.map((step) => (
                          <div key={step.id}>
-                                                      <Card 
-                             className={`shadow-lg hover:shadow-xl transition-shadow cursor-pointer ${
+                           <Card 
+                             className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] ${
                              selectedStep === step.id ? 'ring-2 ring-blue-500' : ''
                            }`}
-                           onClick={() => setSelectedStep(step.id)}
-                         >
-                           <CardHeader className="pb-2">
-                             <div className="flex items-center justify-between">
-                               <div className="flex items-center space-x-2">
-                                 <div className={`w-3 h-3 rounded-full ${getStepColor(step)}`} />
-                                 <Badge variant="outline" className="text-xs">
-                                   {step.type}
-                                 </Badge>
-                               </div>
-                               <div className="flex items-center space-x-1">
-                                 {step.subFlow && step.subFlow.length > 0 && (
+                             onClick={() => setSelectedStep(step.id)}
+                           >
+                             <CardHeader className="pb-4">
+                               <div className="flex items-center justify-between">
+                                 <div className="flex items-center space-x-2">
+                                   <div className={`w-3 h-3 rounded-full ${getStepColor(step)}`} />
+                                   <Badge variant="outline" className="text-xs">
+                                     {step.type}
+                                   </Badge>
+                                   {step.subFlow && step.subFlow.length > 0 && (
+                                     <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                                       {step.subFlow.length} sub-step{step.subFlow.length !== 1 ? 's' : ''}
+                                     </Badge>
+                                   )}
+                                 </div>
+                                 <div className="flex items-center space-x-1">
+                                   {step.subFlow && step.subFlow.length > 0 && (
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         toggleStepExpansion(step.id);
+                                       }}
+                                     >
+                                       {expandedStep === step.id ? (
+                                         <ChevronUp className="h-3 w-3" />
+                                       ) : (
+                                         <ChevronDown className="h-3 w-3" />
+                                       )}
+                                     </Button>
+                                   )}
                                    <Button
                                      variant="ghost"
                                      size="sm"
                                      onClick={(e) => {
                                        e.stopPropagation();
-                                       toggleStepExpansion(step.id);
+                                       deleteStep(step.id);
                                      }}
                                    >
-                                     {expandedStep === step.id ? (
-                                       <ChevronUp className="h-3 w-3" />
-                                     ) : (
-                                       <ChevronDown className="h-3 w-3" />
-                                     )}
+                                     <Trash2 className="h-3 w-3" />
                                    </Button>
+                                 </div>
+                               </div>
+                               <CardTitle className="text-base break-words">{step.title}</CardTitle>
+                             </CardHeader>
+                             <CardContent className="pt-0 space-y-4">
+                               <CardDescription className="text-sm break-words overflow-hidden leading-relaxed">
+                                 {step.description || "No description"}
+                               </CardDescription>
+                               
+                               {/* Category Buttons */}
+                               {renderCategoryButtons(step)}
+                               
+                               <div className="space-y-1 text-xs text-muted-foreground pt-2 border-t">
+                                 {step.assignee && (
+                                   <div className="flex items-center">
+                                     <Users className="h-3 w-3 mr-1" />
+                                     {step.assignee}
+                                   </div>
                                  )}
-                                 <Button
-                                   variant="ghost"
-                                   size="sm"
-                                   onClick={(e) => {
-                                     e.stopPropagation();
-                                     deleteStep(step.id);
-                                   }}
-                                 >
-                                   <Trash2 className="h-3 w-3" />
-                                 </Button>
+                                 {step.estimatedTime && (
+                                   <div className="flex items-center">
+                                     <Clock className="h-3 w-3 mr-1" />
+                                     {step.estimatedTime}h
+                                   </div>
+                                 )}
+                                 {step.cost && (
+                                   <div className="flex items-center">
+                                     <DollarSign className="h-3 w-3 mr-1" />
+                                     ${step.cost}
+                                   </div>
+                                 )}
                                </div>
-                             </div>
-                             <CardTitle className="text-sm break-words">{step.title}</CardTitle>
-                           </CardHeader>
-                           <CardContent className="pt-0">
-                             <CardDescription className="text-xs mb-2 break-words overflow-hidden">
-                               {step.description || "No description"}
-                             </CardDescription>
-                             
-                             {/* Sub-Flow Indicator */}
-                             {step.subFlow && step.subFlow.length > 0 && (
-                               <div className="mb-2">
-                                 <Badge variant="secondary" className="text-xs">
-                                   {step.subFlow.length} sub-step{step.subFlow.length !== 1 ? 's' : ''}
-                                 </Badge>
-                               </div>
-                             )}
-                             
-                             <div className="space-y-1 text-xs text-muted-foreground">
-                               {step.assignee && (
-                                 <div className="flex items-center">
-                                   <Users className="h-3 w-3 mr-1" />
-                                   {step.assignee}
-                                 </div>
-                               )}
-                               {step.estimatedTime && (
-                                 <div className="flex items-center">
-                                   <Clock className="h-3 w-3 mr-1" />
-                                   {step.estimatedTime}h
-                                 </div>
-                               )}
-                               {step.cost && (
-                                 <div className="flex items-center">
-                                   <DollarSign className="h-3 w-3 mr-1" />
-                                   ${step.cost}
-                                 </div>
-                               )}
-                             </div>
-                           </CardContent>
-                         </Card>
+                             </CardContent>
+                           </Card>
                          
                          {/* Expanded Sub-Flow */}
                          {expandedStep === step.id && step.subFlow && step.subFlow.length > 0 && (
