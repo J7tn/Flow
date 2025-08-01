@@ -62,6 +62,8 @@ import {
   CheckSquare,
   ChevronRight,
   ChevronLeft,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
@@ -78,6 +80,8 @@ interface FlowStep {
   estimatedTime?: number;
   cost?: number;
   dependencies: string[];
+  subFlow?: FlowStep[]; // New: nested flow within this step
+  selectedCategory?: string; // New: selected tool category for this step
 }
 
 const WorkflowDesigner = () => {
@@ -99,6 +103,9 @@ const WorkflowDesigner = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [currentStepTools, setCurrentStepTools] = useState<Array<{ name: string; description: string; category: string; icon: any; link?: string }>>([]);
   const [isGeneratingTools, setIsGeneratingTools] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [expandedStep, setExpandedStep] = useState<string | null>(null);
+  const [selectedSubStep, setSelectedSubStep] = useState<string | null>(null);
 
   const generateAISteps = async (goal: string) => {
     if (!goal.trim()) return;
@@ -246,7 +253,7 @@ const WorkflowDesigner = () => {
     ];
   };
 
-  const generateToolsForStep = async (stepTitle: string, stepDescription: string) => {
+  const generateToolsForStep = async (stepTitle: string, stepDescription: string, category: string = "all") => {
     setIsGeneratingTools(true);
     
     try {
@@ -254,10 +261,14 @@ const WorkflowDesigner = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       const tools = await generateToolsWithAI(stepTitle, stepDescription);
-      setCurrentStepTools(tools);
+      // Filter tools by category if specified
+      const filteredTools = category === "all" ? tools : tools.filter(tool => tool.category.toLowerCase() === category.toLowerCase());
+      setCurrentStepTools(filteredTools);
     } catch (error) {
       console.error('Error generating tools:', error);
-      setCurrentStepTools(getFallbackTools(stepTitle));
+      const fallbackTools = getFallbackTools(stepTitle);
+      const filteredTools = category === "all" ? fallbackTools : fallbackTools.filter(tool => tool.category.toLowerCase() === category.toLowerCase());
+      setCurrentStepTools(filteredTools);
     } finally {
       setIsGeneratingTools(false);
     }
@@ -267,70 +278,74 @@ const WorkflowDesigner = () => {
     const lowerTitle = stepTitle.toLowerCase();
     const lowerDesc = stepDescription.toLowerCase();
     
-    // Generate contextually appropriate tools based on step
-    if (lowerTitle.includes('market') || lowerTitle.includes('research') || lowerDesc.includes('market')) {
-      return [
-        { name: "Google Trends", description: "Analyze search trends and market interest", category: "Research Tools", icon: TrendingUp, link: "https://trends.google.com" },
-        { name: "SEMrush", description: "Competitive analysis and keyword research", category: "Research Tools", icon: Search, link: "https://semrush.com" },
-        { name: "SurveyMonkey", description: "Create customer surveys and feedback forms", category: "Research Tools", icon: MessageSquare, link: "https://surveymonkey.com" },
-        { name: "Typeform", description: "Interactive forms and surveys", category: "Research Tools", icon: FileText, link: "https://typeform.com" },
-        { name: "Hotjar", description: "User behavior analytics and heatmaps", category: "Analytics", icon: BarChart3, link: "https://hotjar.com" },
-        { name: "Google Analytics", description: "Website traffic and user behavior analysis", category: "Analytics", icon: BarChart3, link: "https://analytics.google.com" },
-      ];
-    } else if (lowerTitle.includes('product') || lowerTitle.includes('development') || lowerDesc.includes('product')) {
-      return [
-        { name: "Figma", description: "Design and prototype your product", category: "Design Tools", icon: Palette, link: "https://figma.com" },
-        { name: "Notion", description: "Product documentation and project management", category: "Productivity", icon: FileText, link: "https://notion.so" },
-        { name: "Linear", description: "Issue tracking and project management", category: "Development", icon: Code, link: "https://linear.app" },
-        { name: "GitHub", description: "Code repository and version control", category: "Development", icon: Code, link: "https://github.com" },
-        { name: "Vercel", description: "Deploy and host your application", category: "Development", icon: Upload, link: "https://vercel.com" },
-        { name: "Stripe", description: "Payment processing and billing", category: "Business", icon: DollarSign, link: "https://stripe.com" },
-      ];
-    } else if (lowerTitle.includes('marketing') || lowerTitle.includes('campaign') || lowerDesc.includes('marketing')) {
-      return [
-        { name: "Mailchimp", description: "Email marketing and automation", category: "Email Marketing", icon: Mail, link: "https://mailchimp.com" },
-        { name: "Canva", description: "Create marketing graphics and designs", category: "Design", icon: Palette, link: "https://canva.com" },
-        { name: "Hootsuite", description: "Social media management and scheduling", category: "Social Media", icon: Share2, link: "https://hootsuite.com" },
-        { name: "Buffer", description: "Social media scheduling and analytics", category: "Social Media", icon: BarChart3, link: "https://buffer.com" },
-        { name: "Google Ads", description: "PPC advertising and campaign management", category: "Advertising", icon: DollarSign, link: "https://ads.google.com" },
-        { name: "Facebook Ads", description: "Social media advertising platform", category: "Advertising", icon: Share2, link: "https://business.facebook.com" },
-      ];
-    } else if (lowerTitle.includes('user') || lowerTitle.includes('testing') || lowerDesc.includes('user')) {
-      return [
-        { name: "UserTesting", description: "Remote user testing and feedback", category: "User Research", icon: Users, link: "https://usertesting.com" },
-        { name: "Maze", description: "Usability testing and user research", category: "User Research", icon: Search, link: "https://maze.co" },
-        { name: "Lookback", description: "User research and usability testing", category: "User Research", icon: Eye, link: "https://lookback.io" },
-        { name: "Optimal Workshop", description: "Information architecture and user research", category: "User Research", icon: Map, link: "https://optimalworkshop.com" },
-        { name: "Airtable", description: "Organize user research data", category: "Data Management", icon: Database, link: "https://airtable.com" },
-        { name: "Notion", description: "Document user research findings", category: "Documentation", icon: FileText, link: "https://notion.so" },
-      ];
-    } else if (lowerTitle.includes('launch') || lowerTitle.includes('preparation') || lowerDesc.includes('launch')) {
-      return [
-        { name: "Product Hunt", description: "Launch your product to the community", category: "Launch Platforms", icon: Rocket, link: "https://producthunt.com" },
-        { name: "BetaList", description: "Get early adopters and feedback", category: "Launch Platforms", icon: Users, link: "https://betalist.com" },
-        { name: "Press Kit Builder", description: "Create professional press materials", category: "Marketing", icon: FileText, link: "https://presskit.com" },
-        { name: "LaunchRock", description: "Build landing pages for product launches", category: "Landing Pages", icon: Globe, link: "https://launchrock.com" },
-        { name: "ConvertKit", description: "Email marketing for launch campaigns", category: "Email Marketing", icon: Mail, link: "https://convertkit.com" },
-        { name: "Calendly", description: "Schedule launch interviews and meetings", category: "Scheduling", icon: Calendar, link: "https://calendly.com" },
-      ];
-    } else {
-      // Generic tools for other steps
-      return [
-        { name: "Notion", description: "Project documentation and organization", category: "Productivity", icon: FileText, link: "https://notion.so" },
-        { name: "Trello", description: "Task management and project tracking", category: "Project Management", icon: CheckSquare, link: "https://trello.com" },
-        { name: "Slack", description: "Team communication and collaboration", category: "Communication", icon: MessageSquare, link: "https://slack.com" },
-        { name: "Zoom", description: "Video meetings and presentations", category: "Communication", icon: Video, link: "https://zoom.us" },
-        { name: "Google Drive", description: "File storage and collaboration", category: "Storage", icon: Folder, link: "https://drive.google.com" },
-        { name: "Asana", description: "Project management and team coordination", category: "Project Management", icon: Calendar, link: "https://asana.com" },
-      ];
+    const tools = [];
+    
+    // Management tools
+    if (lowerTitle.includes('market') || lowerTitle.includes('research') || lowerDesc.includes('market') || lowerTitle.includes('analysis') || lowerTitle.includes('planning')) {
+      tools.push(
+        { name: "Google Analytics", description: "Track website traffic and user behavior", category: "management", icon: BarChart3, link: "https://analytics.google.com" },
+        { name: "SEMrush", description: "Competitive analysis and keyword research", category: "management", icon: Search, link: "https://semrush.com" },
+        { name: "Ahrefs", description: "SEO and backlink analysis", category: "management", icon: TrendingUp, link: "https://ahrefs.com" },
+        { name: "Hotjar", description: "User behavior analytics and heatmaps", category: "management", icon: Eye, link: "https://hotjar.com" },
+        { name: "Mixpanel", description: "Product analytics and user insights", category: "management", icon: BarChart3, link: "https://mixpanel.com" },
+        { name: "Tableau", description: "Data visualization and business intelligence", category: "management", icon: BarChart3, link: "https://tableau.com" }
+      );
     }
+    
+    // Productivity tools
+    if (lowerTitle.includes('product') || lowerTitle.includes('development') || lowerDesc.includes('product') || lowerTitle.includes('build') || lowerTitle.includes('create')) {
+      tools.push(
+        { name: "Notion", description: "All-in-one workspace for notes and collaboration", category: "productivity", icon: FileText, link: "https://notion.so" },
+        { name: "Trello", description: "Project management with boards and cards", category: "productivity", icon: CheckSquare, link: "https://trello.com" },
+        { name: "Asana", description: "Team collaboration and project tracking", category: "productivity", icon: Target, link: "https://asana.com" },
+        { name: "Monday.com", description: "Work management platform", category: "productivity", icon: Calendar, link: "https://monday.com" },
+        { name: "ClickUp", description: "All-in-one productivity platform", category: "productivity", icon: CheckSquare, link: "https://clickup.com" },
+        { name: "Figma", description: "Design and prototyping tool", category: "productivity", icon: Palette, link: "https://figma.com" }
+      );
+    }
+    
+    // Communication tools
+    if (lowerTitle.includes('marketing') || lowerTitle.includes('campaign') || lowerDesc.includes('marketing') || lowerTitle.includes('promotion') || lowerTitle.includes('outreach') || lowerTitle.includes('communication')) {
+      tools.push(
+        { name: "Mailchimp", description: "Email marketing and automation", category: "communication", icon: Mail, link: "https://mailchimp.com" },
+        { name: "Slack", description: "Team communication and collaboration", category: "communication", icon: MessageSquare, link: "https://slack.com" },
+        { name: "Discord", description: "Community and team chat platform", category: "communication", icon: MessageCircle, link: "https://discord.com" },
+        { name: "Zoom", description: "Video conferencing and meetings", category: "communication", icon: Video, link: "https://zoom.us" },
+        { name: "Microsoft Teams", description: "Business communication platform", category: "communication", icon: MessageSquare, link: "https://teams.microsoft.com" },
+        { name: "Intercom", description: "Customer messaging and support", category: "communication", icon: MessageCircle, link: "https://intercom.com" }
+      );
+    }
+    
+    // Storage tools
+    if (lowerTitle.includes('launch') || lowerTitle.includes('preparation') || lowerDesc.includes('launch') || lowerTitle.includes('deploy') || lowerTitle.includes('release') || lowerTitle.includes('storage')) {
+      tools.push(
+        { name: "Google Drive", description: "Cloud storage and file sharing", category: "storage", icon: Folder, link: "https://drive.google.com" },
+        { name: "Dropbox", description: "File hosting and cloud storage", category: "storage", icon: Upload, link: "https://dropbox.com" },
+        { name: "OneDrive", description: "Microsoft cloud storage solution", category: "storage", icon: Database, link: "https://onedrive.live.com" },
+        { name: "Box", description: "Enterprise file sharing and collaboration", category: "storage", icon: Folder, link: "https://box.com" },
+        { name: "AWS S3", description: "Cloud object storage service", category: "storage", icon: Database, link: "https://aws.amazon.com/s3" },
+        { name: "GitHub", description: "Code repository and version control", category: "storage", icon: Code, link: "https://github.com" }
+      );
+    }
+    
+    // Add some general tools for any step
+    tools.push(
+      { name: "Google Docs", description: "Document creation and collaboration", category: "productivity", icon: FileText, link: "https://docs.google.com" },
+      { name: "Canva", description: "Graphic design and visual content", category: "productivity", icon: Palette, link: "https://canva.com" },
+      { name: "Loom", description: "Screen recording and video messaging", category: "communication", icon: Video, link: "https://loom.com" },
+      { name: "Airtable", description: "Database and spreadsheet hybrid", category: "storage", icon: Database, link: "https://airtable.com" }
+    );
+    
+    return tools;
   };
 
   const getFallbackTools = (stepTitle: string): Array<{ name: string; description: string; category: string; icon: any; link?: string }> => {
     return [
-      { name: "Notion", description: "Documentation and project management", category: "Productivity", icon: FileText },
-      { name: "Trello", description: "Task management and organization", category: "Project Management", icon: CheckSquare },
-      { name: "Google Docs", description: "Collaborative document editing", category: "Productivity", icon: FileText },
+      { name: "Notion", description: "Documentation and project management", category: "productivity", icon: FileText },
+      { name: "Trello", description: "Task management and organization", category: "productivity", icon: CheckSquare },
+      { name: "Google Docs", description: "Collaborative document editing", category: "productivity", icon: FileText },
+      { name: "Slack", description: "Team communication and collaboration", category: "communication", icon: MessageSquare },
+      { name: "Google Drive", description: "Cloud storage and file sharing", category: "storage", icon: Folder },
     ];
   };
 
@@ -350,6 +365,14 @@ const WorkflowDesigner = () => {
     }
   };
 
+  const handleCategorySelect = async (category: string) => {
+    setSelectedCategory(category);
+    if (suggestedSteps[currentStepIndex]) {
+      const step = suggestedSteps[currentStepIndex];
+      await generateToolsForStep(step.title, step.description, category);
+    }
+  };
+
   const addStep = (suggestedStep: { title: string; description: string; type: FlowStep["type"]; icon: any; color: string }) => {
     const newStep: FlowStep = {
       id: crypto.randomUUID(),
@@ -358,6 +381,8 @@ const WorkflowDesigner = () => {
       type: suggestedStep.type,
       status: "pending",
       dependencies: [],
+      subFlow: [], // Initialize empty sub-flow
+      selectedCategory: "all"
     };
     setSteps(prev => [...prev, newStep]);
   };
@@ -371,6 +396,48 @@ const WorkflowDesigner = () => {
     if (selectedStep === id) {
       setSelectedStep(null);
     }
+  };
+
+  const addSubStep = (parentStepId: string, subStep: { title: string; description: string; type: FlowStep["type"]; icon: any; color: string }) => {
+    setSteps(prev => prev.map(step => {
+      if (step.id === parentStepId) {
+        const newSubStep: FlowStep = {
+          id: crypto.randomUUID(),
+          title: subStep.title,
+          description: subStep.description,
+          type: subStep.type,
+          status: "pending",
+          dependencies: [],
+          subFlow: step.subFlow || []
+        };
+        return {
+          ...step,
+          subFlow: [...(step.subFlow || []), newSubStep]
+        };
+      }
+      return step;
+    }));
+  };
+
+  const deleteSubStep = (parentStepId: string, subStepId: string) => {
+    setSteps(prev => prev.map(step => {
+      if (step.id === parentStepId) {
+        return {
+          ...step,
+          subFlow: (step.subFlow || []).filter(subStep => subStep.id !== subStepId)
+        };
+      }
+      return step;
+    }));
+  };
+
+  const toggleStepExpansion = (stepId: string) => {
+    setExpandedStep(expandedStep === stepId ? null : stepId);
+    setSelectedSubStep(null); // Clear sub-step selection when expanding/collapsing
+  };
+
+  const handleSubStepClick = (subStepId: string) => {
+    setSelectedSubStep(selectedSubStep === subStepId ? null : subStepId);
   };
 
   const calculateTotalCost = () => {
@@ -552,12 +619,12 @@ const WorkflowDesigner = () => {
               </Button>
               <Separator orientation="vertical" className="h-6" />
               <div>
-                                 <Input
-                   value={workflowName}
-                   onChange={(e) => setWorkflowName(e.target.value)}
-                   className="text-xl font-semibold border-none p-0 h-auto focus-visible:ring-0"
-                   placeholder="New Flow"
-                 />
+                <Input
+                  value={workflowName}
+                  onChange={(e) => setWorkflowName(e.target.value)}
+                  className="text-xl font-semibold border-none p-0 h-auto focus-visible:ring-0"
+                  placeholder="New Flow"
+                />
                 <Textarea
                   value={workflowDescription}
                   onChange={(e) => setWorkflowDescription(e.target.value)}
@@ -869,7 +936,9 @@ const WorkflowDesigner = () => {
                               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
                                 <div className="flex items-center space-x-3 mb-4">
                                   <div className={`p-3 rounded-lg ${suggestedSteps[currentStepIndex]?.color} bg-opacity-10`}>
-                                    <suggestedSteps[currentStepIndex]?.icon className={`h-6 w-6 ${suggestedSteps[currentStepIndex]?.color.replace('bg-', 'text-')}`} />
+                                    {suggestedSteps[currentStepIndex]?.icon && React.createElement(suggestedSteps[currentStepIndex].icon, {
+                                      className: `h-6 w-6 ${suggestedSteps[currentStepIndex]?.color.replace('bg-', 'text-')}`
+                                    })}
                                   </div>
                                   <div>
                                     <h4 className="font-semibold text-lg">{suggestedSteps[currentStepIndex]?.title}</h4>
@@ -899,35 +968,79 @@ const WorkflowDesigner = () => {
                                   )}
                                 </div>
                                 
+                                {/* Category Filter Buttons */}
+                                <div className="mb-4">
+                                  <div className="flex flex-wrap gap-2">
+                                    {["all", "management", "productivity", "communication", "storage"].map((category) => (
+                                      <Button
+                                        key={category}
+                                        variant={selectedCategory === category ? "default" : "outline"}
+                                        size="sm"
+                                        className="text-xs capitalize"
+                                        onClick={() => handleCategorySelect(category)}
+                                      >
+                                        {category === "all" ? "All Tools" : category}
+                                      </Button>
+                                    ))}
+                                  </div>
+                                </div>
+
                                 {!isGeneratingTools && currentStepTools.length > 0 && (
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {currentStepTools.map((tool, index) => (
-                                      <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                                        <div className="flex items-start space-x-3">
-                                          <div className="p-2 rounded-lg bg-gray-100">
-                                            <tool.icon className="h-5 w-5 text-gray-600" />
-                                          </div>
-                                          <div className="flex-1">
-                                            <div className="flex items-center justify-between mb-1">
-                                              <h5 className="font-medium text-sm">{tool.name}</h5>
-                                              <Badge variant="outline" className="text-xs">{tool.category}</Badge>
+                                  <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      {currentStepTools.map((tool, index) => (
+                                        <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                          <div className="flex items-start space-x-3">
+                                            <div className="p-2 rounded-lg bg-gray-100">
+                                              {tool.icon && React.createElement(tool.icon, {
+                                                className: "h-5 w-5 text-gray-600"
+                                              })}
                                             </div>
-                                            <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
-                                            {tool.link && (
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-6 px-2 text-xs"
-                                                onClick={() => window.open(tool.link, '_blank')}
-                                              >
-                                                Visit Tool
-                                                <ChevronRight className="h-3 w-3 ml-1" />
-                                              </Button>
-                                            )}
+                                            <div className="flex-1">
+                                              <div className="flex items-center justify-between mb-1">
+                                                <h5 className="font-medium text-sm">{tool.name}</h5>
+                                                <Badge variant="outline" className="text-xs">{tool.category}</Badge>
+                                              </div>
+                                              <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                              <div className="flex gap-2">
+                                                {tool.link && (
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 px-2 text-xs"
+                                                    onClick={() => window.open(tool.link, '_blank')}
+                                                  >
+                                                    Visit Tool
+                                                    <ChevronRight className="h-3 w-3 ml-1" />
+                                                  </Button>
+                                                )}
+                                                <Button
+                                                  variant="outline"
+                                                  size="sm"
+                                                  className="h-6 px-2 text-xs"
+                                                  onClick={() => {
+                                                    const newSubStep = {
+                                                      title: `Use ${tool.name}`,
+                                                      description: `Implement ${tool.name} for ${suggestedSteps[currentStepIndex]?.title}`,
+                                                      type: "task" as FlowStep["type"],
+                                                      icon: tool.icon,
+                                                      color: "bg-blue-500"
+                                                    };
+                                                    // Add to the current step if it exists in the main flow
+                                                    if (steps.length > 0) {
+                                                      addSubStep(steps[steps.length - 1].id, newSubStep);
+                                                    }
+                                                  }}
+                                                >
+                                                  Add as Sub-Step
+                                                  <Plus className="h-3 w-3 ml-1" />
+                                                </Button>
+                                              </div>
+                                            </div>
                                           </div>
                                         </div>
-                                      </div>
-                                    ))}
+                                      ))}
+                                    </div>
                                   </div>
                                 )}
                               </div>
@@ -945,11 +1058,11 @@ const WorkflowDesigner = () => {
                        <h3 className="font-semibold text-lg">Your Flow Steps</h3>
                        <Badge variant="secondary">{steps.length} steps added</Badge>
                      </div>
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                     <div className="space-y-6">
                        {steps.map((step) => (
-                         <Card 
-                           key={step.id} 
-                           className={`shadow-lg hover:shadow-xl transition-shadow cursor-pointer ${
+                         <div key={step.id}>
+                                                      <Card 
+                             className={`shadow-lg hover:shadow-xl transition-shadow cursor-pointer ${
                              selectedStep === step.id ? 'ring-2 ring-blue-500' : ''
                            }`}
                            onClick={() => setSelectedStep(step.id)}
@@ -962,16 +1075,34 @@ const WorkflowDesigner = () => {
                                    {step.type}
                                  </Badge>
                                </div>
-                               <Button
-                                 variant="ghost"
-                                 size="sm"
-                                 onClick={(e) => {
-                                   e.stopPropagation();
-                                   deleteStep(step.id);
-                                 }}
-                               >
-                                 <Trash2 className="h-3 w-3" />
-                               </Button>
+                               <div className="flex items-center space-x-1">
+                                 {step.subFlow && step.subFlow.length > 0 && (
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={(e) => {
+                                       e.stopPropagation();
+                                       toggleStepExpansion(step.id);
+                                     }}
+                                   >
+                                     {expandedStep === step.id ? (
+                                       <ChevronUp className="h-3 w-3" />
+                                     ) : (
+                                       <ChevronDown className="h-3 w-3" />
+                                     )}
+                                   </Button>
+                                 )}
+                                 <Button
+                                   variant="ghost"
+                                   size="sm"
+                                   onClick={(e) => {
+                                     e.stopPropagation();
+                                     deleteStep(step.id);
+                                   }}
+                                 >
+                                   <Trash2 className="h-3 w-3" />
+                                 </Button>
+                               </div>
                              </div>
                              <CardTitle className="text-sm break-words">{step.title}</CardTitle>
                            </CardHeader>
@@ -979,6 +1110,16 @@ const WorkflowDesigner = () => {
                              <CardDescription className="text-xs mb-2 break-words overflow-hidden">
                                {step.description || "No description"}
                              </CardDescription>
+                             
+                             {/* Sub-Flow Indicator */}
+                             {step.subFlow && step.subFlow.length > 0 && (
+                               <div className="mb-2">
+                                 <Badge variant="secondary" className="text-xs">
+                                   {step.subFlow.length} sub-step{step.subFlow.length !== 1 ? 's' : ''}
+                                 </Badge>
+                               </div>
+                             )}
+                             
                              <div className="space-y-1 text-xs text-muted-foreground">
                                {step.assignee && (
                                  <div className="flex items-center">
@@ -1001,13 +1142,73 @@ const WorkflowDesigner = () => {
                              </div>
                            </CardContent>
                          </Card>
-                       ))}
-                     </div>
+                         
+                         {/* Expanded Sub-Flow */}
+                         {expandedStep === step.id && step.subFlow && step.subFlow.length > 0 && (
+                           <div className="mt-4 ml-6 border-l-2 border-gray-200 pl-4">
+                             <div className="space-y-3">
+                               <div className="flex items-center justify-between">
+                                 <h4 className="text-sm font-medium text-gray-700">Sub-Steps:</h4>
+                                 <span className="text-xs text-gray-500">Click sub-steps to select them</span>
+                               </div>
+                               {step.subFlow.map((subStep) => (
+                                 <div 
+                                   key={subStep.id} 
+                                   className={`bg-gray-50 rounded-lg p-3 border cursor-pointer transition-all hover:bg-gray-100 hover:shadow-sm ${
+                                     selectedSubStep === subStep.id ? 'ring-2 ring-blue-500 bg-blue-50 shadow-md' : ''
+                                   }`}
+                                   onClick={() => handleSubStepClick(subStep.id)}
+                                 >
+                                   <div className="flex items-center justify-between">
+                                     <div className="flex-1">
+                                       <div className="flex items-center space-x-2 mb-1">
+                                         <div className={`w-2 h-2 rounded-full ${getStepColor(subStep)}`} />
+                                         <span className="text-sm font-medium">{subStep.title}</span>
+                                         <Badge variant="outline" className="text-xs">
+                                           {subStep.type}
+                                         </Badge>
+                                         {selectedSubStep === subStep.id && (
+                                           <Badge variant="default" className="text-xs bg-blue-500">
+                                             Selected
+                                           </Badge>
+                                         )}
+                                       </div>
+                                       <p className="text-xs text-muted-foreground">{subStep.description}</p>
+                                       {selectedSubStep === subStep.id && (
+                                         <div className="mt-2 p-2 bg-white rounded border">
+                                           <p className="text-xs text-gray-600">
+                                             <strong>Sub-step selected:</strong> This sub-step is now active. 
+                                             You can remove it using the delete button on the right.
+                                           </p>
+                                         </div>
+                                       )}
+                                     </div>
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         deleteSubStep(step.id, subStep.id);
+                                       }}
+                                       className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                       title="Remove this sub-step"
+                                     >
+                                       <Trash2 className="h-3 w-3" />
+                                     </Button>
+                                   </div>
+                                 </div>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                     ))}
                    </div>
-                 )}
-               </div>
-            </div>
-          </div>
+                 </div>
+               )}
+             </div>
+           </div>
+         </div>
 
                                 {/* Right Sidebar - Step Properties & Flow Statistics */}
            <div className="w-80 border-l bg-gray-50 p-4 overflow-y-auto">
