@@ -6,6 +6,10 @@ import { Login } from "./components/auth/Login";
 import { Signup } from "./components/auth/Signup";
 import { EmailConfirmation } from "./components/auth/EmailConfirmation";
 import { LandingPage } from "./components/LandingPage";
+import { Features } from "./components/Features";
+import { Pricing } from "./components/Pricing";
+import { About } from "./components/About";
+import { Contact } from "./components/Contact";
 import Home from "./components/home";
 import Calendar from "./components/Calendar";
 import Settings from "./components/Settings";
@@ -23,6 +27,22 @@ function App() {
     {
       path: "/",
       element: <LandingPage />,
+    },
+    {
+      path: "/features",
+      element: <Features />,
+    },
+    {
+      path: "/pricing",
+      element: <Pricing />,
+    },
+    {
+      path: "/about",
+      element: <About />,
+    },
+    {
+      path: "/contact",
+      element: <Contact />,
     },
     {
       path: "/login",
