@@ -111,6 +111,12 @@ export function LandingPage() {
                        From creative projects to personal goals, Flow helps you plan, calculate costs,
                        optimize flows, and choose the right tools for any process or project.
                      </p>
+                     
+                     <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 mb-8 max-w-4xl mx-auto border border-gray-200/50">
+                       <p className="text-lg text-gray-700 leading-relaxed">
+                         Sometimes when you want to build an idea, you don't know where to start. You have to do some research and there are so many options on what tools to use, so many different strategies that people employ, and you aren't sure which one is for you, or if they're even up to date. That's where we come in. Create a flow based on your goal. Optimize it. Calculate the cost. Weigh the pros and cons. All on one dashboard.
+                       </p>
+                     </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                  <Link to="/signup">

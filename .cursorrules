@@ -121,11 +121,27 @@ import type { Workflow } from '@/types/supabase';
 
 ## Specific Patterns for This Project
 
+### Flow Block Types
+When creating flows, there are four fundamental block types that should be consistently referenced:
+
+1. **Goal Block** - Defines the objective or desired outcome of the flow
+2. **Step Block** - Represents individual actions or tasks within the flow
+3. **Tool Block** - Specifies tools, software, or resources needed for the flow
+4. **Strategy Block** - Outlines the approach, methodology, or strategic direction
+
+These block types are core to the Flow application's functionality and should be used consistently in:
+- Component naming and interfaces
+- Database schema design
+- API endpoints and data structures
+- UI components and user interactions
+- Documentation and comments
+
 ### Workflow Components
 - Use the WorkflowBuilder component for creating workflows
 - Implement proper state management for workflow data
 - Use the SmartSuggestionPanel for AI suggestions
 - Implement VisualProgressTracker for workflow progress
+- Structure workflow data using the four block types: Goal, Step, Tool, and Strategy blocks
 
 ### Routing
 - Use React Router for navigation
