@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, ArrowRight, Star } from 'lucide-react';
+import { Check, ArrowRight, Star, Building2, Users, Shield, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function Pricing() {
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+
   const plans = [
     {
       name: "Free",
       price: "$0",
-      period: "forever",
+      yearlyPrice: "$0",
+      period: billingPeriod === 'monthly' ? "forever" : "forever",
       description: "Perfect for individuals and personal projects",
       features: [
         "Unlimited projects",
@@ -23,12 +26,14 @@ export function Pricing() {
       ],
       popular: false,
       buttonText: "Get Started Free",
-      buttonVariant: "outline" as const
+      buttonVariant: "outline" as const,
+      icon: <Zap className="h-6 w-6" />
     },
     {
       name: "Pro",
       price: "$9",
-      period: "per month",
+      yearlyPrice: "$90",
+      period: billingPeriod === 'monthly' ? "per month" : "per year",
       description: "For teams that need to collaborate",
       features: [
         "Everything in Free",
@@ -38,13 +43,52 @@ export function Pricing() {
         "Priority support",
         "AI-powered optimization",
         "Custom workflows",
-        "Advanced analytics"
+        "Advanced analytics",
+        "API access"
       ],
       popular: true,
       buttonText: "Start Pro Trial",
-      buttonVariant: "default" as const
+      buttonVariant: "default" as const,
+      icon: <Users className="h-6 w-6" />
+    },
+    {
+      name: "Enterprise",
+      price: "$29",
+      yearlyPrice: "$290",
+      period: billingPeriod === 'monthly' ? "per month" : "per year",
+      description: "For large organizations with multiple teams",
+      features: [
+        "Everything in Pro",
+        "Unlimited team members",
+        "Advanced team management",
+        "Custom integrations",
+        "Dedicated account manager",
+        "24/7 priority support",
+        "Advanced security features",
+        "Custom branding",
+        "SSO & advanced authentication",
+        "Compliance reporting",
+        "Custom training sessions",
+        "SLA guarantees"
+      ],
+      popular: false,
+      buttonText: "Contact Sales",
+      buttonVariant: "default" as const,
+      icon: <Building2 className="h-6 w-6" />
     }
   ];
+
+  const getCurrentPrice = (plan: typeof plans[0]) => {
+    return billingPeriod === 'monthly' ? plan.price : plan.yearlyPrice;
+  };
+
+  const getSavings = (monthlyPrice: string, yearlyPrice: string) => {
+    const monthly = parseInt(monthlyPrice.replace('$', ''));
+    const yearly = parseInt(yearlyPrice.replace('$', ''));
+    const yearlyTotal = monthly * 12;
+    const savings = yearlyTotal - yearly;
+    return savings;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100">
@@ -86,14 +130,41 @@ export function Pricing() {
               <h1 className="text-5xl font-bold text-gray-900 mb-6">
                 Simple, Transparent Pricing
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                 Choose the plan that fits your needs. Start free and upgrade as you grow.
               </p>
+              
+              {/* Billing Toggle */}
+              <div className="flex items-center justify-center space-x-4 mb-8">
+                <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-gray-900' : 'text-gray-500'}`}>
+                  Monthly
+                </span>
+                <button
+                  onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'yearly' : 'monthly')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
+                    billingPeriod === 'yearly' ? 'bg-orange-500' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      billingPeriod === 'yearly' ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-gray-900' : 'text-gray-500'}`}>
+                  Yearly
+                </span>
+                {billingPeriod === 'yearly' && (
+                  <Badge className="bg-green-100 text-green-800">
+                    Save up to 17%
+                  </Badge>
+                )}
+              </div>
             </motion.div>
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.name}
@@ -112,11 +183,23 @@ export function Pricing() {
                 )}
                 <Card className={`h-full ${plan.popular ? 'border-2 border-orange-500 shadow-xl' : 'border'}`}>
                   <CardHeader className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="p-2 rounded-lg bg-gradient-to-r from-orange-500 to-purple-600 text-white">
+                        {plan.icon}
+                      </div>
+                    </div>
                     <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                     <div className="mt-4">
-                      <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
+                      <span className="text-4xl font-bold text-gray-900">{getCurrentPrice(plan)}</span>
                       <span className="text-gray-600 ml-2">/{plan.period}</span>
                     </div>
+                    {billingPeriod === 'yearly' && plan.name !== 'Free' && (
+                      <div className="mt-2">
+                        <Badge variant="secondary" className="text-green-700 bg-green-100">
+                          Save ${getSavings(plan.price, plan.yearlyPrice)}/year
+                        </Badge>
+                      </div>
+                    )}
                     <CardDescription className="text-base mt-2">
                       {plan.description}
                     </CardDescription>
@@ -124,9 +207,9 @@ export function Pricing() {
                   <CardContent>
                     <ul className="space-y-3 mb-8">
                       {plan.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-center">
-                          <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                          <span className="text-gray-700">{feature}</span>
+                        <li key={featureIndex} className="flex items-start">
+                          <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
+                          <span className="text-gray-700 text-sm">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -163,10 +246,10 @@ export function Pricing() {
               className="bg-gray-50 p-6 rounded-lg"
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                What's the difference between Free and Pro?
+                What's the difference between the plans?
               </h3>
               <p className="text-gray-600">
-                Free users get unlimited projects and templates, but can't add team members. Pro users can collaborate with up to 20 team members and get additional features like advanced analytics and priority support.
+                Free is perfect for individuals with unlimited projects. Pro adds team collaboration for up to 20 members. Enterprise is designed for large organizations with unlimited team members, advanced security, and dedicated support.
               </p>
             </motion.div>
             
@@ -177,10 +260,10 @@ export function Pricing() {
               className="bg-gray-50 p-6 rounded-lg"
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Can I upgrade to Pro later?
+                Is there a discount for yearly billing?
               </h3>
               <p className="text-gray-600">
-                Yes! You can upgrade to Pro at any time. Your existing projects and templates will be preserved, and you'll immediately gain access to team collaboration features.
+                Yes! Yearly plans save you up to 17% compared to monthly billing. You can switch between monthly and yearly billing at any time.
               </p>
             </motion.div>
             
@@ -191,10 +274,24 @@ export function Pricing() {
               className="bg-gray-50 p-6 rounded-lg"
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Is there a free trial for Pro?
+                What's included in Enterprise?
               </h3>
               <p className="text-gray-600">
-                Yes! Pro comes with a 14-day free trial. No credit card required to start exploring team features.
+                Enterprise includes unlimited team members, advanced security features like SSO, custom integrations, dedicated account management, 24/7 support, compliance reporting, and custom training sessions.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="bg-gray-50 p-6 rounded-lg"
+            >
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Can I upgrade or downgrade my plan?
+              </h3>
+              <p className="text-gray-600">
+                Yes! You can upgrade or downgrade at any time. When upgrading, you'll be charged the prorated difference. When downgrading, changes take effect at the next billing cycle.
               </p>
             </motion.div>
           </div>
