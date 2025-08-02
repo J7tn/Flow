@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   Plus,
@@ -84,6 +85,8 @@ import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
 import { flowApi } from "@/lib/api";
 import { flowSchema, type FlowInput } from "@/lib/validation";
+import { allTemplates } from "@/data/templates";
+import type { FlowTemplate } from "@/types/templates";
 
 interface FlowStep {
   id: string;
@@ -102,6 +105,7 @@ interface FlowStep {
 const WorkflowDesigner = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [workflowName, setWorkflowName] = useState("New Flow");
   const [workflowDescription, setWorkflowDescription] = useState("");
   const [workflowGoal, setWorkflowGoal] = useState("");
@@ -121,6 +125,45 @@ const WorkflowDesigner = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
   const [selectedSubStep, setSelectedSubStep] = useState<string | null>(null);
+
+  // Load template from URL parameter
+  useEffect(() => {
+    const templateId = searchParams.get('template');
+    if (templateId) {
+      const template = allTemplates.find(t => t.id === templateId);
+      if (template) {
+        // Load template data into the workflow
+        setWorkflowName(template.name);
+        setWorkflowDescription(template.description);
+        setWorkflowGoal(template.description); // Use description as goal
+        
+        // Convert template steps to FlowStep format
+        const convertedSteps: FlowStep[] = template.steps.map((step, index) => ({
+          id: step.id,
+          title: step.title,
+          description: step.description,
+          type: step.type as FlowStep["type"],
+          status: "pending" as const,
+          estimatedTime: step.estimatedDuration.min,
+          cost: step.costEstimate.min,
+          dependencies: step.dependencies || [],
+        }));
+        
+        setSteps(convertedSteps);
+        
+        toast({
+          title: "Template Loaded",
+          description: `Successfully loaded "${template.name}" template`,
+        });
+      } else {
+        toast({
+          title: "Template Not Found",
+          description: "The requested template could not be found",
+          variant: "destructive",
+        });
+      }
+    }
+  }, [searchParams, toast]);
 
   const generateAISteps = async (goal: string) => {
     if (!goal.trim()) return;
