@@ -690,25 +690,117 @@ const WorkflowDesigner = () => {
     }
   };
 
+  // Determine relevant tool categories based on workflow goal
+  const getRelevantCategories = (goal: string): string[] => {
+    if (!goal.trim()) {
+      return ["all", "management", "productivity", "communication", "storage"];
+    }
+    
+    const lowerGoal = goal.toLowerCase();
+    const relevantCategories = ["all"]; // Always include "all" option
+    
+    // Business and Management workflows
+    if (lowerGoal.includes('business') || lowerGoal.includes('company') || lowerGoal.includes('startup') || lowerGoal.includes('enterprise') || 
+        lowerGoal.includes('management') || lowerGoal.includes('strategy') || lowerGoal.includes('planning')) {
+      relevantCategories.push("management", "productivity", "communication", "storage");
+    }
+    
+    // Product and Development workflows
+    if (lowerGoal.includes('product') || lowerGoal.includes('development') || lowerGoal.includes('coding') || 
+        lowerGoal.includes('software') || lowerGoal.includes('app') || lowerGoal.includes('build') || 
+        lowerGoal.includes('create') || lowerGoal.includes('launch')) {
+      relevantCategories.push("productivity", "storage", "management");
+    }
+    
+    // Marketing and Sales workflows
+    if (lowerGoal.includes('marketing') || lowerGoal.includes('promotion') || lowerGoal.includes('advertising') || 
+        lowerGoal.includes('campaign') || lowerGoal.includes('sales') || lowerGoal.includes('revenue') || 
+        lowerGoal.includes('conversion') || lowerGoal.includes('leads')) {
+      relevantCategories.push("communication", "management", "productivity");
+    }
+    
+    // Creative and Design workflows
+    if (lowerGoal.includes('design') || lowerGoal.includes('creative') || lowerGoal.includes('art') || 
+        lowerGoal.includes('content') || lowerGoal.includes('visual') || lowerGoal.includes('artwork') || 
+        lowerGoal.includes('sketch') || lowerGoal.includes('brand')) {
+      relevantCategories.push("creative", "productivity", "storage");
+    }
+    
+    // Game Development workflows
+    if (lowerGoal.includes('game') || lowerGoal.includes('gaming') || lowerGoal.includes('play') || 
+        lowerGoal.includes('entertainment') || lowerGoal.includes('prototype')) {
+      relevantCategories.push("gaming", "creative", "productivity", "storage");
+    }
+    
+    // Education and Learning workflows
+    if (lowerGoal.includes('learn') || lowerGoal.includes('education') || lowerGoal.includes('course') || 
+        lowerGoal.includes('training') || lowerGoal.includes('tutorial') || lowerGoal.includes('curriculum')) {
+      relevantCategories.push("education", "productivity", "communication");
+    }
+    
+    // Health and Wellness workflows
+    if (lowerGoal.includes('health') || lowerGoal.includes('fitness') || lowerGoal.includes('wellness') || 
+        lowerGoal.includes('medical') || lowerGoal.includes('therapy') || lowerGoal.includes('workout')) {
+      relevantCategories.push("health", "productivity");
+    }
+    
+    // Financial workflows
+    if (lowerGoal.includes('finance') || lowerGoal.includes('money') || lowerGoal.includes('investment') || 
+        lowerGoal.includes('budget') || lowerGoal.includes('financial') || lowerGoal.includes('trading')) {
+      relevantCategories.push("finance", "productivity", "management");
+    }
+    
+    // Social and Community workflows
+    if (lowerGoal.includes('social') || lowerGoal.includes('community') || lowerGoal.includes('network') || 
+        lowerGoal.includes('connect') || lowerGoal.includes('relationship') || lowerGoal.includes('engagement')) {
+      relevantCategories.push("social", "communication", "productivity");
+    }
+    
+    // Research and Analysis workflows
+    if (lowerGoal.includes('research') || lowerGoal.includes('study') || lowerGoal.includes('analysis') || 
+        lowerGoal.includes('investigation') || lowerGoal.includes('explore') || lowerGoal.includes('data')) {
+      relevantCategories.push("research", "management", "productivity");
+    }
+    
+    // Event and Conference workflows
+    if (lowerGoal.includes('event') || lowerGoal.includes('conference') || lowerGoal.includes('meeting') || 
+        lowerGoal.includes('workshop') || lowerGoal.includes('presentation')) {
+      relevantCategories.push("communication", "productivity", "management");
+    }
+    
+    // Customer and Support workflows
+    if (lowerGoal.includes('customer') || lowerGoal.includes('user') || lowerGoal.includes('onboarding') || 
+        lowerGoal.includes('support') || lowerGoal.includes('service')) {
+      relevantCategories.push("communication", "productivity", "management");
+    }
+    
+    // Remove duplicates and return
+    return [...new Set(relevantCategories)];
+  };
+
   // Add category buttons within each step block
-  const renderCategoryButtons = (step: FlowStep) => (
-    <div className="mt-4 space-y-2">
-      <div className="text-sm font-medium text-gray-700 mb-2">Tools & Resources:</div>
-      <div className="flex flex-wrap gap-2">
-        {["all", "management", "productivity", "communication", "storage", "creative", "gaming", "education", "health", "finance", "social", "research"].map((category) => (
-          <Button
-            key={category}
-            variant={step.selectedCategory === category ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleCategorySelect(category, step.id)}
-            className="text-xs capitalize"
-          >
-            {category === "all" ? "All Tools" : category}
-          </Button>
-        ))}
+  const renderCategoryButtons = (step: FlowStep) => {
+    const relevantCategories = getRelevantCategories(workflowGoal);
+    
+    return (
+      <div className="mt-4 space-y-2">
+        <div className="text-sm font-medium text-gray-700 mb-2">Tools & Resources:</div>
+        <div className="flex flex-wrap gap-2">
+          {relevantCategories.map((category) => (
+            <Button
+              key={category}
+              variant={step.selectedCategory === category ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleCategorySelect(category, step.id)}
+              className="text-xs capitalize"
+            >
+              {category === "all" ? "All Tools" : category}
+            </Button>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
 
 
@@ -1178,7 +1270,7 @@ const WorkflowDesigner = () => {
                                 {/* Category Filter Buttons */}
                                 <div className="mb-4">
                                   <div className="flex flex-wrap gap-2">
-                                    {["all", "management", "productivity", "communication", "storage", "creative", "gaming", "education", "health", "finance", "social", "research"].map((category) => (
+                                    {getRelevantCategories(workflowGoal).map((category) => (
                                       <Button
                                         key={category}
                                         variant={selectedCategory === category ? "default" : "outline"}
@@ -1586,22 +1678,22 @@ const WorkflowDesigner = () => {
                        />
                      </div>
                      <div className="grid grid-cols-2 gap-4">
-                       <div>
-                         <label className="text-sm font-medium">Estimated Time (hours)</label>
+                       <div className="flex flex-col">
+                         <label className="text-sm font-medium mb-1">Estimated Time (hours)</label>
                          <Input
                            type="number"
                            value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
                            onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
-                           className="mt-1"
+                           className="h-10"
                          />
                        </div>
-                       <div>
-                         <label className="text-sm font-medium">Cost ($)</label>
+                       <div className="flex flex-col">
+                         <label className="text-sm font-medium mb-1">Cost ($)</label>
                          <Input
                            type="number"
                            value={steps.find(s => s.id === selectedStep)?.cost || ""}
                            onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
-                           className="mt-1"
+                           className="h-10"
                          />
                        </div>
                      </div>
