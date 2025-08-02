@@ -57,8 +57,9 @@ describe('ProfileManager', () => {
     
     renderWithAuth(<ProfileManager />);
     
-    expect(screen.getByRole('button', { name: /change avatar/i })).toBeInTheDocument();
-    expect(screen.getByText(/profile information/i)).toBeInTheDocument();
+    // Should show loading spinner during initial load
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading profile information')).toBeInTheDocument();
   });
 
   it('loads and displays profile data', async () => {

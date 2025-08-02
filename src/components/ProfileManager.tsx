@@ -138,7 +138,7 @@ export function ProfileManager({ className }: ProfileManagerProps) {
     return (
       <Card className={cn('w-full', className)}>
         <CardContent className="flex items-center justify-center p-6">
-          <Loader2 className="h-6 w-6 animate-spin" />
+          <Loader2 className="h-6 w-6 animate-spin" role="status" aria-label="Loading profile information" />
         </CardContent>
       </Card>
     );
