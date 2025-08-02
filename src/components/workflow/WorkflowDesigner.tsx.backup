@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   ArrowLeft,
   Plus,
@@ -69,6 +70,7 @@ import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
 import { flowApi } from "@/lib/api";
 import { flowSchema, type FlowInput } from "@/lib/validation";
+import { Chat2APIService } from "@/lib/chat2api";
 
 interface FlowStep {
   id: string;
@@ -84,6 +86,14 @@ interface FlowStep {
   selectedCategory?: string; // New: selected tool category for this step
 }
 
+interface GoalValidation {
+  isValid: boolean;
+  isGibberish: boolean;
+  needsClarity: boolean;
+  suggestions: string[];
+  confidence: number;
+}
+
 const WorkflowDesigner = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -97,6 +107,11 @@ const WorkflowDesigner = () => {
   const [shareLink, setShareLink] = useState("");
   const [showPreview, setShowPreview] = useState(false);
 
+  // Goal validation state
+  const [goalValidation, setGoalValidation] = useState<GoalValidation | null>(null);
+  const [isValidatingGoal, setIsValidatingGoal] = useState(false);
+  const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // AI-powered step suggestions
   const [isGeneratingSteps, setIsGeneratingSteps] = useState(false);
   const [suggestedSteps, setSuggestedSteps] = useState<Array<{ title: string; description: string; type: FlowStep["type"]; icon: any; color: string }>>([]);
@@ -106,6 +121,120 @@ const WorkflowDesigner = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
   const [selectedSubStep, setSelectedSubStep] = useState<string | null>(null);
+
+  // Goal validation function
+  const validateGoal = async (goal: string) => {
+    if (!goal.trim()) {
+      setGoalValidation(null);
+      return;
+    }
+
+    setIsValidatingGoal(true);
+    try {
+      const validationPrompt = `Analyze this workflow goal and provide validation feedback in JSON format:
+
+Goal: "${goal}"
+
+Please evaluate:
+1. Is this gibberish or nonsensical text?
+2. Is this goal clear and well-defined enough to create a workflow?
+3. What suggestions would improve the goal's clarity?
+
+Respond with a JSON object containing:
+{
+  "isValid": boolean,
+  "isGibberish": boolean,
+  "needsClarity": boolean,
+  "suggestions": [string array],
+  "confidence": number (0-1)
+}
+
+Focus on:
+- Detecting random characters, repeated words, or nonsensical text
+- Assessing if the goal is specific enough to create actionable workflow steps
+- Providing constructive suggestions for improvement
+- Confidence level based on goal clarity and specificity`;
+
+      const response = await Chat2APIService.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a workflow validation expert. Analyze goals for clarity and provide constructive feedback.'
+          },
+          {
+            role: 'user',
+            content: validationPrompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 500
+      });
+
+      const responseText = response.choices[0]?.message?.content || '';
+      
+      // Try to parse JSON response
+      try {
+        const validation = JSON.parse(responseText);
+        setGoalValidation(validation);
+        
+        // Show toast notifications for issues
+        if (validation.isGibberish) {
+          toast({
+            title: "Invalid Goal",
+            description: "The goal appears to be gibberish or nonsensical. Please provide a clear, meaningful goal.",
+            variant: "destructive",
+          });
+        } else if (validation.needsClarity) {
+          toast({
+            title: "Goal Needs Clarity",
+            description: "Your goal could be more specific. Consider adding more details about what you want to achieve.",
+            variant: "default",
+          });
+        }
+      } catch (parseError) {
+        // Fallback validation if AI response isn't valid JSON
+        const fallbackValidation: GoalValidation = {
+          isValid: goal.length > 10 && goal.split(' ').length > 2,
+          isGibberish: false,
+          needsClarity: goal.length < 20 || goal.split(' ').length < 3,
+          suggestions: ["Add more specific details about your goal", "Include measurable outcomes"],
+          confidence: 0.5
+        };
+        setGoalValidation(fallbackValidation);
+      }
+    } catch (error) {
+      console.error('Error validating goal:', error);
+      // Fallback validation on error
+      const fallbackValidation: GoalValidation = {
+        isValid: goal.length > 10,
+        isGibberish: false,
+        needsClarity: goal.length < 20,
+        suggestions: ["Please provide a more detailed goal"],
+        confidence: 0.3
+      };
+      setGoalValidation(fallbackValidation);
+    } finally {
+      setIsValidatingGoal(false);
+    }
+  };
+
+  // Debounced goal validation
+  const debouncedValidateGoal = React.useCallback((goal: string) => {
+    if (validationTimeoutRef.current) {
+      clearTimeout(validationTimeoutRef.current);
+    }
+    validationTimeoutRef.current = setTimeout(() => validateGoal(goal), 1000);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (validationTimeoutRef.current) {
+        clearTimeout(validationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const generateAISteps = async (goal: string) => {
     if (!goal.trim()) return;
@@ -400,7 +529,7 @@ const WorkflowDesigner = () => {
       subFlow: [], // Initialize empty sub-flow
       selectedCategory: "all"
     };
-    setSteps(prev => [newStep, ...prev]);
+    setSteps(prev => [...prev, newStep]);
   };
 
   const updateStep = (id: string, updates: Partial<FlowStep>) => {
@@ -515,6 +644,7 @@ const WorkflowDesigner = () => {
 
   const updateGoal = (newGoal: string) => {
     setWorkflowGoal(newGoal);
+    debouncedValidateGoal(newGoal);
   };
 
   // Save flow functionality
@@ -868,15 +998,171 @@ const WorkflowDesigner = () => {
         </div>
 
                  {/* Main Content */}
-         <div className="flex-1 flex overflow-hidden">
-           {/* Center - Flow Canvas */}
-           <div className="flex-1 bg-white relative overflow-auto">
-             <div className="p-6 min-h-full">
-                              <div className="canvas-container w-full h-full min-h-[600px] bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+                 <div className="flex-1 flex overflow-hidden">
+                   {/* Center - Flow Canvas */}
+                   <div className="flex-1 bg-white relative overflow-auto">
+                     <div className="p-6 min-h-full">
+                       <div className="canvas-container w-full h-full min-h-[600px] bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
                  {/* Main Content Grid - AI-Guided Flow and Goal Input side by side */}
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                    {/* AI-Guided Flow Block - Left Side */}
                    <div className="order-2 lg:order-1">
+                     {/* AI Suggested Steps - Appear below goal */}
+                     {isGeneratingSteps && (
+                       <Card className="w-full shadow-lg">
+                         <CardContent className="p-6">
+                           <div className="text-center">
+                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-3"></div>
+                             <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
+                           </div>
+                         </CardContent>
+                       </Card>
+                     )}
+
+                     {/* Progressive AI Steps */}
+                     {suggestedSteps.length > 0 && !isGeneratingSteps && (
+                       <Card className="w-full shadow-lg">
+                         <CardHeader className="pb-4">
+                           <div className="flex items-center justify-between">
+                             <div className="flex items-center space-x-2">
+                               <Sparkles className="h-5 w-5 text-purple-500" />
+                               <h3 className="font-semibold">AI-Guided Flow</h3>
+                               <Badge variant="secondary">Step {currentStepIndex + 1} of {suggestedSteps.length}</Badge>
+                             </div>
+                             <div className="flex items-center space-x-2">
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={moveToPreviousStep}
+                                 disabled={currentStepIndex === 0}
+                               >
+                                 <ChevronLeft className="h-3 w-3 mr-1" />
+                                 Previous
+                               </Button>
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={moveToNextStep}
+                                 disabled={currentStepIndex === suggestedSteps.length - 1}
+                               >
+                                 Next
+                                 <ChevronRight className="h-3 w-3 ml-1" />
+                               </Button>
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={() => generateAISteps(workflowGoal)}
+                                 disabled={!workflowGoal.trim()}
+                               >
+                                 <Sparkles className="h-3 w-3 mr-1" />
+                                 Regenerate
+                               </Button>
+                             </div>
+                           </div>
+                         </CardHeader>
+                         <CardContent className="pt-0">
+                           <div className="space-y-6">
+                             {/* Current Step */}
+                             <div>
+                               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+                                 <div className="flex items-center space-x-3 mb-4">
+                                   <div className={`p-3 rounded-lg ${suggestedSteps[currentStepIndex]?.color} bg-opacity-10`}>
+                                     {suggestedSteps[currentStepIndex]?.icon && React.createElement(suggestedSteps[currentStepIndex].icon, {
+                                       className: `h-6 w-6 ${suggestedSteps[currentStepIndex]?.color.replace('bg-', 'text-')}`
+                                     })}
+                                   </div>
+                                   <div>
+                                     <h4 className="font-semibold text-lg">{suggestedSteps[currentStepIndex]?.title}</h4>
+                                     <p className="text-sm text-muted-foreground">{suggestedSteps[currentStepIndex]?.description}</p>
+                                   </div>
+                                 </div>
+                                 <Button 
+                                   className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                                   onClick={() => addStep(suggestedSteps[currentStepIndex])}
+                                 >
+                                   <Plus className="h-4 w-4 mr-2" />
+                                   Add This Step
+                                 </Button>
+                               </div>
+                             </div>
+
+                             {/* Tools and Resources */}
+                             <div>
+                               <div className="space-y-4">
+                                 <div className="flex items-center justify-between">
+                                   <h4 className="font-semibold">Tools & Resources</h4>
+                                   {isGeneratingTools && (
+                                     <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                                       <span>AI is finding tools...</span>
+                                     </div>
+                                   )}
+                                 </div>
+                                 
+                                 {/* Category Filter Buttons */}
+                                 <div className="mb-4">
+                                   <div className="flex flex-wrap gap-2">
+                                     {["all", "management", "productivity", "communication", "storage"].map((category) => (
+                                       <Button
+                                         key={category}
+                                         variant={selectedCategory === category ? "default" : "outline"}
+                                         size="sm"
+                                         className="text-xs capitalize"
+                                         onClick={() => handleCategorySelect(category)}
+                                       >
+                                         {category === "all" ? "All Tools" : category}
+                                       </Button>
+                                     ))}
+                                   </div>
+                                 </div>
+
+                                 {!isGeneratingTools && currentStepTools.length > 0 && (
+                                   <div className="space-y-4">
+                                     <div className="grid grid-cols-1 gap-4">
+                                       {currentStepTools.map((tool, index) => (
+                                         <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                           <div className="flex items-start space-x-3">
+                                             <div className="p-2 rounded-lg bg-gray-100">
+                                               {tool.icon && React.createElement(tool.icon, {
+                                                 className: "h-5 w-5 text-gray-600"
+                                               })}
+                                             </div>
+                                             <div className="flex-1">
+                                               <div className="flex items-center justify-between mb-1">
+                                                 <h5 className="font-medium text-sm">{tool.name}</h5>
+                                                 <Badge variant="outline" className="text-xs">{tool.category}</Badge>
+                                               </div>
+                                               <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                               <div className="flex gap-2">
+                                                 {tool.link && (
+                                                   <Button
+                                                     variant="ghost"
+                                                     size="sm"
+                                                     className="h-6 px-2 text-xs"
+                                                     onClick={() => window.open(tool.link, '_blank')}
+                                                   >
+                                                     Visit Tool
+                                                     <ChevronRight className="h-3 w-3 ml-1" />
+                                                   </Button>
+                                                 )}
+                                                 <Button
+                                                   variant="outline"
+                                                   size="sm"
+                                                   className="h-6 px-2 text-xs"
+                                                   onClick={() => {
+                                                     const newSubStep = {
+                                                       title: `Use ${tool.name}`,
+                                                       description: `Implement ${tool.name} for ${suggestedSteps[currentStepIndex]?.title}`,
+                                                       type: "task" as FlowStep["type"],
+                                                       icon: tool.icon,
+                                                       color: "bg-blue-500"
+                                                     };
+                                                     // Add to the current step if it exists in the main flow
+                                                     if (steps.length > 0) {
+                                                       addSubStep(steps[steps.length - 1].id, newSubStep);
+                                                     }
+                                                   }}
+                                                 >
 
                  {/* AI Suggested Steps - Appear below goal */}
                  {isGeneratingSteps && (
@@ -1053,8 +1339,7 @@ const WorkflowDesigner = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </div>
-                  )}
+                    )}
                    </div>
 
                    {/* Goal Input Block - Right Side */}
@@ -1078,33 +1363,115 @@ const WorkflowDesigner = () => {
                                  value={workflowGoal}
                                  onChange={(e) => updateGoal(e.target.value)}
                                  placeholder="e.g., Launch a new product, Optimize customer onboarding, Create a marketing campaign..."
-                                 className="w-full border-purple-200 focus:border-purple-400"
+                                 className={`w-full border-purple-200 focus:border-purple-400 ${
+                                   goalValidation?.isGibberish ? 'border-red-300 focus:border-red-400' :
+                                   goalValidation?.needsClarity ? 'border-yellow-300 focus:border-yellow-400' :
+                                   goalValidation?.isValid ? 'border-green-300 focus:border-green-400' : ''
+                                 }`}
                                  rows={3}
                                />
+                               {isValidatingGoal && (
+                                 <div className="absolute right-3 top-3">
+                                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
+                                 </div>
+                               )}
                              </div>
+                             
+                             {/* Goal Validation Feedback */}
+                             {goalValidation && !isValidatingGoal && (
+                               <div className="mt-3">
+                                 {goalValidation.isGibberish && (
+                                   <Alert variant="destructive" className="border-red-200 bg-red-50">
+                                     <AlertCircle className="h-4 w-4" />
+                                     <AlertDescription>
+                                       <strong>Invalid Goal:</strong> The goal appears to be gibberish or nonsensical. Please provide a clear, meaningful goal that describes what you want to achieve.
+                                     </AlertDescription>
+                                   </Alert>
+                                 )}
+                                 
+                                 {goalValidation.needsClarity && !goalValidation.isGibberish && (
+                                   <Alert className="border-yellow-200 bg-yellow-50">
+                                     <AlertTriangle className="h-4 w-4" />
+                                     <AlertDescription>
+                                       <div className="space-y-2">
+                                         <div className="flex items-center justify-between">
+                                           <strong>Goal Needs Clarity:</strong>
+                                           <div className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
+                                             Confidence: {Math.round(goalValidation.confidence * 100)}%
+                                           </div>
+                                         </div>
+                                         <div>Your goal could be more specific. Consider:</div>
+                                         <ul className="ml-4 list-disc space-y-1">
+                                           {goalValidation.suggestions.map((suggestion, index) => (
+                                             <li key={index} className="text-sm">{suggestion}</li>
+                                           ))}
+                                         </ul>
+                                       </div>
+                                     </AlertDescription>
+                                   </Alert>
+                                 )}
+                                 
+                                 {goalValidation.isValid && !goalValidation.needsClarity && !goalValidation.isGibberish && (
+                                   <Alert className="border-green-200 bg-green-50">
+                                     <CheckCircle className="h-4 w-4" />
+                                     <AlertDescription>
+                                       <div className="flex items-center justify-between">
+                                         <div>
+                                           <strong>Great Goal!</strong> Your goal is clear and well-defined. You can now generate AI-powered workflow steps.
+                                         </div>
+                                         <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                                           Confidence: {Math.round(goalValidation.confidence * 100)}%
+                                         </div>
+                                       </div>
+                                     </AlertDescription>
+                                   </Alert>
+                                 )}
+                               </div>
+                             )}
                            </div>
                            <div className="flex items-center justify-between">
                              <div className="text-xs text-purple-700">
                                Define a clear, measurable goal to help guide your flow design
                              </div>
-                             <Button
-                               onClick={() => generateAISteps(workflowGoal)}
-                               disabled={!workflowGoal.trim() || isGeneratingSteps}
-                               size="sm"
-                               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                             >
-                               {isGeneratingSteps ? (
-                                 <>
-                                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                   AI is thinking...
-                                 </>
-                               ) : (
-                                 <>
-                                   <Sparkles className="h-4 w-4 mr-2" />
-                                   Generate Steps
-                                 </>
-                               )}
-                             </Button>
+                             <div className="flex items-center space-x-2">
+                               <Button
+                                 onClick={() => validateGoal(workflowGoal)}
+                                 disabled={!workflowGoal.trim() || isValidatingGoal}
+                                 variant="outline"
+                                 size="sm"
+                                 className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                               >
+                                 {isValidatingGoal ? (
+                                   <>
+                                     <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-purple-500 mr-1"></div>
+                                     Validating...
+                                   </>
+                                 ) : (
+                                   <>
+                                     <CheckCircle className="h-3 w-3 mr-1" />
+                                     Validate Goal
+                                   </>
+                                 )}
+                               </Button>
+                               <Button
+                                 onClick={() => generateAISteps(workflowGoal)}
+                                 disabled={!workflowGoal.trim() || isGeneratingSteps || goalValidation?.isGibberish || !goalValidation?.isValid}
+                                 size="sm"
+                                 className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                               >
+                                 {isGeneratingSteps ? (
+                                   <>
+                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                     AI is thinking...
+                                   </>
+                                 ) : (
+                                   <>
+                                     <Sparkles className="h-4 w-4 mr-2" />
+                                     Generate Steps
+                                   </>
+                                 )}
+                               </Button>
+                             </div>
                            </div>
                          </div>
                        </CardHeader>
@@ -1270,8 +1637,8 @@ const WorkflowDesigner = () => {
            </div>
          </div>
 
-                                {/* Right Sidebar - Step Properties & Flow Statistics */}
-           <div className="w-80 border-l bg-gray-50 p-4 overflow-y-auto">
+                 {/* Right Sidebar - Step Properties & Flow Statistics */}
+                 <div className="w-80 border-l bg-gray-50 p-4 overflow-y-auto">
              {/* Flow Statistics */}
              <div className="mb-6">
                <h3 className="font-semibold mb-3">Flow Statistics</h3>
@@ -1414,10 +1781,13 @@ const WorkflowDesigner = () => {
                  <p>Select a step to edit its properties</p>
                </div>
              )}
+                 </div>
+               </div>
+             </div>
            </div>
-        </div>
-      </div>
-    </PermanentDashboard>
+         </div>
+       </div>
+     </PermanentDashboard>
   );
 };
 
