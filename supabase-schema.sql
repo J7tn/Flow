@@ -1,8 +1,7 @@
 -- Flow Application Database Schema
 -- Run this in your Supabase SQL Editor
 
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret-here';
+-- Note: JWT secret is managed by Supabase automatically
 
 -- Create custom types
 CREATE TYPE workflow_status AS ENUM ('draft', 'active', 'completed', 'archived');
@@ -41,6 +40,7 @@ CREATE TABLE public.workflow_templates (
   description TEXT,
   category template_category NOT NULL,
   difficulty difficulty_level NOT NULL,
+  target_audience TEXT,
   estimated_duration_min INTEGER NOT NULL,
   estimated_duration_max INTEGER NOT NULL,
   duration_unit TEXT NOT NULL DEFAULT 'weeks',
@@ -287,7 +287,7 @@ CREATE POLICY "Users can view own votes" ON public.review_votes
   FOR SELECT USING (auth.uid() = voter_id);
 
 CREATE POLICY "Users can create votes" ON public.review_votes
-  FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
+  FOR INSERT WITH CHECK (auth.uid() = voter_id);
 
 CREATE POLICY "Users can update own votes" ON public.review_votes
   FOR UPDATE USING (auth.uid() = voter_id);

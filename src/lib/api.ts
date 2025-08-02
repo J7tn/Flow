@@ -289,37 +289,211 @@ export class SecureApi {
 // Flow-specific API functions
 export const flowApi = {
   async getFlows(userId?: string) {
-    return SecureApi.get('flows', { userId });
+    return SecureApi.get('workflow_instances', { userId });
   },
 
   async createFlow(flowData: any) {
-    return SecureApi.post('flows', flowData);
+    try {
+      const client = supabase();
+      if (!client) {
+        return { success: false, error: 'Supabase client not available' };
+      }
+
+      const { data: { user }, error: authError } = await client.auth.getUser();
+      if (authError) {
+        return { success: false, error: `Authentication error: ${authError.message}` };
+      }
+      
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      // Transform flow data to match workflow_instances schema
+      const workflowInstanceData = {
+        name: flowData.title,
+        description: flowData.description || '',
+        user_id: user.id,
+        status: 'draft',
+        current_step: 0,
+        completed_steps: [],
+        customizations: {},
+        notes: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // Insert the workflow instance
+      const { data: workflowInstance, error: instanceError } = await client
+        .from('workflow_instances')
+        .insert(workflowInstanceData)
+        .select()
+        .single();
+
+      if (instanceError) {
+        console.error('Error creating workflow instance:', instanceError);
+        return { success: false, error: `Failed to create workflow: ${instanceError.message}` };
+      }
+
+      // Insert the workflow steps
+      if (flowData.steps && flowData.steps.length > 0) {
+        const stepsData = flowData.steps.map((step: any, index: number) => ({
+          workflow_instance_id: workflowInstance.id,
+          title: step.title,
+          description: step.description || '',
+          step_type: 'task',
+          order_index: index,
+          estimated_duration_min: 1,
+          estimated_duration_max: 2,
+          duration_unit: 'days',
+          required_skills: [],
+          required_tools: [],
+          dependencies: [],
+          deliverables: [],
+          acceptance_criteria: [],
+          risk_level: 'medium',
+          cost_estimate_min: 0,
+          cost_estimate_max: 0,
+          cost_currency: 'USD',
+          automation_potential: 0,
+          optimization_tips: [],
+          is_completed: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }));
+
+        const { error: stepsError } = await client
+          .from('workflow_steps')
+          .insert(stepsData);
+
+        if (stepsError) {
+          console.error('Error creating workflow steps:', stepsError);
+          // Don't fail the whole operation if steps creation fails
+        }
+      }
+
+      return { success: true, data: workflowInstance, error: null };
+    } catch (error) {
+      console.error('Error creating flow:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to create flow' 
+      };
+    }
   },
 
   async updateFlow(id: string, flowData: any) {
-    return SecureApi.put('flows', id, flowData);
+    try {
+      const client = supabase();
+      if (!client) {
+        return { success: false, error: 'Supabase client not available' };
+      }
+
+      const { data: { user }, error: authError } = await client.auth.getUser();
+      if (authError) {
+        return { success: false, error: `Authentication error: ${authError.message}` };
+      }
+      
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      // Update the workflow instance
+      const updateData = {
+        name: flowData.title,
+        description: flowData.description || '',
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await client
+        .from('workflow_instances')
+        .update(updateData)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) {
+        return { success: false, error: `Failed to update workflow: ${error.message}` };
+      }
+
+      return { success: true, data, error: null };
+    } catch (error) {
+      console.error('Error updating flow:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to update flow' 
+      };
+    }
   },
 
   async deleteFlow(id: string) {
-    return SecureApi.delete('flows', id);
+    try {
+      const client = supabase();
+      if (!client) {
+        return { success: false, error: 'Supabase client not available' };
+      }
+
+      const { data: { user }, error: authError } = await client.auth.getUser();
+      if (authError) {
+        return { success: false, error: `Authentication error: ${authError.message}` };
+      }
+      
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      const { error } = await client
+        .from('workflow_instances')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) {
+        return { success: false, error: `Failed to delete workflow: ${error.message}` };
+      }
+
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error deleting flow:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to delete flow' 
+      };
+    }
   },
 
   async getFlowById(id: string) {
-    const userId = await getCurrentUser();
-    if (!userId) throw new Error('Authentication required');
+    try {
+      const client = supabase();
+      if (!client) {
+        throw new Error('Supabase client not available');
+      }
 
-    const client = supabase();
-    if (!client) throw new Error('Supabase client not available');
+      const { data: { user }, error: authError } = await client.auth.getUser();
+      if (authError) {
+        throw new Error(`Authentication error: ${authError.message}`);
+      }
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
 
-    const { data, error } = await client
-      .from('flows')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', userId.id)
-      .single();
+      const { data, error } = await client
+        .from('workflow_instances')
+        .select(`
+          *,
+          workflow_steps (*)
+        `)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single();
 
-    if (error) throw error;
-    return data;
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error fetching flow:', error);
+      throw error;
+    }
   },
 };
 
@@ -364,48 +538,96 @@ export const userApi = {
 // Template Upload Functions
 export const uploadTemplate = async (template: Omit<FlowTemplate, 'id' | 'lastUpdated' | 'rating' | 'usageCount'>): Promise<{ data: FlowTemplate | null; error: string | null }> => {
   try {
+    console.log('Starting template upload with data:', template);
+    
     const client = supabase();
     if (!client) {
+      console.error('Supabase client not available');
       return { data: null, error: 'Supabase client not available' };
     }
 
-    const { data: { user } } = await client.auth.getUser();
+    const { data: { user }, error: authError } = await client.auth.getUser();
+    if (authError) {
+      console.error('Authentication error:', authError);
+      return { data: null, error: `Authentication error: ${authError.message}` };
+    }
+    
     if (!user) {
+      console.error('User not authenticated');
       return { data: null, error: 'User not authenticated' };
     }
 
-    const { data: profile } = await client
+    console.log('User authenticated:', user.id);
+
+    const { data: profile, error: profileError } = await client
       .from('user_profiles')
       .select('full_name')
       .eq('id', user.id)
       .single();
 
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
+      // Continue with default values if profile fetch fails
+    }
+
+    // Transform the template data to match database schema
     const templateData = {
-      ...template,
+      name: template.name,
+      description: template.description,
+      category: template.category,
+      difficulty: template.difficulty,
+      target_audience: template.targetAudience,
+      estimated_duration_min: template.estimatedDuration.min,
+      estimated_duration_max: template.estimatedDuration.max,
+      duration_unit: template.estimatedDuration.unit,
+      tags: template.tags,
+      thumbnail_url: template.thumbnail,
+      version: template.version,
       author_id: user.id,
       author_name: profile?.full_name || user.email || 'Anonymous',
-      is_user_generated: true,
-      status: 'pending' as TemplateStatus,
+      is_public: template.isPublic,
+      steps: template.steps,
+      cost_analysis: template.costAnalysis,
+      recommended_tools: template.recommendedTools,
+      optimization_suggestions: template.optimizationSuggestions,
+      industry_context: template.industryContext,
+      success_metrics: template.successMetrics,
+      risks: template.risks,
+      customization_options: template.customizationOptions,
+      is_user_generated: template.isUserGenerated,
+      status: template.status,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await client
+    console.log('Transformed template data:', templateData);
+
+    const { data, error: insertError } = await client
       .from('workflow_templates')
       .insert(templateData)
       .select()
       .single();
 
-    if (error) throw error;
+    if (insertError) {
+      console.error('Error inserting template:', insertError);
+      throw insertError;
+    }
+
+    console.log('Template inserted successfully:', data);
 
     // Create upload record
-    await client
+    const { error: uploadError } = await client
       .from('template_uploads')
       .insert({
         template_id: data.id,
         uploader_id: user.id,
         upload_date: new Date().toISOString(),
       });
+
+    if (uploadError) {
+      console.error('Error creating upload record:', uploadError);
+      // Don't fail the whole operation if upload record creation fails
+    }
 
     return { data, error: null };
   } catch (error) {
@@ -768,6 +990,65 @@ export const getTemplateUploads = async (): Promise<{ data: TemplateUpload[] | n
     return { 
       data: null, 
       error: error instanceof Error ? error.message : 'Failed to fetch template uploads' 
+    };
+  }
+}; 
+
+// Test function to check Supabase connection and authentication
+export const testSupabaseConnection = async (): Promise<{ success: boolean; error?: string; user?: any }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { success: false, error: 'Supabase client not available' };
+    }
+
+    const { data: { user }, error: authError } = await client.auth.getUser();
+    if (authError) {
+      return { success: false, error: `Authentication error: ${authError.message}` };
+    }
+
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    // Test database connection by trying to fetch user profile
+    const { data: profiles, error: profileError } = await client
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user.id);
+
+    if (profileError) {
+      return { success: false, error: `Database error: ${profileError.message}`, user };
+    }
+
+    // Check if profile exists (it might not exist if the trigger didn't run)
+    const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+    
+    if (!profile) {
+      // Try to create a profile if it doesn't exist
+      const { data: newProfile, error: createError } = await client
+        .from('user_profiles')
+        .insert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
+        })
+        .select()
+        .single();
+      
+      if (createError) {
+        return { success: false, error: `Failed to create user profile: ${createError.message}`, user };
+      }
+      
+      return { success: true, user, profile: newProfile };
+    }
+
+    return { success: true, user, profile };
+  } catch (error) {
+    console.error('Error testing Supabase connection:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error occurred' 
     };
   }
 }; 

@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Upload, CheckCircle, AlertCircle } from 'lucide-react';
-import { uploadTemplate } from '@/lib/api';
+import { uploadTemplate, testSupabaseConnection } from '@/lib/api';
 import { templateCategories, difficultyLevels, targetAudiences } from '@/data/templates';
 import type { FlowTemplate, WorkflowStep } from '@/types/templates';
 
@@ -207,6 +207,19 @@ export const TemplateUploadForm: React.FC<TemplateUploadFormProps> = ({
       onCancel();
     } else {
       navigate(-1);
+    }
+  };
+
+  const handleTestConnection = async () => {
+    const result = await testSupabaseConnection();
+    console.log('Supabase connection test result:', result);
+    if (!result.success) {
+      setErrorMessage(`Connection test failed: ${result.error}`);
+      setSubmitStatus('error');
+    } else {
+      setErrorMessage('');
+      setSubmitStatus('idle');
+      alert('Connection test successful! User is authenticated and database is accessible.');
     }
   };
 
@@ -449,6 +462,14 @@ export const TemplateUploadForm: React.FC<TemplateUploadFormProps> = ({
                 disabled={isSubmitting}
               >
                 Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleTestConnection}
+                disabled={isSubmitting}
+              >
+                Test Connection
               </Button>
             </div>
           </form>

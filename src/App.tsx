@@ -21,6 +21,7 @@ import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
 import WorkflowDesigner from "./components/workflow/WorkflowDesigner";
 import SharedFlowViewer from "./components/workflow/SharedFlowViewer";
+import { TemplateTest } from "./components/TemplateTest";
 import { Toaster } from "./components/ui/toaster";
 import { useScrollToTop } from "./lib/hooks/useScrollToTop";
 
@@ -148,6 +149,14 @@ function App() {
     {
       path: "/flow/share/:encodedData",
       element: <SharedFlowViewer />,
+    },
+    {
+      path: "/template-test",
+      element: (
+        <ProtectedRoute>
+          <TemplateTest />
+        </ProtectedRoute>
+      ),
     },
   ];
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Clock,
   Search,
@@ -11,6 +11,7 @@ import {
   Trash2,
   Edit,
   Copy,
+  Loader2,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -45,97 +46,53 @@ import {
 import { useToast } from "./ui/use-toast";
 import { useNavigate, Link } from "react-router-dom";
 import PermanentDashboard from "./shared/PermanentDashboard";
+import { flowApi } from "@/lib/api";
 
 const MyFlows = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [flows, setFlows] = useState([
-    {
-      id: "1",
-      title: "Product Launch Campaign",
-      description: "Complete marketing flow for Q2 product launch",
-      status: "active",
-      progress: 75,
-      dueDate: "2023-06-15",
-      priority: "high",
-      tags: ["Marketing", "Launch"],
-      collaborators: [
-        {
-          id: "1",
-          name: "Alex",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-        },
-        {
-          id: "2",
-          name: "Jamie",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jamie",
-        },
-      ],
-      totalSteps: 12,
-      completedSteps: 9,
-    },
-    {
-      id: "2",
-      title: "Website Redesign",
-      description: "UX improvements and visual refresh for main website",
-      status: "active",
-      progress: 40,
-      dueDate: "2023-07-30",
-      priority: "medium",
-      tags: ["Design", "Development"],
-      collaborators: [
-        {
-          id: "3",
-          name: "Taylor",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Taylor",
-        },
-      ],
-      totalSteps: 15,
-      completedSteps: 6,
-    },
-    {
-      id: "3",
-      title: "Quarterly Budget Review",
-      description: "Financial planning and resource allocation for Q3",
-      status: "paused",
-      progress: 20,
-      dueDate: "2023-08-15",
-      priority: "medium",
-      tags: ["Finance", "Planning"],
-      collaborators: [
-        {
-          id: "4",
-          name: "Morgan",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Morgan",
-        },
-        {
-          id: "5",
-          name: "Casey",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Casey",
-        },
-      ],
-      totalSteps: 8,
-      completedSteps: 2,
-    },
-    {
-      id: "4",
-      title: "Customer Feedback Analysis",
-      description: "Analyze and implement customer feedback improvements",
-      status: "completed",
-      progress: 100,
-      dueDate: "2023-05-20",
-      priority: "low",
-      tags: ["Customer", "Analysis"],
-      collaborators: [
-        {
-          id: "6",
-          name: "Riley",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Riley",
-        },
-      ],
-      totalSteps: 10,
-      completedSteps: 10,
-    },
+  const [flows, setFlows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch flows from database
+  useEffect(() => {
+    const fetchFlows = async () => {
+      try {
+        setLoading(true);
+        const result = await flowApi.getFlows();
+        
+        if (result.success && result.data) {
+          // Transform database data to match component expectations
+          const transformedFlows = result.data.map((flow: any) => ({
+            id: flow.id,
+            title: flow.name,
+            description: flow.description || '',
+            status: flow.status || 'draft',
+            progress: flow.current_step || 0,
+            dueDate: flow.updated_at ? new Date(flow.updated_at).toISOString().split('T')[0] : '',
+            priority: 'medium', // Default priority
+            tags: [], // No tags in current schema
+            collaborators: [], // No collaborators in current schema
+            totalSteps: flow.workflow_steps?.length || 0,
+            completedSteps: flow.completed_steps?.length || 0,
+            created_at: flow.created_at,
+            updated_at: flow.updated_at,
+          }));
+          setFlows(transformedFlows);
+        } else {
+          setError(result.error || 'Failed to fetch flows');
+        }
+      } catch (err) {
+        console.error('Error fetching flows:', err);
+        setError('Failed to fetch flows');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFlows();
+  }, []);
     {
       id: "5",
       title: "Team Building Event",
@@ -203,14 +160,34 @@ const MyFlows = () => {
     setFlowToDelete(flowId);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (flowToDelete) {
-      setFlows(prev => prev.filter(flow => flow.id !== flowToDelete));
-      toast({
-        title: "Flow deleted",
-        description: "The flow has been successfully deleted.",
-      });
-      setFlowToDelete(null);
+      try {
+        const result = await flowApi.deleteFlow(flowToDelete);
+        
+        if (result.success) {
+          setFlows(prev => prev.filter(flow => flow.id !== flowToDelete));
+          toast({
+            title: "Flow deleted",
+            description: "The flow has been successfully deleted.",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: result.error || "Failed to delete flow",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error deleting flow:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete flow",
+          variant: "destructive",
+        });
+      } finally {
+        setFlowToDelete(null);
+      }
     }
   };
 
@@ -267,8 +244,36 @@ const MyFlows = () => {
               </TabsList>
 
               <TabsContent value="all" className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {flows.map((flow) => (
+                {loading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin mr-2" />
+                    <span>Loading flows...</span>
+                  </div>
+                ) : error ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <p className="text-destructive mb-2">{error}</p>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => window.location.reload()}
+                      >
+                        Try Again
+                      </Button>
+                    </div>
+                  </div>
+                ) : flows.length === 0 ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <p className="text-muted-foreground mb-4">No flows found</p>
+                      <Button onClick={() => navigate("/workflow/new")}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Your First Flow
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {flows.map((flow) => (
                     <Card
                       key={flow.id}
                       className="overflow-hidden hover:shadow-lg transition-shadow"
@@ -384,6 +389,7 @@ const MyFlows = () => {
                     </Card>
                   ))}
                 </div>
+                )}
               </TabsContent>
 
               <TabsContent value="active" className="mt-6">
