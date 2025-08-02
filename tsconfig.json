@@ -17,9 +17,10 @@
     "strict": false,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["vitest"]
   },
-  "include": ["src"],
+  "include": ["src", "src/**/*.test.ts", "src/**/*.test.tsx", "src/**/__tests__/*"],
   "exclude": [],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

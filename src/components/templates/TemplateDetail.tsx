@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -14,7 +14,8 @@ import {
   ExternalLink,
   Play,
   Share2,
-  Bookmark
+  Bookmark,
+  MessageCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,12 +25,19 @@ import {
   allTemplates, 
   templateCategories
 } from '@/data/templates';
-import type { FlowTemplate } from '@/types/templates';
+import { getTemplateReviews, getUserReview } from '@/lib/api';
+import { ReviewSubmissionForm } from './ReviewSubmissionForm';
+import { ReviewDisplay } from './ReviewDisplay';
+import type { FlowTemplate, TemplateReview } from '@/types/templates';
 
 export const TemplateDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
+  const [reviews, setReviews] = useState<TemplateReview[]>([]);
+  const [userReview, setUserReview] = useState<TemplateReview | null>(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
   const { user } = useAuth();
 
   // Find the template by ID
@@ -85,6 +93,47 @@ export const TemplateDetail: React.FC = () => {
     } else {
       navigate('/signup', { state: { from: `/templates/${template.id}` } });
     }
+  };
+
+  // Load reviews
+  useEffect(() => {
+    if (id) {
+      loadReviews();
+    }
+  }, [id]);
+
+  const loadReviews = async () => {
+    if (!id) return;
+    
+    setIsLoadingReviews(true);
+    try {
+      const [reviewsResult, userReviewResult] = await Promise.all([
+        getTemplateReviews(id),
+        user ? getUserReview(id) : Promise.resolve({ data: null, error: null })
+      ]);
+
+      if (reviewsResult.data) {
+        setReviews(reviewsResult.data);
+      }
+
+      if (userReviewResult.data) {
+        setUserReview(userReviewResult.data);
+      }
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  const handleReviewSuccess = (review: TemplateReview) => {
+    setUserReview(review);
+    setShowReviewForm(false);
+    loadReviews(); // Reload all reviews to update the list
+  };
+
+  const handleReviewCancel = () => {
+    setShowReviewForm(false);
   };
 
   return (
@@ -167,12 +216,16 @@ export const TemplateDetail: React.FC = () => {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="steps">Steps</TabsTrigger>
           <TabsTrigger value="costs">Costs</TabsTrigger>
           <TabsTrigger value="tools">Tools</TabsTrigger>
           <TabsTrigger value="optimization">Optimization</TabsTrigger>
+          <TabsTrigger value="reviews">
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Reviews ({reviews.length})
+          </TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -658,6 +711,76 @@ export const TemplateDetail: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Reviews Tab */}
+        <TabsContent value="reviews" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">Reviews</h2>
+              <p className="text-muted-foreground">
+                See what others think about this template
+              </p>
+            </div>
+            {user && !userReview && (
+              <Button onClick={() => setShowReviewForm(true)}>
+                <Star className="h-4 w-4 mr-2" />
+                Write a Review
+              </Button>
+            )}
+          </div>
+
+          {/* Review Form */}
+          {showReviewForm && (
+            <ReviewSubmissionForm
+              templateId={template.id}
+              existingReview={userReview}
+              onSuccess={handleReviewSuccess}
+              onCancel={handleReviewCancel}
+            />
+          )}
+
+          {/* User's Review */}
+          {userReview && !showReviewForm && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Your Review</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowReviewForm(true)}
+                  >
+                    Edit Review
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ReviewDisplay
+                  reviews={[userReview]}
+                  onReviewUpdate={loadReviews}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* All Reviews */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">
+              Community Reviews ({reviews.length})
+            </h3>
+            {isLoadingReviews ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                <p className="text-muted-foreground mt-2">Loading reviews...</p>
+              </div>
+            ) : (
+              <ReviewDisplay
+                reviews={userReview ? reviews.filter(r => r.id !== userReview.id) : reviews}
+                onReviewUpdate={loadReviews}
+              />
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -6,9 +6,10 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import WorkflowDesigner from '../WorkflowDesigner';
 
 // Mock the Chat2API service
+const mockCreateChatCompletion = vi.fn();
 vi.mock('@/lib/chat2api', () => ({
   Chat2APIService: {
-    createChatCompletion: vi.fn(),
+    createChatCompletion: mockCreateChatCompletion,
   },
 }));
 
@@ -64,8 +65,7 @@ describe('WorkflowDesigner Goal Validation', () => {
   });
 
   it('should show loading state during validation', async () => {
-    const { Chat2APIService } = await import('@/lib/chat2api');
-    Chat2APIService.createChatCompletion.mockImplementation(() => 
+    mockCreateChatCompletion.mockImplementation(() => 
       new Promise(resolve => setTimeout(resolve, 100))
     );
 
@@ -81,8 +81,7 @@ describe('WorkflowDesigner Goal Validation', () => {
   });
 
   it('should handle gibberish goal validation', async () => {
-    const { Chat2APIService } = await import('@/lib/chat2api');
-    Chat2APIService.createChatCompletion.mockResolvedValue({
+    mockCreateChatCompletion.mockResolvedValue({
       choices: [{
         message: {
           content: JSON.stringify({
@@ -112,8 +111,7 @@ describe('WorkflowDesigner Goal Validation', () => {
   });
 
   it('should handle needs clarity goal validation', async () => {
-    const { Chat2APIService } = await import('@/lib/chat2api');
-    Chat2APIService.createChatCompletion.mockResolvedValue({
+    mockCreateChatCompletion.mockResolvedValue({
       choices: [{
         message: {
           content: JSON.stringify({
@@ -142,8 +140,7 @@ describe('WorkflowDesigner Goal Validation', () => {
   });
 
   it('should handle valid goal validation', async () => {
-    const { Chat2APIService } = await import('@/lib/chat2api');
-    Chat2APIService.createChatCompletion.mockResolvedValue({
+    mockCreateChatCompletion.mockResolvedValue({
       choices: [{
         message: {
           content: JSON.stringify({
@@ -172,8 +169,7 @@ describe('WorkflowDesigner Goal Validation', () => {
   });
 
   it('should disable generate steps button for gibberish goals', async () => {
-    const { Chat2APIService } = await import('@/lib/chat2api');
-    Chat2APIService.createChatCompletion.mockResolvedValue({
+    mockCreateChatCompletion.mockResolvedValue({
       choices: [{
         message: {
           content: JSON.stringify({
@@ -224,8 +220,7 @@ describe('WorkflowDesigner Goal Validation', () => {
     fireEvent.change(goalInput, { target: { value: 'Create a mobile game' } });
     
     // Mock successful goal validation
-    const { Chat2APIService } = await import('@/lib/chat2api');
-    Chat2APIService.createChatCompletion.mockResolvedValue({
+    mockCreateChatCompletion.mockResolvedValue({
       choices: [{
         message: {
           content: JSON.stringify({

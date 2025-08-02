@@ -11,6 +11,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
   description: 'Complete workflow for developing and launching a mobile application from concept to app store deployment.',
   category: 'software-development',
   difficulty: 'advanced',
+  targetAudience: 'small-team',
   estimatedDuration: { min: 12, max: 24, unit: 'weeks' },
   tags: ['mobile', 'app-development', 'ios', 'android', 'react-native', 'flutter'],
   version: '1.0.0',
@@ -33,7 +34,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
       deliverables: ['Market research report', 'Competitor analysis', 'User personas', 'Concept validation results'],
       acceptanceCriteria: ['Clear target audience defined', 'Competitive landscape mapped', 'Concept validated with 50+ users'],
       riskLevel: 'low',
-      costEstimate: { min: 2000, max: 5000, currency: 'USD' },
+      costEstimate: { min: 800, max: 1500, currency: 'USD' },
       automationPotential: 30,
       optimizationTips: ['Use automated survey tools', 'Leverage AI for competitor analysis', 'Automate data collection']
     },
@@ -50,7 +51,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
       deliverables: ['Wireframes', 'High-fidelity mockups', 'Interactive prototype', 'Design system'],
       acceptanceCriteria: ['All screens designed', 'Prototype tested with users', 'Design system documented'],
       riskLevel: 'medium',
-      costEstimate: { min: 8000, max: 15000, currency: 'USD' },
+      costEstimate: { min: 3000, max: 6000, currency: 'USD' },
       automationPotential: 20,
       optimizationTips: ['Use design system templates', 'Automate design handoff', 'Implement design tokens']
     },
@@ -67,7 +68,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
       deliverables: ['Technical architecture document', 'Database schema', 'API specifications', 'Security plan'],
       acceptanceCriteria: ['Architecture approved by team', 'Database schema finalized', 'API endpoints defined'],
       riskLevel: 'medium',
-      costEstimate: { min: 5000, max: 10000, currency: 'USD' },
+      costEstimate: { min: 2000, max: 4000, currency: 'USD' },
       automationPotential: 40,
       optimizationTips: ['Use architecture templates', 'Automate API documentation', 'Implement security scanning']
     },
@@ -84,7 +85,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
       deliverables: ['Mobile app frontend', 'State management', 'Navigation', 'UI components'],
       acceptanceCriteria: ['All screens implemented', 'Navigation working', 'State management functional'],
       riskLevel: 'high',
-      costEstimate: { min: 25000, max: 50000, currency: 'USD' },
+      costEstimate: { min: 8000, max: 15000, currency: 'USD' },
       automationPotential: 60,
       optimizationTips: ['Use component libraries', 'Implement automated testing', 'Use code generation tools']
     },
@@ -101,7 +102,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
       deliverables: ['Backend API', 'Database', 'Authentication system', 'Server infrastructure'],
       acceptanceCriteria: ['API endpoints functional', 'Database operational', 'Authentication working'],
       riskLevel: 'high',
-      costEstimate: { min: 20000, max: 40000, currency: 'USD' },
+      costEstimate: { min: 6000, max: 12000, currency: 'USD' },
       automationPotential: 70,
       optimizationTips: ['Use API frameworks', 'Implement automated testing', 'Use infrastructure as code']
     },
@@ -118,7 +119,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
       deliverables: ['Test suite', 'Bug reports', 'Performance test results', 'Security audit'],
       acceptanceCriteria: ['90% code coverage', 'All critical bugs fixed', 'Performance benchmarks met'],
       riskLevel: 'medium',
-      costEstimate: { min: 10000, max: 20000, currency: 'USD' },
+      costEstimate: { min: 3000, max: 6000, currency: 'USD' },
       automationPotential: 80,
       optimizationTips: ['Automate test execution', 'Use continuous testing', 'Implement automated bug reporting']
     },
@@ -135,14 +136,14 @@ export const appDevelopmentTemplate: FlowTemplate = {
       deliverables: ['App store listings', 'Screenshots and videos', 'Privacy policy', 'App store approval'],
       acceptanceCriteria: ['App approved by stores', 'Store listings complete', 'Compliance requirements met'],
       riskLevel: 'medium',
-      costEstimate: { min: 3000, max: 8000, currency: 'USD' },
+      costEstimate: { min: 1000, max: 2000, currency: 'USD' },
       automationPotential: 50,
       optimizationTips: ['Automate screenshot generation', 'Use ASO tools', 'Implement automated compliance checking']
     }
   ],
 
   costAnalysis: {
-    totalCost: 75000,
+    totalCost: 25000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
@@ -151,7 +152,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
         name: 'Development Team',
         description: 'Frontend and backend developers',
         type: 'labor',
-        amount: 45000,
+        amount: 15000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
@@ -161,7 +162,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
         name: 'Design Services',
         description: 'UI/UX design and prototyping',
         type: 'labor',
-        amount: 12000,
+        amount: 4000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'design'
@@ -171,9 +172,9 @@ export const appDevelopmentTemplate: FlowTemplate = {
         name: 'Infrastructure & Hosting',
         description: 'Cloud hosting and services',
         type: 'infrastructure',
-        amount: 3000,
+        amount: 1200,
         currency: 'USD',
-        frequency: 'monthly',
+        frequency: 'yearly',
         category: 'infrastructure'
       },
       {
@@ -181,7 +182,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
         name: 'Development Tools',
         description: 'Software licenses and tools',
         type: 'licensing',
-        amount: 2000,
+        amount: 800,
         currency: 'USD',
         frequency: 'one-time',
         category: 'tools'
@@ -191,7 +192,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
         name: 'Testing & QA',
         description: 'Testing services and tools',
         type: 'labor',
-        amount: 8000,
+        amount: 3000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'quality'
@@ -201,7 +202,7 @@ export const appDevelopmentTemplate: FlowTemplate = {
         name: 'App Store Fees',
         description: 'Apple Developer Program and Google Play fees',
         type: 'subscription',
-        amount: 500,
+        amount: 200,
         currency: 'USD',
         frequency: 'yearly',
         category: 'platform'
@@ -422,6 +423,7 @@ export const gameDesignTemplate: FlowTemplate = {
   description: 'Complete workflow for developing a video game from concept to release, including design, development, and marketing phases.',
   category: 'game-design',
   difficulty: 'expert',
+  targetAudience: 'enterprise',
   estimatedDuration: { min: 18, max: 36, unit: 'months' },
   tags: ['game-development', 'unity', 'unreal', 'indie-games', 'mobile-games'],
   version: '1.0.0',
@@ -467,7 +469,7 @@ export const gameDesignTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 250000,
+    totalCost: 45000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
@@ -476,7 +478,7 @@ export const gameDesignTemplate: FlowTemplate = {
         name: 'Development Team',
         description: 'Programmers, artists, designers',
         type: 'labor',
-        amount: 180000,
+        amount: 30000,
         currency: 'USD',
         frequency: 'one-time'
       },
@@ -485,7 +487,7 @@ export const gameDesignTemplate: FlowTemplate = {
         name: 'Software Licenses',
         description: 'Game engines, tools, and software',
         type: 'licensing',
-        amount: 15000,
+        amount: 3000,
         currency: 'USD',
         frequency: 'one-time'
       },
@@ -494,7 +496,16 @@ export const gameDesignTemplate: FlowTemplate = {
         name: 'Marketing & PR',
         description: 'Game marketing and promotion',
         type: 'labor',
-        amount: 30000,
+        amount: 8000,
+        currency: 'USD',
+        frequency: 'one-time'
+      },
+      {
+        id: createId(),
+        name: 'Asset Creation',
+        description: 'Graphics, sound, and animation assets',
+        type: 'materials',
+        amount: 4000,
         currency: 'USD',
         frequency: 'one-time'
       }
@@ -579,6 +590,7 @@ export const manufacturingTemplate: FlowTemplate = {
   description: 'Complete workflow from product design to retail distribution, including manufacturing, quality control, and logistics.',
   category: 'manufacturing',
   difficulty: 'advanced',
+  targetAudience: 'enterprise',
   estimatedDuration: { min: 6, max: 18, unit: 'months' },
   tags: ['manufacturing', 'product-development', 'supply-chain', 'retail'],
   version: '1.0.0',
@@ -601,7 +613,7 @@ export const manufacturingTemplate: FlowTemplate = {
       deliverables: ['Technical drawings', '3D models', 'Bill of materials', 'Manufacturing specifications'],
       acceptanceCriteria: ['Design is manufacturable', 'Cost targets met', 'Quality standards defined'],
       riskLevel: 'medium',
-      costEstimate: { min: 25000, max: 75000, currency: 'USD' },
+      costEstimate: { min: 8000, max: 20000, currency: 'USD' },
       automationPotential: 60
     }
     // Additional steps would continue here...
@@ -713,6 +725,7 @@ export const marketingCampaignTemplate: FlowTemplate = {
   description: 'Complete digital marketing campaign from strategy to execution and analysis.',
   category: 'marketing',
   difficulty: 'intermediate',
+  targetAudience: 'small-team',
   estimatedDuration: { min: 8, max: 16, unit: 'weeks' },
   tags: ['digital-marketing', 'social-media', 'content-marketing', 'analytics'],
   version: '1.0.0',
@@ -759,7 +772,7 @@ export const marketingCampaignTemplate: FlowTemplate = {
         id: createId(),
         name: 'Advertising Budget',
         description: 'Paid advertising and promotion',
-        type: 'advertising',
+        type: 'variable',
         amount: 8000,
         currency: 'USD',
         frequency: 'one-time',
@@ -856,6 +869,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
   description: 'Complete workflow for setting up an online store from platform selection to launch.',
   category: 'business-operations',
   difficulty: 'intermediate',
+  targetAudience: 'individual',
   estimatedDuration: { min: 4, max: 12, unit: 'weeks' },
   tags: ['ecommerce', 'online-store', 'shopify', 'woocommerce', 'payment-processing'],
   version: '1.0.0',
@@ -870,7 +884,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
       id: createId(),
       title: 'Platform Selection & Setup',
       description: 'Choose e-commerce platform and set up basic store structure',
-      type: 'setup',
+      type: 'planning',
       order: 0,
       estimatedDuration: { min: 1, max: 2, unit: 'weeks' },
       requiredSkills: ['ecommerce-platforms', 'web-design', 'basic-coding'],
@@ -884,7 +898,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 15000,
+    totalCost: 8000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
@@ -893,7 +907,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
         name: 'Platform Fees',
         description: 'Monthly platform subscription and transaction fees',
         type: 'subscription',
-        amount: 3000,
+        amount: 1500,
         currency: 'USD',
         frequency: 'yearly',
         category: 'platform'
@@ -903,7 +917,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
         name: 'Design & Development',
         description: 'Store design and customization',
         type: 'labor',
-        amount: 8000,
+        amount: 4000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'development'
@@ -913,7 +927,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
         name: 'Payment Processing',
         description: 'Payment gateway setup and fees',
         type: 'subscription',
-        amount: 2000,
+        amount: 1000,
         currency: 'USD',
         frequency: 'yearly',
         category: 'payments'
@@ -923,7 +937,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
         name: 'Marketing & SEO',
         description: 'Initial marketing setup and SEO optimization',
         type: 'labor',
-        amount: 2000,
+        amount: 1500,
         currency: 'USD',
         frequency: 'one-time',
         category: 'marketing'
@@ -935,7 +949,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
     {
       id: createId(),
       name: 'Shopify',
-      category: 'ecommerce-platform',
+      category: 'development',
       description: 'Complete e-commerce platform',
       website: 'https://shopify.com',
       pricing: {
@@ -954,7 +968,7 @@ export const ecommerceSetupTemplate: FlowTemplate = {
 
   optimizationSuggestions: [
     {
-      category: 'conversion',
+      category: 'efficiency',
       title: 'Optimize Product Pages',
       description: 'Improve product page design and copy to increase conversions',
       impact: 'high',
@@ -1009,6 +1023,7 @@ export const contentCreationTemplate: FlowTemplate = {
   description: 'Systematic approach to creating, publishing, and promoting content across multiple channels.',
   category: 'creative-projects',
   difficulty: 'beginner',
+  targetAudience: 'individual',
   estimatedDuration: { min: 2, max: 8, unit: 'weeks' },
   tags: ['content-creation', 'blogging', 'social-media', 'video-production', 'copywriting'],
   version: '1.0.0',
@@ -1037,7 +1052,7 @@ export const contentCreationTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 8000,
+    totalCost: 3000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
@@ -1046,7 +1061,7 @@ export const contentCreationTemplate: FlowTemplate = {
         name: 'Content Creation',
         description: 'Writing, design, and production costs',
         type: 'labor',
-        amount: 5000,
+        amount: 1800,
         currency: 'USD',
         frequency: 'one-time',
         category: 'content'
@@ -1056,7 +1071,7 @@ export const contentCreationTemplate: FlowTemplate = {
         name: 'Tools & Software',
         description: 'Content creation and management tools',
         type: 'licensing',
-        amount: 1500,
+        amount: 600,
         currency: 'USD',
         frequency: 'yearly',
         category: 'tools'
@@ -1065,8 +1080,8 @@ export const contentCreationTemplate: FlowTemplate = {
         id: createId(),
         name: 'Promotion & Distribution',
         description: 'Paid promotion and distribution costs',
-        type: 'advertising',
-        amount: 1500,
+        type: 'variable',
+        amount: 600,
         currency: 'USD',
         frequency: 'one-time',
         category: 'marketing'
@@ -1125,7 +1140,7 @@ export const contentCreationTemplate: FlowTemplate = {
 
   risks: [
     {
-      category: 'reputation',
+      category: 'business',
       description: 'Content backlash or negative feedback',
       probability: 'medium',
       impact: 'medium',
@@ -1152,6 +1167,7 @@ export const customerSupportTemplate: FlowTemplate = {
   description: 'Complete customer support workflow from ticket creation to resolution and follow-up.',
   category: 'customer-service',
   difficulty: 'beginner',
+  targetAudience: 'small-team',
   estimatedDuration: { min: 2, max: 6, unit: 'weeks' },
   tags: ['customer-support', 'help-desk', 'ticketing-system', 'customer-service', 'automation'],
   version: '1.0.0',
@@ -1166,7 +1182,7 @@ export const customerSupportTemplate: FlowTemplate = {
       id: createId(),
       title: 'Support System Setup',
       description: 'Choose and configure customer support platform and workflows',
-      type: 'setup',
+      type: 'planning',
       order: 0,
       estimatedDuration: { min: 1, max: 2, unit: 'weeks' },
       requiredSkills: ['customer-service', 'system-administration', 'workflow-design'],
@@ -1180,7 +1196,7 @@ export const customerSupportTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 12000,
+    totalCost: 5000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
@@ -1189,7 +1205,7 @@ export const customerSupportTemplate: FlowTemplate = {
         name: 'Support Platform',
         description: 'Help desk software and tools',
         type: 'subscription',
-        amount: 3000,
+        amount: 1200,
         currency: 'USD',
         frequency: 'yearly',
         category: 'software'
@@ -1199,7 +1215,7 @@ export const customerSupportTemplate: FlowTemplate = {
         name: 'Support Team',
         description: 'Customer support staff training and setup',
         type: 'labor',
-        amount: 6000,
+        amount: 2500,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
@@ -1209,7 +1225,7 @@ export const customerSupportTemplate: FlowTemplate = {
         name: 'Knowledge Base',
         description: 'Documentation and self-service resources',
         type: 'labor',
-        amount: 3000,
+        amount: 1300,
         currency: 'USD',
         frequency: 'one-time',
         category: 'content'
@@ -1221,7 +1237,7 @@ export const customerSupportTemplate: FlowTemplate = {
     {
       id: createId(),
       name: 'Zendesk',
-      category: 'help-desk',
+      category: 'communication',
       description: 'Customer service platform',
       website: 'https://zendesk.com',
       pricing: {
@@ -1268,7 +1284,7 @@ export const customerSupportTemplate: FlowTemplate = {
 
   risks: [
     {
-      category: 'reputation',
+      category: 'business',
       description: 'Poor customer service affecting brand reputation',
       probability: 'medium',
       impact: 'high',
@@ -1280,7 +1296,7 @@ export const customerSupportTemplate: FlowTemplate = {
     {
       name: 'supportChannels',
       description: 'Support channels to implement',
-      type: 'multi-select',
+      type: 'select',
       defaultValue: ['email', 'chat'],
       options: ['email', 'chat', 'phone', 'social-media'],
       required: true
@@ -1295,6 +1311,7 @@ export const hrRecruitmentTemplate: FlowTemplate = {
   description: 'Complete recruitment workflow from job posting to employee onboarding.',
   category: 'human-resources',
   difficulty: 'intermediate',
+  targetAudience: 'small-team',
   estimatedDuration: { min: 4, max: 12, unit: 'weeks' },
   tags: ['recruitment', 'hiring', 'onboarding', 'hr-processes', 'talent-acquisition'],
   version: '1.0.0',
@@ -1323,7 +1340,7 @@ export const hrRecruitmentTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 15000,
+    totalCost: 6000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
@@ -1331,8 +1348,8 @@ export const hrRecruitmentTemplate: FlowTemplate = {
         id: createId(),
         name: 'Job Board Postings',
         description: 'Paid job postings and recruitment advertising',
-        type: 'advertising',
-        amount: 3000,
+        type: 'variable',
+        amount: 1200,
         currency: 'USD',
         frequency: 'one-time',
         category: 'advertising'
@@ -1342,7 +1359,7 @@ export const hrRecruitmentTemplate: FlowTemplate = {
         name: 'Recruitment Software',
         description: 'ATS and recruitment tools',
         type: 'subscription',
-        amount: 2000,
+        amount: 800,
         currency: 'USD',
         frequency: 'yearly',
         category: 'software'
@@ -1352,7 +1369,7 @@ export const hrRecruitmentTemplate: FlowTemplate = {
         name: 'HR Staff Time',
         description: 'HR team time for recruitment process',
         type: 'labor',
-        amount: 8000,
+        amount: 3000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
@@ -1361,8 +1378,8 @@ export const hrRecruitmentTemplate: FlowTemplate = {
         id: createId(),
         name: 'Background Checks',
         description: 'Candidate background verification',
-        type: 'service',
-        amount: 2000,
+        type: 'one-time',
+        amount: 1000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'verification'
@@ -1374,7 +1391,7 @@ export const hrRecruitmentTemplate: FlowTemplate = {
     {
       id: createId(),
       name: 'BambooHR',
-      category: 'hr-software',
+      category: 'project-management',
       description: 'HR management platform',
       website: 'https://bamboohr.com',
       pricing: {
@@ -1421,7 +1438,7 @@ export const hrRecruitmentTemplate: FlowTemplate = {
 
   risks: [
     {
-      category: 'compliance',
+      category: 'legal',
       description: 'Hiring discrimination or compliance issues',
       probability: 'medium',
       impact: 'high',
@@ -1448,6 +1465,7 @@ export const financialPlanningTemplate: FlowTemplate = {
   description: 'Comprehensive financial planning workflow for individuals and businesses.',
   category: 'finance',
   difficulty: 'advanced',
+  targetAudience: 'individual',
   estimatedDuration: { min: 4, max: 12, unit: 'weeks' },
   tags: ['financial-planning', 'budgeting', 'investment', 'tax-planning', 'risk-management'],
   version: '1.0.0',
@@ -1514,7 +1532,7 @@ export const financialPlanningTemplate: FlowTemplate = {
         id: createId(),
         name: 'Insurance & Protection',
         description: 'Insurance planning and implementation',
-        type: 'insurance',
+        type: 'subscription',
         amount: 2000,
         currency: 'USD',
         frequency: 'yearly',
@@ -1527,7 +1545,7 @@ export const financialPlanningTemplate: FlowTemplate = {
     {
       id: createId(),
       name: 'Mint',
-      category: 'personal-finance',
+      category: 'analytics',
       description: 'Personal finance management app',
       website: 'https://mint.com',
       pricing: {
@@ -1599,6 +1617,7 @@ export const researchProjectTemplate: FlowTemplate = {
   description: 'Systematic approach to conducting research projects from hypothesis to publication.',
   category: 'research-development',
   difficulty: 'expert',
+  targetAudience: 'enterprise',
   estimatedDuration: { min: 6, max: 24, unit: 'months' },
   tags: ['research', 'academic', 'data-analysis', 'publication', 'methodology'],
   version: '1.0.0',
@@ -1621,13 +1640,13 @@ export const researchProjectTemplate: FlowTemplate = {
       deliverables: ['Research proposal', 'Methodology document', 'Data collection plan'],
       acceptanceCriteria: ['Research question defined', 'Methodology approved', 'Plan finalized'],
       riskLevel: 'medium',
-      costEstimate: { min: 5000, max: 15000, currency: 'USD' },
+      costEstimate: { min: 2000, max: 5000, currency: 'USD' },
       automationPotential: 50
     }
   ],
 
   costAnalysis: {
-    totalCost: 50000,
+    totalCost: 15000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
@@ -1636,7 +1655,7 @@ export const researchProjectTemplate: FlowTemplate = {
         name: 'Research Staff',
         description: 'Researchers and assistants',
         type: 'labor',
-        amount: 30000,
+        amount: 8000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
@@ -1645,8 +1664,8 @@ export const researchProjectTemplate: FlowTemplate = {
         id: createId(),
         name: 'Equipment & Software',
         description: 'Research equipment and analysis software',
-        type: 'equipment',
-        amount: 10000,
+        type: 'one-time',
+        amount: 3000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'equipment'
@@ -1655,8 +1674,8 @@ export const researchProjectTemplate: FlowTemplate = {
         id: createId(),
         name: 'Data Collection',
         description: 'Survey costs, participant compensation, data access',
-        type: 'data',
-        amount: 8000,
+        type: 'subscription',
+        amount: 3000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'data'
@@ -1665,8 +1684,8 @@ export const researchProjectTemplate: FlowTemplate = {
         id: createId(),
         name: 'Publication & Dissemination',
         description: 'Journal fees, conference attendance, publication costs',
-        type: 'publication',
-        amount: 2000,
+        type: 'one-time',
+        amount: 1000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'publication'
@@ -1678,7 +1697,7 @@ export const researchProjectTemplate: FlowTemplate = {
     {
       id: createId(),
       name: 'SPSS',
-      category: 'statistical-analysis',
+      category: 'analytics',
       description: 'Statistical analysis software',
       website: 'https://ibm.com/spss',
       pricing: {
@@ -1719,13 +1738,13 @@ export const researchProjectTemplate: FlowTemplate = {
       description: 'Number of peer-reviewed publications',
       target: '1-3 publications',
       measurement: 'Publication tracking',
-      frequency: 'project completion'
+      frequency: 'monthly'
     }
   ],
 
   risks: [
     {
-      category: 'methodological',
+      category: 'technical',
       description: 'Research methodology flaws affecting results',
       probability: 'medium',
       impact: 'high',
@@ -1743,6 +1762,959 @@ export const researchProjectTemplate: FlowTemplate = {
       required: true
     }
   ]
+};
+
+// Game Development Studio Team Templates
+export const gameBalanceTemplate: FlowTemplate = {
+  id: createId(),
+  name: 'Game Balance Testing & Tuning',
+  description: 'Focused workflow for game balance team to test, analyze, and tune game mechanics for optimal player experience.',
+  category: 'game-design',
+  difficulty: 'intermediate',
+  targetAudience: 'small-team',
+  estimatedDuration: { min: 2, max: 4, unit: 'weeks' },
+  tags: ['game-balance', 'testing', 'analytics', 'tuning', 'player-experience'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.6,
+  usageCount: 320,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Balance Metrics Setup',
+      description: 'Define key performance indicators and metrics to track for balance analysis',
+      type: 'planning',
+      order: 0,
+      estimatedDuration: { min: 2, max: 3, unit: 'days' },
+      requiredSkills: ['game-analytics', 'data-analysis', 'balance-design'],
+      requiredTools: ['analytics-dashboard', 'spreadsheet-software', 'game-engine'],
+      deliverables: ['Balance metrics framework', 'KPI definitions', 'Data collection plan'],
+      acceptanceCriteria: ['All key metrics defined', 'Data collection automated', 'Baseline established'],
+      riskLevel: 'low',
+      costEstimate: { min: 200, max: 400, currency: 'USD' },
+      automationPotential: 80,
+      optimizationTips: ['Automate data collection', 'Use real-time dashboards', 'Implement alert systems']
+    },
+    {
+      id: createId(),
+      title: 'Player Data Collection',
+      description: 'Gather player behavior data, win rates, and engagement metrics from live gameplay',
+      type: 'analysis',
+      order: 1,
+      estimatedDuration: { min: 3, max: 7, unit: 'days' },
+      requiredSkills: ['data-collection', 'game-analytics', 'sql'],
+      requiredTools: ['analytics-platform', 'database', 'data-visualization'],
+      dependencies: [createId()], // Balance metrics setup
+      deliverables: ['Player behavior dataset', 'Win rate analysis', 'Engagement metrics'],
+      acceptanceCriteria: ['Sufficient data collected', 'Metrics validated', 'Anomalies identified'],
+      riskLevel: 'medium',
+      costEstimate: { min: 300, max: 600, currency: 'USD' },
+      automationPotential: 90,
+      optimizationTips: ['Automate data pipelines', 'Use real-time processing', 'Implement data validation']
+    },
+    {
+      id: createId(),
+      title: 'Balance Analysis & Identification',
+      description: 'Analyze collected data to identify balance issues, overpowered/underpowered elements',
+      type: 'analysis',
+      order: 2,
+      estimatedDuration: { min: 2, max: 4, unit: 'days' },
+      requiredSkills: ['statistical-analysis', 'game-balance', 'data-interpretation'],
+      requiredTools: ['statistical-software', 'data-visualization', 'spreadsheet-software'],
+      dependencies: [createId()], // Player data collection
+      deliverables: ['Balance analysis report', 'Issue identification', 'Priority ranking'],
+      acceptanceCriteria: ['All issues documented', 'Root causes identified', 'Impact assessed'],
+      riskLevel: 'medium',
+      costEstimate: { min: 400, max: 800, currency: 'USD' },
+      automationPotential: 70,
+      optimizationTips: ['Use automated analysis tools', 'Implement anomaly detection', 'Create automated reports']
+    },
+    {
+      id: createId(),
+      title: 'Balance Adjustments & Testing',
+      description: 'Implement balance changes and test their impact on gameplay metrics',
+      type: 'testing',
+      order: 3,
+      estimatedDuration: { min: 3, max: 7, unit: 'days' },
+      requiredSkills: ['game-balance', 'testing', 'iteration'],
+      requiredTools: ['game-engine', 'testing-framework', 'version-control'],
+      dependencies: [createId()], // Balance analysis
+      deliverables: ['Balance adjustments', 'Test results', 'Iteration plan'],
+      acceptanceCriteria: ['Changes implemented', 'Tests completed', 'Results documented'],
+      riskLevel: 'high',
+      costEstimate: { min: 500, max: 1000, currency: 'USD' },
+      automationPotential: 60,
+      optimizationTips: ['Automate testing processes', 'Use A/B testing', 'Implement rapid iteration']
+    },
+    {
+      id: createId(),
+      title: 'Final Validation & Documentation',
+      description: 'Validate final balance changes and document the process for future reference',
+      type: 'quality-assurance',
+      order: 4,
+      estimatedDuration: { min: 1, max: 2, unit: 'days' },
+      requiredSkills: ['documentation', 'validation', 'communication'],
+      requiredTools: ['documentation-tools', 'communication-platform', 'version-control'],
+      dependencies: [createId()], // Balance adjustments
+      deliverables: ['Final balance report', 'Process documentation', 'Recommendations'],
+      acceptanceCriteria: ['Changes validated', 'Documentation complete', 'Team informed'],
+      riskLevel: 'low',
+      costEstimate: { min: 200, max: 400, currency: 'USD' },
+      automationPotential: 50,
+      optimizationTips: ['Automate reporting', 'Use templates', 'Implement knowledge base']
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 2400,
+    breakdown: [
+      { id: createId(), name: 'Analytics Setup', description: 'Analytics setup and tools', type: 'one-time', amount: 750, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Data Collection', description: 'Data collection and processing', type: 'variable', amount: 450, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Analysis and Testing', description: 'Analysis and testing', type: 'one-time', amount: 600, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Documentation', description: 'Documentation and validation', type: 'one-time', amount: 300, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Ongoing Tools', description: 'Ongoing analytics tools', type: 'subscription', amount: 300, currency: 'USD', frequency: 'monthly' }
+    ],
+    currency: 'USD',
+    calculationDate: new Date(),
+    assumptions: ['Standard game analytics tools', 'Team of 3-5 people', '2-4 week timeline'],
+    riskFactors: ['Data quality issues', 'Player engagement changes', 'Technical implementation delays']
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Unity Analytics',
+      category: 'analytics',
+      description: 'Game analytics and player behavior tracking',
+      website: 'https://unity.com/analytics',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        notes: 'Free tier available, paid plans for advanced features'
+      },
+      features: ['Player behavior tracking', 'Real-time analytics', 'Custom events', 'Performance monitoring'],
+      pros: ['Easy integration', 'Real-time data', 'Comprehensive metrics', 'Free tier available'],
+      cons: ['Limited free tier', 'Data privacy concerns', 'Complex setup', 'Performance overhead'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Automated Data Collection',
+      description: 'Implement automated data collection to reduce manual work',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Set up automated data pipelines and real-time monitoring'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Global game analytics market valued at $2.5 billion',
+    competition: 'High competition in mobile gaming market',
+    regulations: ['GDPR compliance', 'Data privacy laws', 'Age restrictions'],
+    trends: ['Real-time analytics', 'AI-powered insights', 'Cross-platform tracking'],
+    challenges: ['Data accuracy', 'Player privacy', 'Real-time processing'],
+    opportunities: ['Predictive analytics', 'Personalized experiences', 'Performance optimization']
+  }
+};
+
+export const gameMechanicsTemplate: FlowTemplate = {
+  id: createId(),
+  name: 'Game Mechanics Design & Implementation',
+  description: 'Workflow for game mechanics team to design, prototype, and implement new game systems and mechanics.',
+  category: 'game-design',
+  difficulty: 'advanced',
+  targetAudience: 'small-team',
+  estimatedDuration: { min: 3, max: 6, unit: 'weeks' },
+  tags: ['game-mechanics', 'prototyping', 'system-design', 'implementation', 'playtesting'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.7,
+  usageCount: 450,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Mechanics Concept & Design',
+      description: 'Brainstorm and design new game mechanics, systems, and interactions',
+      type: 'design',
+      order: 0,
+      estimatedDuration: { min: 3, max: 5, unit: 'days' },
+      requiredSkills: ['game-design', 'system-design', 'creative-thinking'],
+      requiredTools: ['design-software', 'whiteboard', 'collaboration-tools'],
+      deliverables: ['Mechanics concept document', 'System diagrams', 'Design specifications'],
+      acceptanceCriteria: ['Concepts clearly defined', 'Systems mapped out', 'Design approved by team'],
+      riskLevel: 'medium',
+      costEstimate: { min: 600, max: 1200, currency: 'USD' },
+      automationPotential: 20,
+      optimizationTips: ['Use design templates', 'Implement feedback loops', 'Document design decisions']
+    },
+    {
+      id: createId(),
+      title: 'Rapid Prototyping',
+      description: 'Create quick prototypes to test mechanics and validate design concepts',
+      type: 'development',
+      order: 1,
+      estimatedDuration: { min: 4, max: 7, unit: 'days' },
+      requiredSkills: ['prototyping', 'game-development', 'rapid-iteration'],
+      requiredTools: ['game-engine', 'prototyping-tools', 'version-control'],
+      dependencies: [createId()], // Mechanics concept
+      deliverables: ['Functional prototypes', 'Test scenarios', 'Initial feedback'],
+      acceptanceCriteria: ['Prototypes functional', 'Core mechanics working', 'Team can test'],
+      riskLevel: 'high',
+      costEstimate: { min: 800, max: 1500, currency: 'USD' },
+      automationPotential: 40,
+      optimizationTips: ['Use prototyping frameworks', 'Automate build processes', 'Implement quick iteration']
+    },
+    {
+      id: createId(),
+      title: 'Internal Playtesting',
+      description: 'Conduct internal playtesting sessions to gather feedback and identify issues',
+      type: 'testing',
+      order: 2,
+      estimatedDuration: { min: 2, max: 4, unit: 'days' },
+      requiredSkills: ['playtesting', 'feedback-collection', 'analysis'],
+      requiredTools: ['testing-framework', 'feedback-tools', 'recording-software'],
+      dependencies: [createId()], // Rapid prototyping
+      deliverables: ['Playtest feedback', 'Issue reports', 'Improvement suggestions'],
+      acceptanceCriteria: ['Comprehensive feedback collected', 'Issues documented', 'Priorities established'],
+      riskLevel: 'medium',
+      costEstimate: { min: 400, max: 800, currency: 'USD' },
+      automationPotential: 30,
+      optimizationTips: ['Automate feedback collection', 'Use structured testing', 'Implement feedback tracking']
+    },
+    {
+      id: createId(),
+      title: 'Mechanics Refinement',
+      description: 'Iterate on mechanics based on playtest feedback and improve implementation',
+      type: 'development',
+      order: 3,
+      estimatedDuration: { min: 3, max: 6, unit: 'days' },
+      requiredSkills: ['game-development', 'iteration', 'problem-solving'],
+      requiredTools: ['game-engine', 'development-tools', 'version-control'],
+      dependencies: [createId()], // Internal playtesting
+      deliverables: ['Refined mechanics', 'Updated prototypes', 'Implementation notes'],
+      acceptanceCriteria: ['Issues addressed', 'Mechanics improved', 'Ready for final testing'],
+      riskLevel: 'medium',
+      costEstimate: { min: 600, max: 1200, currency: 'USD' },
+      automationPotential: 50,
+      optimizationTips: ['Use automated testing', 'Implement continuous integration', 'Automate deployment']
+    },
+    {
+      id: createId(),
+      title: 'Final Integration & Documentation',
+      description: 'Integrate refined mechanics into main game and document for future reference',
+      type: 'implementation',
+      order: 4,
+      estimatedDuration: { min: 2, max: 3, unit: 'days' },
+      requiredSkills: ['integration', 'documentation', 'communication'],
+      requiredTools: ['game-engine', 'documentation-tools', 'version-control'],
+      dependencies: [createId()], // Mechanics refinement
+      deliverables: ['Integrated mechanics', 'Technical documentation', 'Design documentation'],
+      acceptanceCriteria: ['Mechanics integrated', 'Documentation complete', 'Team trained'],
+      riskLevel: 'low',
+      costEstimate: { min: 300, max: 600, currency: 'USD' },
+      automationPotential: 60,
+      optimizationTips: ['Automate integration', 'Use documentation templates', 'Implement knowledge sharing']
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 4000,
+    breakdown: [
+      { id: createId(), name: 'Design and Concept', description: 'Design and concept development', type: 'one-time', amount: 900, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Prototyping', description: 'Prototyping and development', type: 'one-time', amount: 1150, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Playtesting', description: 'Playtesting and feedback', type: 'one-time', amount: 600, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Refinement', description: 'Refinement and iteration', type: 'one-time', amount: 900, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Integration', description: 'Integration and documentation', type: 'one-time', amount: 450, currency: 'USD', frequency: 'one-time' }
+    ],
+    currency: 'USD',
+    calculationDate: new Date(),
+    assumptions: ['Game engine already available', 'Team of 3-4 people', '3-6 week timeline'],
+    riskFactors: ['Design complexity', 'Technical challenges', 'Playtesting feedback changes']
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Unity Game Engine',
+      category: 'development',
+      description: 'Cross-platform game development engine',
+      website: 'https://unity.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        notes: 'Free for personal use, paid plans for commercial use'
+      },
+      features: ['Cross-platform development', 'Visual scripting', 'Asset store', 'Real-time rendering'],
+      pros: ['Easy to learn', 'Large community', 'Extensive documentation', 'Asset store'],
+      cons: ['Performance limitations', 'Licensing costs', 'Platform-specific issues', 'Learning curve'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'speed',
+      title: 'Rapid Prototyping',
+      description: 'Use rapid prototyping to validate mechanics early',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Implement quick prototypes and iterate based on feedback'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Global game development market valued at $200 billion',
+    competition: 'High competition in indie game market',
+    regulations: ['Age ratings', 'Content guidelines', 'Platform policies'],
+    trends: ['Procedural generation', 'AI integration', 'Cross-platform play'],
+    challenges: ['Market saturation', 'Development costs', 'Player retention'],
+    opportunities: ['Emerging platforms', 'Subscription models', 'Esports integration']
+  }
+};
+
+export const gameArtTemplate: FlowTemplate = {
+  id: createId(),
+  name: 'Game Art Asset Pipeline',
+  description: 'Streamlined workflow for art team to create, optimize, and integrate game assets efficiently.',
+  category: 'creative-projects',
+  difficulty: 'intermediate',
+  targetAudience: 'small-team',
+  estimatedDuration: { min: 2, max: 4, unit: 'weeks' },
+  tags: ['game-art', 'asset-creation', 'optimization', 'pipeline', 'texturing'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.5,
+  usageCount: 280,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Art Style Guide & Asset Planning',
+      description: 'Define art style guidelines, asset specifications, and production pipeline',
+      type: 'planning',
+      order: 0,
+      estimatedDuration: { min: 2, max: 3, unit: 'days' },
+      requiredSkills: ['art-direction', 'pipeline-design', 'project-planning'],
+      requiredTools: ['design-software', 'project-management', 'style-guide-tools'],
+      deliverables: ['Art style guide', 'Asset specifications', 'Production pipeline'],
+      acceptanceCriteria: ['Style guide approved', 'Specifications clear', 'Pipeline defined'],
+      riskLevel: 'low',
+      costEstimate: { min: 400, max: 800, currency: 'USD' },
+      automationPotential: 30,
+      optimizationTips: ['Use style guide templates', 'Automate specification generation', 'Implement approval workflows']
+    },
+    {
+      id: createId(),
+      title: 'Asset Creation & Modeling',
+      description: 'Create 3D models, textures, and 2D assets according to specifications',
+      type: 'development',
+      order: 1,
+      estimatedDuration: { min: 5, max: 10, unit: 'days' },
+      requiredSkills: ['3d-modeling', 'texturing', '2d-art', 'asset-creation'],
+      requiredTools: ['3d-software', 'texture-software', '2d-software', 'asset-library'],
+      dependencies: [createId()], // Art style guide
+      deliverables: ['3D models', 'Textures', '2D assets', 'Asset library'],
+      acceptanceCriteria: ['Assets meet specifications', 'Quality standards met', 'Assets organized'],
+      riskLevel: 'medium',
+      costEstimate: { min: 1200, max: 2400, currency: 'USD' },
+      automationPotential: 40,
+      optimizationTips: ['Use asset libraries', 'Implement batch processing', 'Automate quality checks']
+    },
+    {
+      id: createId(),
+      title: 'Asset Optimization & LOD Creation',
+      description: 'Optimize assets for performance, create LODs, and prepare for game engine',
+      type: 'optimization',
+      order: 2,
+      estimatedDuration: { min: 2, max: 4, unit: 'days' },
+      requiredSkills: ['asset-optimization', 'performance-tuning', 'lod-creation'],
+      requiredTools: ['optimization-tools', 'lod-generators', 'performance-testing'],
+      dependencies: [createId()], // Asset creation
+      deliverables: ['Optimized assets', 'LOD models', 'Performance metrics'],
+      acceptanceCriteria: ['Assets optimized', 'LODs created', 'Performance targets met'],
+      riskLevel: 'medium',
+      costEstimate: { min: 600, max: 1200, currency: 'USD' },
+      automationPotential: 80,
+      optimizationTips: ['Automate optimization', 'Use batch processing', 'Implement quality validation']
+    },
+    {
+      id: createId(),
+      title: 'Asset Integration & Testing',
+      description: 'Import assets into game engine, test functionality, and validate performance',
+      type: 'implementation',
+      order: 3,
+      estimatedDuration: { min: 2, max: 3, unit: 'days' },
+      requiredSkills: ['game-engine', 'asset-integration', 'testing'],
+      requiredTools: ['game-engine', 'testing-framework', 'performance-tools'],
+      dependencies: [createId()], // Asset optimization
+      deliverables: ['Integrated assets', 'Test results', 'Performance validation'],
+      acceptanceCriteria: ['Assets integrated', 'Functionality tested', 'Performance validated'],
+      riskLevel: 'low',
+      costEstimate: { min: 400, max: 800, currency: 'USD' },
+      automationPotential: 70,
+      optimizationTips: ['Automate integration', 'Use automated testing', 'Implement performance monitoring']
+    },
+    {
+      id: createId(),
+      title: 'Asset Management & Documentation',
+      description: 'Organize asset library, create documentation, and establish maintenance procedures',
+      type: 'documentation',
+      order: 4,
+      estimatedDuration: { min: 1, max: 2, unit: 'days' },
+      requiredSkills: ['asset-management', 'documentation', 'organization'],
+      requiredTools: ['asset-management-system', 'documentation-tools', 'version-control'],
+      dependencies: [createId()], // Asset integration
+      deliverables: ['Asset library', 'Documentation', 'Maintenance procedures'],
+      acceptanceCriteria: ['Assets organized', 'Documentation complete', 'Procedures established'],
+      riskLevel: 'low',
+      costEstimate: { min: 200, max: 400, currency: 'USD' },
+      automationPotential: 60,
+      optimizationTips: ['Automate asset management', 'Use documentation templates', 'Implement version control']
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 4200,
+    breakdown: [
+      { id: createId(), name: 'Style Guide', description: 'Style guide and planning', type: 'one-time', amount: 600, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Asset Creation', description: 'Asset creation and modeling', type: 'one-time', amount: 1800, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Optimization', description: 'Optimization and LOD creation', type: 'one-time', amount: 900, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Integration', description: 'Integration and testing', type: 'one-time', amount: 600, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Management', description: 'Management and documentation', type: 'one-time', amount: 300, currency: 'USD', frequency: 'one-time' }
+    ],
+    currency: 'USD',
+    calculationDate: new Date(),
+    assumptions: ['3D modeling software available', 'Team of 2-3 artists', '2-4 week timeline'],
+    riskFactors: ['Asset complexity', 'Performance requirements', 'Style consistency issues']
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Blender',
+      category: 'design',
+      description: 'Free 3D modeling and animation software',
+      website: 'https://blender.org',
+      pricing: {
+        model: 'free',
+        notes: 'Completely free and open source'
+      },
+      features: ['3D modeling', 'Animation', 'Rendering', 'Video editing'],
+      pros: ['Completely free', 'Powerful features', 'Active community', 'Regular updates'],
+      cons: ['Steep learning curve', 'Complex interface', 'Limited support', 'Performance issues'],
+      learningCurve: 'advanced',
+      popularity: 8
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Asset Pipeline Automation',
+      description: 'Automate asset optimization and LOD generation',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Set up automated asset processing workflows'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Global 3D animation market valued at $15 billion',
+    competition: 'High competition in game art market',
+    regulations: ['Copyright laws', 'Asset licensing', 'Quality standards'],
+    trends: ['Procedural generation', 'AI-assisted creation', 'Real-time rendering'],
+    challenges: ['Asset optimization', 'Style consistency', 'Performance constraints'],
+    opportunities: ['Asset marketplaces', 'Automation tools', 'Cross-platform assets']
+  }
+};
+
+export const gameMusicTemplate: FlowTemplate = {
+  id: createId(),
+  name: 'Game Music & Audio Production',
+  description: 'Complete workflow for music team to compose, produce, and integrate game audio assets.',
+  category: 'creative-projects',
+  difficulty: 'intermediate',
+  targetAudience: 'small-team',
+  estimatedDuration: { min: 2, max: 3, unit: 'weeks' },
+  tags: ['game-audio', 'music-composition', 'sound-design', 'audio-integration', 'production'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.4,
+  usageCount: 190,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Audio Design & Planning',
+      description: 'Define audio style, create music briefs, and plan sound design approach',
+      type: 'planning',
+      order: 0,
+      estimatedDuration: { min: 2, max: 3, unit: 'days' },
+      requiredSkills: ['audio-design', 'music-direction', 'sound-design'],
+      requiredTools: ['audio-software', 'reference-library', 'planning-tools'],
+      deliverables: ['Audio style guide', 'Music briefs', 'Sound design plan'],
+      acceptanceCriteria: ['Style guide approved', 'Briefs clear', 'Plan comprehensive'],
+      riskLevel: 'low',
+      costEstimate: { min: 300, max: 600, currency: 'USD' },
+      automationPotential: 20,
+      optimizationTips: ['Use audio templates', 'Create reference libraries', 'Implement feedback systems']
+    },
+    {
+      id: createId(),
+      title: 'Music Composition & Production',
+      description: 'Compose and produce game music tracks, themes, and ambient audio',
+      type: 'development',
+      order: 1,
+      estimatedDuration: { min: 4, max: 8, unit: 'days' },
+      requiredSkills: ['music-composition', 'audio-production', 'arrangement'],
+      requiredTools: ['daw-software', 'virtual-instruments', 'audio-plugins'],
+      dependencies: [createId()], // Audio design
+      deliverables: ['Music tracks', 'Themes', 'Ambient audio', 'Production files'],
+      acceptanceCriteria: ['Tracks composed', 'Quality standards met', 'Files organized'],
+      riskLevel: 'medium',
+      costEstimate: { min: 800, max: 1600, currency: 'USD' },
+      automationPotential: 30,
+      optimizationTips: ['Use music templates', 'Implement batch processing', 'Automate mixing']
+    },
+    {
+      id: createId(),
+      title: 'Sound Effects & Foley Creation',
+      description: 'Create sound effects, UI sounds, and environmental audio elements',
+      type: 'development',
+      order: 2,
+      estimatedDuration: { min: 3, max: 5, unit: 'days' },
+      requiredSkills: ['sound-design', 'foley-recording', 'audio-editing'],
+      requiredTools: ['audio-software', 'recording-equipment', 'sound-libraries'],
+      dependencies: [createId()], // Audio design
+      deliverables: ['Sound effects', 'UI sounds', 'Environmental audio', 'Foley recordings'],
+      acceptanceCriteria: ['Effects created', 'Quality standards met', 'Library organized'],
+      riskLevel: 'medium',
+      costEstimate: { min: 600, max: 1200, currency: 'USD' },
+      automationPotential: 40,
+      optimizationTips: ['Use sound libraries', 'Implement batch processing', 'Automate quality checks']
+    },
+    {
+      id: createId(),
+      title: 'Audio Optimization & Integration',
+      description: 'Optimize audio files, create adaptive music systems, and integrate into game engine',
+      type: 'implementation',
+      order: 3,
+      estimatedDuration: { min: 2, max: 4, unit: 'days' },
+      requiredSkills: ['audio-optimization', 'game-audio', 'integration'],
+      requiredTools: ['audio-optimization-tools', 'game-engine', 'adaptive-audio-system'],
+      dependencies: [createId(), createId()], // Music composition and sound effects
+      deliverables: ['Optimized audio', 'Adaptive music system', 'Integrated audio'],
+      acceptanceCriteria: ['Audio optimized', 'System functional', 'Integration complete'],
+      riskLevel: 'medium',
+      costEstimate: { min: 500, max: 1000, currency: 'USD' },
+      automationPotential: 70,
+      optimizationTips: ['Automate optimization', 'Use adaptive audio tools', 'Implement quality validation']
+    },
+    {
+      id: createId(),
+      title: 'Audio Testing & Finalization',
+      description: 'Test audio in game context, gather feedback, and finalize audio implementation',
+      type: 'testing',
+      order: 4,
+      estimatedDuration: { min: 1, max: 2, unit: 'days' },
+      requiredSkills: ['audio-testing', 'feedback-collection', 'quality-assurance'],
+      requiredTools: ['testing-framework', 'feedback-tools', 'audio-monitoring'],
+      dependencies: [createId()], // Audio integration
+      deliverables: ['Test results', 'Feedback report', 'Final audio assets'],
+      acceptanceCriteria: ['Testing complete', 'Feedback incorporated', 'Assets finalized'],
+      riskLevel: 'low',
+      costEstimate: { min: 200, max: 400, currency: 'USD' },
+      automationPotential: 50,
+      optimizationTips: ['Automate testing', 'Use feedback systems', 'Implement quality monitoring']
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 3600,
+    breakdown: [
+      { id: createId(), name: 'Audio Design', description: 'Audio design and planning', type: 'one-time', amount: 450, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Music Production', description: 'Music composition and production', type: 'one-time', amount: 1200, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Sound Effects', description: 'Sound effects and foley', type: 'one-time', amount: 900, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Optimization', description: 'Optimization and integration', type: 'one-time', amount: 750, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Testing', description: 'Testing and finalization', type: 'one-time', amount: 300, currency: 'USD', frequency: 'one-time' }
+    ],
+    currency: 'USD',
+    calculationDate: new Date(),
+    assumptions: ['Audio software available', 'Team of 1-2 audio professionals', '2-3 week timeline'],
+    riskFactors: ['Audio quality requirements', 'Integration complexity', 'Performance constraints']
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Ableton Live',
+      category: 'design',
+      description: 'Digital audio workstation for music production',
+      website: 'https://ableton.com',
+      pricing: {
+        model: 'one-time',
+        startingPrice: 99,
+        notes: 'Intro version available, full version for professionals'
+      },
+      features: ['Music production', 'Live performance', 'Audio effects', 'MIDI support'],
+      pros: ['Professional quality', 'Live performance features', 'Extensive effects', 'Session view'],
+      cons: ['Expensive', 'Steep learning curve', 'Resource intensive', 'Limited free trial'],
+      learningCurve: 'advanced',
+      popularity: 9
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'quality',
+      title: 'Audio Optimization',
+      description: 'Optimize audio files for game performance',
+      impact: 'medium',
+      effort: 'low',
+      implementation: 'Use compression and format optimization tools'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Global game audio market valued at $3 billion',
+    competition: 'Moderate competition in game audio market',
+    regulations: ['Copyright laws', 'Licensing requirements', 'Quality standards'],
+    trends: ['Adaptive audio', 'Spatial audio', 'AI-generated music'],
+    challenges: ['Performance optimization', 'File size constraints', 'Platform compatibility'],
+    opportunities: ['Audio middleware', 'Licensing opportunities', 'Custom audio solutions']
+  }
+};
+
+export const gameWebDevTemplate: FlowTemplate = {
+  id: createId(),
+  name: 'Game Web Development & Services',
+  description: 'Workflow for web development team to create game-related web services, APIs, and player portals.',
+  category: 'software-development',
+  difficulty: 'intermediate',
+  targetAudience: 'small-team',
+  estimatedDuration: { min: 3, max: 5, unit: 'weeks' },
+  tags: ['web-development', 'api-development', 'game-services', 'player-portal', 'backend'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.6,
+  usageCount: 340,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Web Services Planning & Architecture',
+      description: 'Plan web services architecture, API design, and database schema for game-related features',
+      type: 'planning',
+      order: 0,
+      estimatedDuration: { min: 3, max: 5, unit: 'days' },
+      requiredSkills: ['system-architecture', 'api-design', 'database-design'],
+      requiredTools: ['architecture-tools', 'api-design-tools', 'database-design-software'],
+      deliverables: ['System architecture', 'API specifications', 'Database schema'],
+      acceptanceCriteria: ['Architecture approved', 'APIs designed', 'Schema finalized'],
+      riskLevel: 'medium',
+      costEstimate: { min: 600, max: 1200, currency: 'USD' },
+      automationPotential: 40,
+      optimizationTips: ['Use architecture templates', 'Automate API documentation', 'Implement design validation']
+    },
+    {
+      id: createId(),
+      title: 'Backend API Development',
+      description: 'Develop RESTful APIs, authentication systems, and backend services for game features',
+      type: 'development',
+      order: 1,
+      estimatedDuration: { min: 5, max: 10, unit: 'days' },
+      requiredSkills: ['backend-development', 'api-development', 'authentication'],
+      requiredTools: ['backend-framework', 'database', 'api-testing-tools'],
+      dependencies: [createId()], // Web services planning
+      deliverables: ['RESTful APIs', 'Authentication system', 'Backend services'],
+      acceptanceCriteria: ['APIs functional', 'Authentication working', 'Services tested'],
+      riskLevel: 'high',
+      costEstimate: { min: 1000, max: 2000, currency: 'USD' },
+      automationPotential: 60,
+      optimizationTips: ['Use API frameworks', 'Implement automated testing', 'Use code generation']
+    },
+    {
+      id: createId(),
+      title: 'Frontend Development & UI',
+      description: 'Create player portal, admin interfaces, and web-based game management tools',
+      type: 'development',
+      order: 2,
+      estimatedDuration: { min: 4, max: 8, unit: 'days' },
+      requiredSkills: ['frontend-development', 'ui-design', 'user-experience'],
+      requiredTools: ['frontend-framework', 'ui-library', 'design-tools'],
+      dependencies: [createId()], // Backend API development
+      deliverables: ['Player portal', 'Admin interfaces', 'Management tools'],
+      acceptanceCriteria: ['Interfaces functional', 'UI responsive', 'User experience good'],
+      riskLevel: 'medium',
+      costEstimate: { min: 800, max: 1600, currency: 'USD' },
+      automationPotential: 50,
+      optimizationTips: ['Use component libraries', 'Implement responsive design', 'Automate UI testing']
+    },
+    {
+      id: createId(),
+      title: 'Integration & Testing',
+      description: 'Integrate web services with game, conduct comprehensive testing, and validate functionality',
+      type: 'testing',
+      order: 3,
+      estimatedDuration: { min: 3, max: 5, unit: 'days' },
+      requiredSkills: ['integration', 'testing', 'quality-assurance'],
+      requiredTools: ['testing-framework', 'integration-tools', 'monitoring-software'],
+      dependencies: [createId()], // Frontend development
+      deliverables: ['Integrated services', 'Test results', 'Quality validation'],
+      acceptanceCriteria: ['Integration complete', 'Tests passed', 'Quality validated'],
+      riskLevel: 'medium',
+      costEstimate: { min: 600, max: 1200, currency: 'USD' },
+      automationPotential: 80,
+      optimizationTips: ['Automate integration', 'Use continuous testing', 'Implement monitoring']
+    },
+    {
+      id: createId(),
+      title: 'Deployment & Monitoring',
+      description: 'Deploy web services to production, set up monitoring, and establish maintenance procedures',
+      type: 'deployment',
+      order: 4,
+      estimatedDuration: { min: 2, max: 3, unit: 'days' },
+      requiredSkills: ['deployment', 'monitoring', 'devops'],
+      requiredTools: ['deployment-tools', 'monitoring-platform', 'cloud-services'],
+      dependencies: [createId()], // Integration and testing
+      deliverables: ['Production deployment', 'Monitoring setup', 'Maintenance procedures'],
+      acceptanceCriteria: ['Services deployed', 'Monitoring active', 'Procedures documented'],
+      riskLevel: 'low',
+      costEstimate: { min: 400, max: 800, currency: 'USD' },
+      automationPotential: 90,
+      optimizationTips: ['Automate deployment', 'Use monitoring tools', 'Implement alerting']
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 5100,
+    breakdown: [
+      { id: createId(), name: 'Planning', description: 'Planning and architecture', type: 'one-time', amount: 900, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Backend Development', description: 'Backend API development', type: 'one-time', amount: 1500, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Frontend Development', description: 'Frontend development', type: 'one-time', amount: 1200, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Integration', description: 'Integration and testing', type: 'one-time', amount: 900, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Deployment', description: 'Deployment and monitoring', type: 'one-time', amount: 600, currency: 'USD', frequency: 'one-time' }
+    ],
+    currency: 'USD',
+    calculationDate: new Date(),
+    assumptions: ['Development tools available', 'Team of 2-3 developers', '3-5 week timeline'],
+    riskFactors: ['Technical complexity', 'Integration challenges', 'Performance requirements']
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Node.js',
+      category: 'backend',
+      description: 'JavaScript runtime for server-side development',
+      website: 'https://nodejs.org',
+      pricing: {
+        model: 'free',
+        notes: 'Open source runtime environment'
+      },
+      features: ['Server-side JavaScript', 'NPM package manager', 'Event-driven', 'Non-blocking I/O'],
+      pros: ['Fast development', 'Large ecosystem', 'JavaScript everywhere', 'Active community'],
+      cons: ['Single-threaded', 'Callback complexity', 'Memory leaks', 'Debugging challenges'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'speed',
+      title: 'API Development',
+      description: 'Use modern API frameworks for faster development',
+      impact: 'high',
+      effort: 'medium',
+      implementation: 'Implement RESTful APIs with proper documentation'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Global web development market valued at $40 billion',
+    competition: 'High competition in web development market',
+    regulations: ['Data protection laws', 'API standards', 'Security requirements'],
+    trends: ['Microservices', 'Serverless architecture', 'API-first development'],
+    challenges: ['Scalability', 'Security', 'Performance optimization'],
+    opportunities: ['Cloud services', 'API marketplaces', 'Integration services']
+  }
+};
+
+export const gameProgrammingTemplate: FlowTemplate = {
+  id: createId(),
+  name: 'Game Programming & Core Systems',
+  description: 'Focused workflow for programming team to develop core game systems, features, and technical infrastructure.',
+  category: 'software-development',
+  difficulty: 'advanced',
+  targetAudience: 'small-team',
+  estimatedDuration: { min: 4, max: 8, unit: 'weeks' },
+  tags: ['game-programming', 'core-systems', 'game-engine', 'optimization', 'technical-infrastructure'],
+  version: '1.0.0',
+  author: 'Flow Team',
+  lastUpdated: new Date(),
+  isPublic: true,
+  rating: 4.8,
+  usageCount: 520,
+
+  steps: [
+    {
+      id: createId(),
+      title: 'Technical Architecture & System Design',
+      description: 'Design core game systems, technical architecture, and development framework',
+      type: 'planning',
+      order: 0,
+      estimatedDuration: { min: 4, max: 6, unit: 'days' },
+      requiredSkills: ['system-architecture', 'game-programming', 'technical-design'],
+      requiredTools: ['architecture-tools', 'design-software', 'documentation-tools'],
+      deliverables: ['Technical architecture', 'System design documents', 'Development framework'],
+      acceptanceCriteria: ['Architecture approved', 'Systems designed', 'Framework established'],
+      riskLevel: 'medium',
+      costEstimate: { min: 800, max: 1600, currency: 'USD' },
+      automationPotential: 30,
+      optimizationTips: ['Use architecture patterns', 'Implement design validation', 'Create technical templates']
+    },
+    {
+      id: createId(),
+      title: 'Core Systems Development',
+      description: 'Develop core game systems including rendering, physics, audio, and input handling',
+      type: 'development',
+      order: 1,
+      estimatedDuration: { min: 8, max: 15, unit: 'days' },
+      requiredSkills: ['game-programming', 'system-development', 'optimization'],
+      requiredTools: ['game-engine', 'development-tools', 'profiling-tools'],
+      dependencies: [createId()], // Technical architecture
+      deliverables: ['Core systems', 'Rendering engine', 'Physics system', 'Audio system'],
+      acceptanceCriteria: ['Systems functional', 'Performance targets met', 'Integration working'],
+      riskLevel: 'high',
+      costEstimate: { min: 1600, max: 3200, currency: 'USD' },
+      automationPotential: 50,
+      optimizationTips: ['Use development frameworks', 'Implement automated testing', 'Use profiling tools']
+    },
+    {
+      id: createId(),
+      title: 'Game Features Implementation',
+      description: 'Implement game-specific features, mechanics, and gameplay systems',
+      type: 'development',
+      order: 2,
+      estimatedDuration: { min: 6, max: 12, unit: 'days' },
+      requiredSkills: ['game-programming', 'feature-development', 'mechanics-implementation'],
+      requiredTools: ['game-engine', 'development-tools', 'version-control'],
+      dependencies: [createId()], // Core systems development
+      deliverables: ['Game features', 'Mechanics implementation', 'Gameplay systems'],
+      acceptanceCriteria: ['Features implemented', 'Mechanics working', 'Systems integrated'],
+      riskLevel: 'high',
+      costEstimate: { min: 1200, max: 2400, currency: 'USD' },
+      automationPotential: 40,
+      optimizationTips: ['Use feature frameworks', 'Implement modular design', 'Automate testing']
+    },
+    {
+      id: createId(),
+      title: 'Performance Optimization & Testing',
+      description: 'Optimize game performance, conduct comprehensive testing, and fix critical issues',
+      type: 'optimization',
+      order: 3,
+      estimatedDuration: { min: 4, max: 8, unit: 'days' },
+      requiredSkills: ['performance-optimization', 'testing', 'debugging'],
+      requiredTools: ['profiling-tools', 'testing-framework', 'debugging-tools'],
+      dependencies: [createId()], // Game features implementation
+      deliverables: ['Optimized performance', 'Test results', 'Bug fixes'],
+      acceptanceCriteria: ['Performance optimized', 'Tests passed', 'Critical bugs fixed'],
+      riskLevel: 'medium',
+      costEstimate: { min: 800, max: 1600, currency: 'USD' },
+      automationPotential: 70,
+      optimizationTips: ['Automate performance testing', 'Use profiling tools', 'Implement continuous testing']
+    },
+    {
+      id: createId(),
+      title: 'Documentation & Knowledge Transfer',
+      description: 'Create technical documentation, establish coding standards, and transfer knowledge to team',
+      type: 'documentation',
+      order: 4,
+      estimatedDuration: { min: 2, max: 3, unit: 'days' },
+      requiredSkills: ['documentation', 'knowledge-transfer', 'communication'],
+      requiredTools: ['documentation-tools', 'knowledge-base', 'communication-platform'],
+      dependencies: [createId()], // Performance optimization
+      deliverables: ['Technical documentation', 'Coding standards', 'Knowledge base'],
+      acceptanceCriteria: ['Documentation complete', 'Standards established', 'Knowledge transferred'],
+      riskLevel: 'low',
+      costEstimate: { min: 400, max: 800, currency: 'USD' },
+      automationPotential: 60,
+      optimizationTips: ['Automate documentation', 'Use documentation templates', 'Implement knowledge sharing']
+    }
+  ],
+
+  costAnalysis: {
+    totalCost: 7200,
+    breakdown: [
+      { id: createId(), name: 'Technical Architecture', description: 'Technical architecture and design', type: 'one-time', amount: 1200, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Core Systems', description: 'Core systems development', type: 'one-time', amount: 2400, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Game Features', description: 'Game features implementation', type: 'one-time', amount: 1800, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Performance Optimization', description: 'Performance optimization and testing', type: 'one-time', amount: 1200, currency: 'USD', frequency: 'one-time' },
+      { id: createId(), name: 'Documentation', description: 'Documentation and knowledge transfer', type: 'one-time', amount: 600, currency: 'USD', frequency: 'one-time' }
+    ],
+    currency: 'USD',
+    calculationDate: new Date(),
+    assumptions: ['Game engine available', 'Team of 3-4 programmers', '4-8 week timeline'],
+    riskFactors: ['Technical complexity', 'Performance requirements', 'Integration challenges']
+  },
+
+  recommendedTools: [
+    {
+      id: createId(),
+      name: 'Unreal Engine',
+      category: 'development',
+      description: 'Advanced game development engine',
+      website: 'https://unrealengine.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        notes: 'Free until $1 million in revenue, then 5% royalty'
+      },
+      features: ['Advanced graphics', 'Blueprints visual scripting', 'C++ programming', 'Real-time rendering'],
+      pros: ['High-quality graphics', 'Powerful features', 'Free for indie developers', 'Active community'],
+      cons: ['Steep learning curve', 'Resource intensive', 'Complex setup', 'Performance overhead'],
+      learningCurve: 'advanced',
+      popularity: 8
+    }
+  ],
+
+  optimizationSuggestions: [
+    {
+      category: 'efficiency',
+      title: 'Performance Optimization',
+      description: 'Optimize core systems for better performance',
+      impact: 'high',
+      effort: 'high',
+      implementation: 'Use profiling tools and optimize critical paths'
+    }
+  ],
+
+  industryContext: {
+    marketSize: 'Global game engine market valued at $3 billion',
+    competition: 'High competition in game development market',
+    regulations: ['Platform requirements', 'Performance standards', 'Content guidelines'],
+    trends: ['Real-time rendering', 'AI integration', 'Cross-platform development'],
+    challenges: ['Performance optimization', 'Platform compatibility', 'Development complexity'],
+    opportunities: ['Engine licensing', 'Asset marketplaces', 'Development services']
+  }
 };
 
 // Export all templates with additional templates
@@ -1787,7 +2759,13 @@ export const allTemplates: FlowTemplate[] = [
   { ...customerSupportTemplate, id: createId(), name: 'Multi-language Support', category: 'customer-service' },
   { ...hrRecruitmentTemplate, id: createId(), name: 'Technical Talent Acquisition', category: 'human-resources' },
   { ...financialPlanningTemplate, id: createId(), name: 'Retirement Planning', category: 'finance' },
-  { ...researchProjectTemplate, id: createId(), name: 'User Experience Research', category: 'research-development' }
+  { ...researchProjectTemplate, id: createId(), name: 'User Experience Research', category: 'research-development' },
+  gameBalanceTemplate,
+  gameMechanicsTemplate,
+  gameArtTemplate,
+  gameMusicTemplate,
+  gameWebDevTemplate,
+  gameProgrammingTemplate
 ];
 
 // Template categories with descriptions
@@ -1797,14 +2775,14 @@ export const templateCategories = [
     name: 'Software Development',
     description: 'Web apps, mobile apps, desktop software, and system development',
     icon: '💻',
-    templateCount: 15
+    templateCount: 17
   },
   {
     id: 'game-design',
     name: 'Game Design',
     description: 'Video game development, from concept to release',
     icon: '🎮',
-    templateCount: 8
+    templateCount: 14
   },
   {
     id: 'manufacturing',
@@ -1832,7 +2810,7 @@ export const templateCategories = [
     name: 'Creative Projects',
     description: 'Design, content creation, and creative project management',
     icon: '🎨',
-    templateCount: 14
+    templateCount: 16
   },
   {
     id: 'research-development',
@@ -1862,4 +2840,19 @@ export const templateCategories = [
     icon: '💰',
     templateCount: 9
   }
+];
+
+// Difficulty levels
+export const difficultyLevels = [
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' },
+  { value: 'expert', label: 'Expert' }
+];
+
+// Target audiences
+export const targetAudiences = [
+  { value: 'individual', label: 'Individual' },
+  { value: 'small-team', label: 'Small Team' },
+  { value: 'enterprise', label: 'Enterprise' }
 ]; 

@@ -23,6 +23,8 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [selectedTargetAudience, setSelectedTargetAudience] = useState<string>('all');
+  const [selectedSource, setSelectedSource] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'popularity' | 'rating' | 'duration' | 'cost'>('popularity');
   const [visibleCount, setVisibleCount] = useState(15);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +52,20 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
       filtered = filtered.filter(template => template.difficulty === selectedDifficulty);
     }
 
+    // Filter by target audience
+    if (selectedTargetAudience !== 'all') {
+      filtered = filtered.filter(template => template.targetAudience === selectedTargetAudience);
+    }
+
+    // Filter by source (official vs user-generated)
+    if (selectedSource !== 'all') {
+      if (selectedSource === 'official') {
+        filtered = filtered.filter(template => !template.isUserGenerated);
+      } else if (selectedSource === 'user-generated') {
+        filtered = filtered.filter(template => template.isUserGenerated);
+      }
+    }
+
     // Sort templates
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -67,7 +83,7 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
     });
 
     return filtered;
-  }, [searchQuery, selectedCategory, selectedDifficulty, sortBy]);
+  }, [searchQuery, selectedCategory, selectedDifficulty, selectedTargetAudience, selectedSource, sortBy]);
 
   // Get visible templates based on current count
   const visibleTemplates = useMemo(() => {
@@ -116,7 +132,7 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
   // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(15);
-  }, [searchQuery, selectedCategory, selectedDifficulty, sortBy]);
+  }, [searchQuery, selectedCategory, selectedDifficulty, selectedTargetAudience, sortBy]);
 
   const handleTemplateSelect = (template: FlowTemplate) => {
     if (onTemplateSelect) {
@@ -193,6 +209,29 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
             </SelectContent>
           </Select>
 
+          <Select value={selectedTargetAudience} onValueChange={setSelectedTargetAudience}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Target Audience" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Audiences</SelectItem>
+              <SelectItem value="individual">Individual</SelectItem>
+              <SelectItem value="small-team">Small Team</SelectItem>
+              <SelectItem value="enterprise">Enterprise</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedSource} onValueChange={setSelectedSource}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Source" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Sources</SelectItem>
+              <SelectItem value="official">Official Templates</SelectItem>
+              <SelectItem value="user-generated">User Generated</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Sort by" />
@@ -262,6 +301,15 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
                   <Badge variant="outline" className="capitalize">
                     {template.difficulty}
                   </Badge>
+                  <Badge variant="outline" className="capitalize">
+                    {template.targetAudience === 'individual' ? 'Individual' : 
+                     template.targetAudience === 'small-team' ? 'Small Team' : 'Enterprise'}
+                  </Badge>
+                  {template.isUserGenerated && (
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      Community
+                    </Badge>
+                  )}
                 </div>
               </CardHeader>
 
@@ -395,6 +443,8 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
                 setSearchQuery('');
                 setSelectedCategory('all');
                 setSelectedDifficulty('all');
+                setSelectedTargetAudience('all');
+                setSelectedSource('all');
               }}
             >
               Clear Filters

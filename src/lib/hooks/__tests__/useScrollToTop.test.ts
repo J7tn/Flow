@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useLocation } from 'react-router-dom';
 import { useScrollToTop } from '../useScrollToTop';

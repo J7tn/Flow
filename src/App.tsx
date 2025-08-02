@@ -24,7 +24,6 @@ import SharedFlowViewer from "./components/workflow/SharedFlowViewer";
 import { Toaster } from "./components/ui/toaster";
 import { useScrollToTop } from "./lib/hooks/useScrollToTop";
 
-
 function App() {
   // Use custom hook for scroll restoration
   useScrollToTop();

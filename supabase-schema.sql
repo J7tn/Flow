@@ -18,6 +18,8 @@ CREATE TYPE cost_type AS ENUM (
   'fixed', 'variable', 'recurring', 'one-time', 'subscription',
   'licensing', 'infrastructure', 'labor', 'materials', 'overhead'
 );
+CREATE TYPE template_status AS ENUM ('draft', 'pending', 'approved', 'rejected');
+CREATE TYPE review_status AS ENUM ('pending', 'approved', 'rejected');
 
 -- Users table (extends Supabase auth.users)
 CREATE TABLE public.user_profiles (
@@ -59,6 +61,13 @@ CREATE TABLE public.workflow_templates (
   success_metrics JSONB NOT NULL DEFAULT '[]',
   risks JSONB NOT NULL DEFAULT '[]',
   customization_options JSONB NOT NULL DEFAULT '[]',
+  -- New fields for user-generated templates
+  is_user_generated BOOLEAN DEFAULT false,
+  status template_status DEFAULT 'pending',
+  moderation_notes TEXT,
+  moderated_by UUID REFERENCES public.user_profiles(id),
+  moderated_at TIMESTAMP WITH TIME ZONE,
+  rejection_reason TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -155,11 +164,65 @@ CREATE TABLE public.analytics_events (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Template reviews table
+CREATE TABLE public.template_reviews (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  template_id UUID REFERENCES public.workflow_templates(id) ON DELETE CASCADE NOT NULL,
+  reviewer_id UUID REFERENCES public.user_profiles(id) ON DELETE CASCADE NOT NULL,
+  reviewer_name TEXT NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  title TEXT NOT NULL,
+  review_text TEXT NOT NULL,
+  pros TEXT[] DEFAULT '{}',
+  cons TEXT[] DEFAULT '{}',
+  status review_status DEFAULT 'approved',
+  moderated_by UUID REFERENCES public.user_profiles(id),
+  moderated_at TIMESTAMP WITH TIME ZONE,
+  rejection_reason TEXT,
+  helpful_votes INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(template_id, reviewer_id)
+);
+
+-- Review helpful votes table
+CREATE TABLE public.review_votes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  review_id UUID REFERENCES public.template_reviews(id) ON DELETE CASCADE NOT NULL,
+  voter_id UUID REFERENCES public.user_profiles(id) ON DELETE CASCADE NOT NULL,
+  is_helpful BOOLEAN NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(review_id, voter_id)
+);
+
+-- Template uploads tracking table
+CREATE TABLE public.template_uploads (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  template_id UUID REFERENCES public.workflow_templates(id) ON DELETE CASCADE NOT NULL,
+  uploader_id UUID REFERENCES public.user_profiles(id) ON DELETE CASCADE NOT NULL,
+  original_workflow_id UUID REFERENCES public.workflow_instances(id) ON DELETE SET NULL,
+  upload_notes TEXT,
+  upload_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  version_number INTEGER DEFAULT 1,
+  is_latest_version BOOLEAN DEFAULT true
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_workflow_templates_category ON public.workflow_templates(category);
 CREATE INDEX idx_workflow_templates_difficulty ON public.workflow_templates(difficulty);
 CREATE INDEX idx_workflow_templates_rating ON public.workflow_templates(rating);
 CREATE INDEX idx_workflow_templates_usage_count ON public.workflow_templates(usage_count);
+CREATE INDEX idx_workflow_templates_status ON public.workflow_templates(status);
+CREATE INDEX idx_workflow_templates_author_id ON public.workflow_templates(author_id);
+CREATE INDEX idx_workflow_templates_user_generated ON public.workflow_templates(is_user_generated);
+CREATE INDEX idx_template_reviews_template_id ON public.template_reviews(template_id);
+CREATE INDEX idx_template_reviews_reviewer_id ON public.template_reviews(reviewer_id);
+CREATE INDEX idx_template_reviews_status ON public.template_reviews(status);
+CREATE INDEX idx_template_reviews_rating ON public.template_reviews(rating);
+CREATE INDEX idx_review_votes_review_id ON public.review_votes(review_id);
+CREATE INDEX idx_review_votes_voter_id ON public.review_votes(voter_id);
+CREATE INDEX idx_template_uploads_template_id ON public.template_uploads(template_id);
+CREATE INDEX idx_template_uploads_uploader_id ON public.template_uploads(uploader_id);
 CREATE INDEX idx_workflow_instances_user_id ON public.workflow_instances(user_id);
 CREATE INDEX idx_workflow_instances_status ON public.workflow_instances(status);
 CREATE INDEX idx_workflow_steps_instance_id ON public.workflow_steps(workflow_instance_id);
@@ -176,6 +239,9 @@ ALTER TABLE public.workflow_instances ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workflow_steps ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tools ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.template_reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.review_votes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.template_uploads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.analytics_events ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
@@ -202,6 +268,42 @@ CREATE POLICY "Users can update own templates" ON public.workflow_templates
 
 CREATE POLICY "Users can delete own templates" ON public.workflow_templates
   FOR DELETE USING (auth.uid() = author_id);
+
+-- Template reviews: approved reviews are viewable by all, pending by reviewer
+CREATE POLICY "Approved reviews are viewable by all" ON public.template_reviews
+  FOR SELECT USING (status = 'approved' OR auth.uid() = reviewer_id);
+
+CREATE POLICY "Users can create reviews" ON public.template_reviews
+  FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
+
+CREATE POLICY "Users can update own reviews" ON public.template_reviews
+  FOR UPDATE USING (auth.uid() = reviewer_id);
+
+CREATE POLICY "Users can delete own reviews" ON public.template_reviews
+  FOR DELETE USING (auth.uid() = reviewer_id);
+
+-- Review votes: users can only see their own votes
+CREATE POLICY "Users can view own votes" ON public.review_votes
+  FOR SELECT USING (auth.uid() = voter_id);
+
+CREATE POLICY "Users can create votes" ON public.review_votes
+  FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
+
+CREATE POLICY "Users can update own votes" ON public.review_votes
+  FOR UPDATE USING (auth.uid() = voter_id);
+
+CREATE POLICY "Users can delete own votes" ON public.review_votes
+  FOR DELETE USING (auth.uid() = voter_id);
+
+-- Template uploads: users can only see their own uploads
+CREATE POLICY "Users can view own uploads" ON public.template_uploads
+  FOR SELECT USING (auth.uid() = uploader_id);
+
+CREATE POLICY "Users can create uploads" ON public.template_uploads
+  FOR INSERT WITH CHECK (auth.uid() = uploader_id);
+
+CREATE POLICY "Users can update own uploads" ON public.template_uploads
+  FOR UPDATE USING (auth.uid() = uploader_id);
 
 -- Workflow instances: users can only see their own workflows
 CREATE POLICY "Users can view own workflows" ON public.workflow_instances
@@ -297,6 +399,12 @@ CREATE TRIGGER update_workflow_steps_updated_at BEFORE UPDATE ON public.workflow
 CREATE TRIGGER update_tools_updated_at BEFORE UPDATE ON public.tools
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_template_reviews_updated_at BEFORE UPDATE ON public.template_reviews
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_template_uploads_updated_at BEFORE UPDATE ON public.template_uploads
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Function to handle user creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
@@ -307,10 +415,56 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Function to update template rating when reviews change
+CREATE OR REPLACE FUNCTION update_template_rating()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Update the template's average rating
+  UPDATE public.workflow_templates 
+  SET rating = (
+    SELECT AVG(rating)::DECIMAL(3,2)
+    FROM public.template_reviews 
+    WHERE template_id = COALESCE(NEW.template_id, OLD.template_id)
+    AND status = 'approved'
+  )
+  WHERE id = COALESCE(NEW.template_id, OLD.template_id);
+  
+  RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to update review helpful votes count
+CREATE OR REPLACE FUNCTION update_review_helpful_votes()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Update the review's helpful votes count
+  UPDATE public.template_reviews 
+  SET helpful_votes = (
+    SELECT COUNT(*)
+    FROM public.review_votes 
+    WHERE review_id = COALESCE(NEW.review_id, OLD.review_id)
+    AND is_helpful = true
+  )
+  WHERE id = COALESCE(NEW.review_id, OLD.review_id);
+  
+  RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
 -- Trigger to create user profile on signup
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Trigger to update template rating when reviews change
+CREATE TRIGGER update_template_rating_trigger
+  AFTER INSERT OR UPDATE OR DELETE ON public.template_reviews
+  FOR EACH ROW EXECUTE FUNCTION update_template_rating();
+
+-- Trigger to update review helpful votes when votes change
+CREATE TRIGGER update_review_helpful_votes_trigger
+  AFTER INSERT OR UPDATE OR DELETE ON public.review_votes
+  FOR EACH ROW EXECUTE FUNCTION update_review_helpful_votes();
 
 -- Insert some sample data
 INSERT INTO public.tools (name, category, description, pricing_model, starting_price, features, pros, cons) VALUES

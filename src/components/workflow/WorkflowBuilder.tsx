@@ -23,6 +23,7 @@ import {
   Calculator,
   RefreshCw,
   AlertCircle,
+  Upload,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,7 @@ import { useChat2API } from "@/lib/hooks/useChat2API";
 import SmartSuggestionPanel from "./SmartSuggestionPanel";
 import VisualProgressTracker from "./VisualProgressTracker";
 import PermanentDashboard from "../shared/PermanentDashboard";
+import { TemplateUploadForm } from "../templates/TemplateUploadForm";
 
 interface WorkflowStep {
   id: string;
@@ -63,6 +65,7 @@ const WorkflowBuilder = ({
   const [activeTab, setActiveTab] = useState("canvas");
   const [selectedStep, setSelectedStep] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [showUploadForm, setShowUploadForm] = useState(false);
   const [aiStatus, setAiStatus] = useState<{
     isGenerating: boolean;
     error: string | null;
@@ -137,6 +140,16 @@ const WorkflowBuilder = ({
   const handleSave = () => {
     onSave(workflow);
     // Show success message or redirect
+  };
+
+  const handleUploadSuccess = (template: any) => {
+    setShowUploadForm(false);
+    // You could show a success message or navigate to the template
+    console.log('Template uploaded successfully:', template);
+  };
+
+  const handleUploadCancel = () => {
+    setShowUploadForm(false);
   };
 
   // AI-powered step generation
@@ -315,6 +328,14 @@ Please suggest 3-5 workflow steps that would be appropriate for this type of pro
               >
                 {showSuggestions ? "Hide" : "Show"} Suggestions
               </Button>
+              {workflow.steps.length > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowUploadForm(true)}
+                >
+                  <Upload className="mr-2 h-4 w-4" /> Upload as Template
+                </Button>
+              )}
               <Button onClick={handleSave}>
                 <Save className="mr-2 h-4 w-4" /> Save Workflow
               </Button>
@@ -778,6 +799,23 @@ Please suggest 3-5 workflow steps that would be appropriate for this type of pro
           </div>
         )}
       </div>
+
+      {/* Template Upload Modal */}
+      {showUploadForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <TemplateUploadForm
+              workflow={{
+                title: workflow.title,
+                description: workflow.description,
+                steps: workflow.steps,
+              }}
+              onSuccess={handleUploadSuccess}
+              onCancel={handleUploadCancel}
+            />
+          </div>
+        </div>
+      )}
     </PermanentDashboard>
   );
 };

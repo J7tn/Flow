@@ -1,6 +1,14 @@
 import { supabase } from './supabase';
 import { RateLimiter } from './validation';
 import { getCurrentUser } from './supabase';
+import type { 
+  FlowTemplate, 
+  TemplateReview, 
+  ReviewVote, 
+  TemplateUpload,
+  TemplateStatus,
+  ReviewStatus 
+} from '@/types/templates';
 
 // Rate limiter instance
 const apiRateLimiter = new RateLimiter(10, 60 * 1000); // 10 requests per minute
@@ -351,4 +359,415 @@ export const userApi = {
     if (error) throw error;
     return data;
   },
+}; 
+
+// Template Upload Functions
+export const uploadTemplate = async (template: Omit<FlowTemplate, 'id' | 'lastUpdated' | 'rating' | 'usageCount'>): Promise<{ data: FlowTemplate | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { data: null, error: 'User not authenticated' };
+    }
+
+    const { data: profile } = await client
+      .from('user_profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .single();
+
+    const templateData = {
+      ...template,
+      author_id: user.id,
+      author_name: profile?.full_name || user.email || 'Anonymous',
+      is_user_generated: true,
+      status: 'pending' as TemplateStatus,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await client
+      .from('workflow_templates')
+      .insert(templateData)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Create upload record
+    await client
+      .from('template_uploads')
+      .insert({
+        template_id: data.id,
+        uploader_id: user.id,
+        upload_date: new Date().toISOString(),
+      });
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error uploading template:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to upload template' 
+    };
+  }
+};
+
+export const getUserTemplates = async (): Promise<{ data: FlowTemplate[] | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { data: null, error: 'User not authenticated' };
+    }
+
+    const { data, error } = await client
+      .from('workflow_templates')
+      .select('*')
+      .eq('author_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error fetching user templates:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to fetch user templates' 
+    };
+  }
+};
+
+export const updateTemplateStatus = async (
+  templateId: string, 
+  status: TemplateStatus, 
+  notes?: string
+): Promise<{ data: FlowTemplate | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { data: null, error: 'User not authenticated' };
+    }
+
+    const updateData: any = {
+      status,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (notes) {
+      updateData.moderation_notes = notes;
+    }
+
+    if (status === 'approved' || status === 'rejected') {
+      updateData.moderated_by = user.id;
+      updateData.moderated_at = new Date().toISOString();
+    }
+
+    const { data, error } = await client
+      .from('workflow_templates')
+      .update(updateData)
+      .eq('id', templateId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error updating template status:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to update template status' 
+    };
+  }
+};
+
+// Review Functions
+export const submitReview = async (
+  templateId: string,
+  review: Omit<TemplateReview, 'id' | 'template_id' | 'reviewer_id' | 'reviewer_name' | 'status' | 'helpful_votes' | 'created_at' | 'updated_at'>
+): Promise<{ data: TemplateReview | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { data: null, error: 'User not authenticated' };
+    }
+
+    const { data: profile } = await client
+      .from('user_profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .single();
+
+    const reviewData = {
+      ...review,
+      template_id: templateId,
+      reviewer_id: user.id,
+      reviewer_name: profile?.full_name || user.email || 'Anonymous',
+      status: 'approved' as ReviewStatus,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await client
+      .from('template_reviews')
+      .insert(reviewData)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error submitting review:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to submit review' 
+    };
+  }
+};
+
+export const getTemplateReviews = async (templateId: string): Promise<{ data: TemplateReview[] | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+
+    const { data, error } = await client
+      .from('template_reviews')
+      .select('*')
+      .eq('template_id', templateId)
+      .eq('status', 'approved')
+      .order('helpful_votes', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error fetching template reviews:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to fetch template reviews' 
+    };
+  }
+};
+
+export const getUserReview = async (templateId: string): Promise<{ data: TemplateReview | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { data: null, error: 'User not authenticated' };
+    }
+
+    const { data, error } = await client
+      .from('template_reviews')
+      .select('*')
+      .eq('template_id', templateId)
+      .eq('reviewer_id', user.id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows returned
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error fetching user review:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to fetch user review' 
+    };
+  }
+};
+
+export const updateReview = async (
+  reviewId: string,
+  review: Partial<Omit<TemplateReview, 'id' | 'template_id' | 'reviewer_id' | 'reviewer_name' | 'status' | 'helpful_votes' | 'created_at' | 'updated_at'>>
+): Promise<{ data: TemplateReview | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { data: null, error: 'User not authenticated' };
+    }
+
+    const updateData = {
+      ...review,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await client
+      .from('template_reviews')
+      .update(updateData)
+      .eq('id', reviewId)
+      .eq('reviewer_id', user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error updating review:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to update review' 
+    };
+  }
+};
+
+export const deleteReview = async (reviewId: string): Promise<{ error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { error: 'Supabase client not available' };
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { error: 'User not authenticated' };
+    }
+
+    const { error } = await client
+      .from('template_reviews')
+      .delete()
+      .eq('id', reviewId)
+      .eq('reviewer_id', user.id);
+
+    if (error) throw error;
+
+    return { error: null };
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    return { 
+      error: error instanceof Error ? error.message : 'Failed to delete review' 
+    };
+  }
+};
+
+// Review Vote Functions
+export const voteReview = async (
+  reviewId: string,
+  isHelpful: boolean
+): Promise<{ data: ReviewVote | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { data: null, error: 'User not authenticated' };
+    }
+
+    const voteData = {
+      review_id: reviewId,
+      voter_id: user.id,
+      is_helpful: isHelpful,
+      created_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await client
+      .from('review_votes')
+      .upsert(voteData, { onConflict: 'review_id,voter_id' })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error voting on review:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to vote on review' 
+    };
+  }
+};
+
+export const removeReviewVote = async (reviewId: string): Promise<{ error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { error: 'Supabase client not available' };
+    }
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { error: 'User not authenticated' };
+    }
+
+    const { error } = await client
+      .from('review_votes')
+      .delete()
+      .eq('review_id', reviewId)
+      .eq('voter_id', user.id);
+
+    if (error) throw error;
+
+    return { error: null };
+  } catch (error) {
+    console.error('Error removing review vote:', error);
+    return { 
+      error: error instanceof Error ? error.message : 'Failed to remove review vote' 
+    };
+  }
+};
+
+// Template Upload Tracking Functions
+export const getTemplateUploads = async (): Promise<{ data: TemplateUpload[] | null; error: string | null }> => {
+  try {
+    const client = supabase();
+    if (!client) {
+      return { data: null, error: 'Supabase client not available' };
+    }
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) {
+      return { data: null, error: 'User not authenticated' };
+    }
+
+    const { data, error } = await client
+      .from('template_uploads')
+      .select('*')
+      .eq('uploader_id', user.id)
+      .order('upload_date', { ascending: false });
+
+    if (error) throw error;
+
+    return { data, error: null };
+  } catch (error) {
+    console.error('Error fetching template uploads:', error);
+    return { 
+      data: null, 
+      error: error instanceof Error ? error.message : 'Failed to fetch template uploads' 
+    };
+  }
 }; 

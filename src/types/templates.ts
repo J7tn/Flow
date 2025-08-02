@@ -26,6 +26,8 @@ export const templateCategorySchema = z.enum([
 
 export const difficultyLevelSchema = z.enum(['beginner', 'intermediate', 'advanced', 'expert']);
 
+export const targetAudienceSchema = z.enum(['individual', 'small-team', 'enterprise']);
+
 export const costTypeSchema = z.enum([
   'fixed',
   'variable',
@@ -155,13 +157,59 @@ export const processStepSchema = z.object({
   optimizationTips: z.array(z.string()).optional(),
 });
 
-// Template definition
+// New types for user-generated templates and reviews
+export const templateStatusSchema = z.enum(['draft', 'pending', 'approved', 'rejected']);
+export const reviewStatusSchema = z.enum(['pending', 'approved', 'rejected']);
+
+// Review schema
+export const templateReviewSchema = z.object({
+  id: z.string().uuid(),
+  template_id: z.string().uuid(),
+  reviewer_id: z.string().uuid(),
+  reviewer_name: z.string(),
+  rating: z.number().min(1).max(5),
+  title: z.string().min(1, 'Review title is required'),
+  review_text: z.string().min(10, 'Review text must be at least 10 characters'),
+  pros: z.array(z.string()).default([]),
+  cons: z.array(z.string()).default([]),
+  status: reviewStatusSchema.default('approved'),
+  moderated_by: z.string().uuid().optional(),
+  moderated_at: z.date().optional(),
+  rejection_reason: z.string().optional(),
+  helpful_votes: z.number().int().min(0).default(0),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+// Review vote schema
+export const reviewVoteSchema = z.object({
+  id: z.string().uuid(),
+  review_id: z.string().uuid(),
+  voter_id: z.string().uuid(),
+  is_helpful: z.boolean(),
+  created_at: z.date(),
+});
+
+// Template upload schema
+export const templateUploadSchema = z.object({
+  id: z.string().uuid(),
+  template_id: z.string().uuid(),
+  uploader_id: z.string().uuid(),
+  original_workflow_id: z.string().uuid().optional(),
+  upload_notes: z.string().optional(),
+  upload_date: z.date(),
+  version_number: z.number().int().min(1).default(1),
+  is_latest_version: z.boolean().default(true),
+});
+
+// Enhanced flow template schema with user-generated fields
 export const flowTemplateSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1, 'Template name is required'),
   description: z.string(),
   category: templateCategorySchema,
   difficulty: difficultyLevelSchema,
+  targetAudience: targetAudienceSchema,
   estimatedDuration: z.object({
     min: z.number().positive(),
     max: z.number().positive(),
@@ -217,9 +265,10 @@ export const flowTemplateSchema = z.object({
   // Risk assessment
   risks: z.array(z.object({
     category: z.enum(['technical', 'business', 'operational', 'financial', 'legal']),
+    title: z.string(),
     description: z.string(),
     probability: z.enum(['low', 'medium', 'high']),
-    impact: z.enum(['low', 'medium', 'high', 'critical']),
+    impact: z.enum(['low', 'medium', 'high']),
     mitigation: z.string(),
   })),
   
@@ -227,11 +276,19 @@ export const flowTemplateSchema = z.object({
   customizationOptions: z.array(z.object({
     name: z.string(),
     description: z.string(),
-    type: z.enum(['boolean', 'number', 'string', 'select']),
-    defaultValue: z.any(),
+    type: z.enum(['text', 'number', 'select', 'multi-select', 'boolean']),
     options: z.array(z.string()).optional(),
+    defaultValue: z.union([z.string(), z.number(), z.boolean(), z.array(z.string())]).optional(),
     required: z.boolean().default(false),
   })),
+  
+  // User-generated template fields
+  isUserGenerated: z.boolean().default(false),
+  status: templateStatusSchema.default('pending'),
+  moderationNotes: z.string().optional(),
+  moderatedBy: z.string().uuid().optional(),
+  moderatedAt: z.date().optional(),
+  rejectionReason: z.string().optional(),
 });
 
 // Template instances (user-created flows from templates)
@@ -271,6 +328,7 @@ export const flowInstanceSchema = z.object({
 // Type exports
 export type TemplateCategory = z.infer<typeof templateCategorySchema>;
 export type DifficultyLevel = z.infer<typeof difficultyLevelSchema>;
+export type TargetAudience = z.infer<typeof targetAudienceSchema>;
 export type CostType = z.infer<typeof costTypeSchema>;
 export type CostItem = z.infer<typeof costItemSchema>;
 export type CostCalculation = z.infer<typeof costCalculationSchema>;
@@ -279,4 +337,21 @@ export type Tool = z.infer<typeof toolSchema>;
 export type StepType = z.infer<typeof stepTypeSchema>;
 export type ProcessStep = z.infer<typeof processStepSchema>;
 export type FlowTemplate = z.infer<typeof flowTemplateSchema>;
-export type FlowInstance = z.infer<typeof flowInstanceSchema>; 
+export type FlowInstance = z.infer<typeof flowInstanceSchema>;
+
+// Template review and upload types
+export type TemplateStatus = z.infer<typeof templateStatusSchema>;
+export type ReviewStatus = z.infer<typeof reviewStatusSchema>;
+export type TemplateReview = z.infer<typeof templateReviewSchema>;
+export type ReviewVote = z.infer<typeof reviewVoteSchema>;
+export type TemplateUpload = z.infer<typeof templateUploadSchema>;
+
+// Workflow step type for the builder
+export interface WorkflowStep {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  duration: number;
+  dependencies: string[];
+} 

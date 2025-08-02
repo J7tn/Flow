@@ -77,7 +77,7 @@ import {
   Calculator,
   RefreshCw,
   HelpCircle,
-  Cube,
+  Box,
   Gamepad2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -420,7 +420,7 @@ const WorkflowDesigner = () => {
         { name: "Sketch", description: "Digital design for Mac users", category: "creative", icon: PenTool, link: "https://sketch.com", pricing: { model: "subscription", startingPrice: 9, currency: "USD", notes: "Starting at $9/month" } },
         { name: "Canva Pro", description: "Graphic design platform with templates", category: "creative", icon: Image, link: "https://canva.com", pricing: { model: "subscription", startingPrice: 12.99, currency: "USD", notes: "Starting at $12.99/month" } },
         { name: "Procreate", description: "Digital painting and illustration app", category: "creative", icon: PenTool, link: "https://procreate.art", pricing: { model: "one-time", startingPrice: 9.99, currency: "USD", notes: "One-time purchase for iPad" } },
-        { name: "Blender", description: "Free 3D creation suite", category: "creative", icon: Cube, link: "https://blender.org", pricing: { model: "free", currency: "USD", notes: "Completely free open-source software" } }
+        { name: "Blender", description: "Free 3D creation suite", category: "creative", icon: Box, link: "https://blender.org", pricing: { model: "free", currency: "USD", notes: "Completely free open-source software" } }
       );
     }
     
