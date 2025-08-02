@@ -1677,26 +1677,26 @@ const WorkflowDesigner = () => {
                          placeholder="Enter assignee name"
                        />
                      </div>
-                     <div className="grid grid-cols-2 gap-4">
-                       <div className="flex flex-col">
-                         <label className="text-sm font-medium mb-1">Estimated Time (hours)</label>
-                         <Input
-                           type="number"
-                           value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
-                           onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
-                           className="h-10"
-                         />
-                       </div>
-                       <div className="flex flex-col">
-                         <label className="text-sm font-medium mb-1">Cost ($)</label>
-                         <Input
-                           type="number"
-                           value={steps.find(s => s.id === selectedStep)?.cost || ""}
-                           onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
-                           className="h-10"
-                         />
-                       </div>
-                     </div>
+                           <div className="grid grid-cols-2 gap-4 items-start">
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1 whitespace-nowrap">Estimated Time (hours)</label>
+          <Input
+            type="number"
+            value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
+            onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
+            className="h-10"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1 whitespace-nowrap">Cost ($)</label>
+          <Input
+            type="number"
+            value={steps.find(s => s.id === selectedStep)?.cost || ""}
+            onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
+            className="h-10"
+          />
+        </div>
+      </div>
                    </TabsContent>
                    <TabsContent value="advanced" className="space-y-4">
                      <div>
