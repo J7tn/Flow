@@ -200,4 +200,18 @@ describe('WorkflowDesigner Goal Validation', () => {
       expect(generateButton).toBeDisabled();
     });
   });
+
+  it('should display tool pricing information', async () => {
+    renderWithRouter(<WorkflowDesigner />);
+    
+    // Wait for tools to be generated
+    await waitFor(() => {
+      expect(screen.getByText('FREE')).toBeInTheDocument();
+    });
+    
+    // Check for pricing information
+    expect(screen.getByText(/FREE - Completely free/)).toBeInTheDocument();
+    expect(screen.getByText(/FREEMIUM/)).toBeInTheDocument();
+    expect(screen.getByText(/From \$8\/month/)).toBeInTheDocument();
+  });
 }); 

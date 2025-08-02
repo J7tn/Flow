@@ -101,7 +101,7 @@ const WorkflowDesigner = () => {
   const [isGeneratingSteps, setIsGeneratingSteps] = useState(false);
   const [suggestedSteps, setSuggestedSteps] = useState<Array<{ title: string; description: string; type: FlowStep["type"]; icon: any; color: string }>>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [currentStepTools, setCurrentStepTools] = useState<Array<{ name: string; description: string; category: string; icon: any; link?: string }>>([]);
+  const [currentStepTools, setCurrentStepTools] = useState<Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }>>([]);
   const [isGeneratingTools, setIsGeneratingTools] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
@@ -274,7 +274,7 @@ const WorkflowDesigner = () => {
     }
   };
 
-  const generateToolsWithAI = async (stepTitle: string, stepDescription: string): Promise<Array<{ name: string; description: string; category: string; icon: any; link?: string }>> => {
+  const generateToolsWithAI = async (stepTitle: string, stepDescription: string): Promise<Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }>> => {
     const lowerTitle = stepTitle.toLowerCase();
     const lowerDesc = stepDescription.toLowerCase();
     
@@ -283,69 +283,69 @@ const WorkflowDesigner = () => {
     // Management tools
     if (lowerTitle.includes('market') || lowerTitle.includes('research') || lowerDesc.includes('market') || lowerTitle.includes('analysis') || lowerTitle.includes('planning')) {
       tools.push(
-        { name: "Google Analytics", description: "Track website traffic and user behavior", category: "management", icon: BarChart3, link: "https://analytics.google.com" },
-        { name: "SEMrush", description: "Competitive analysis and keyword research", category: "management", icon: Search, link: "https://semrush.com" },
-        { name: "Ahrefs", description: "SEO and backlink analysis", category: "management", icon: TrendingUp, link: "https://ahrefs.com" },
-        { name: "Hotjar", description: "User behavior analytics and heatmaps", category: "management", icon: Eye, link: "https://hotjar.com" },
-        { name: "Mixpanel", description: "Product analytics and user insights", category: "management", icon: BarChart3, link: "https://mixpanel.com" },
-        { name: "Tableau", description: "Data visualization and business intelligence", category: "management", icon: BarChart3, link: "https://tableau.com" }
+        { name: "Google Analytics", description: "Track website traffic and user behavior", category: "management", icon: BarChart3, link: "https://analytics.google.com", pricing: { model: "free", currency: "USD", notes: "Free for basic features" } },
+        { name: "SEMrush", description: "Competitive analysis and keyword research", category: "management", icon: Search, link: "https://semrush.com", pricing: { model: "subscription", startingPrice: 119, currency: "USD", notes: "Starting at $119/month" } },
+        { name: "Ahrefs", description: "SEO and backlink analysis", category: "management", icon: TrendingUp, link: "https://ahrefs.com", pricing: { model: "subscription", startingPrice: 99, currency: "USD", notes: "Starting at $99/month" } },
+        { name: "Hotjar", description: "User behavior analytics and heatmaps", category: "management", icon: Eye, link: "https://hotjar.com", pricing: { model: "freemium", startingPrice: 32, currency: "USD", notes: "Free plan available, paid from $32/month" } },
+        { name: "Mixpanel", description: "Product analytics and user insights", category: "management", icon: BarChart3, link: "https://mixpanel.com", pricing: { model: "freemium", startingPrice: 25, currency: "USD", notes: "Free plan available, paid from $25/month" } },
+        { name: "Tableau", description: "Data visualization and business intelligence", category: "management", icon: BarChart3, link: "https://tableau.com", pricing: { model: "subscription", startingPrice: 70, currency: "USD", notes: "Starting at $70/month" } }
       );
     }
     
     // Productivity tools
     if (lowerTitle.includes('product') || lowerTitle.includes('development') || lowerDesc.includes('product') || lowerTitle.includes('build') || lowerTitle.includes('create')) {
       tools.push(
-        { name: "Notion", description: "All-in-one workspace for notes and collaboration", category: "productivity", icon: FileText, link: "https://notion.so" },
-        { name: "Trello", description: "Project management with boards and cards", category: "productivity", icon: CheckSquare, link: "https://trello.com" },
-        { name: "Asana", description: "Team collaboration and project tracking", category: "productivity", icon: Target, link: "https://asana.com" },
-        { name: "Monday.com", description: "Work management platform", category: "productivity", icon: Calendar, link: "https://monday.com" },
-        { name: "ClickUp", description: "All-in-one productivity platform", category: "productivity", icon: CheckSquare, link: "https://clickup.com" },
-        { name: "Figma", description: "Design and prototyping tool", category: "productivity", icon: Palette, link: "https://figma.com" }
+        { name: "Notion", description: "All-in-one workspace for notes and collaboration", category: "productivity", icon: FileText, link: "https://notion.so", pricing: { model: "freemium", startingPrice: 8, currency: "USD", notes: "Free plan available, paid from $8/month" } },
+        { name: "Trello", description: "Project management with boards and cards", category: "productivity", icon: CheckSquare, link: "https://trello.com", pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } },
+        { name: "Asana", description: "Team collaboration and project tracking", category: "productivity", icon: Target, link: "https://asana.com", pricing: { model: "freemium", startingPrice: 10.99, currency: "USD", notes: "Free plan available, paid from $10.99/month" } },
+        { name: "Monday.com", description: "Work management platform", category: "productivity", icon: Calendar, link: "https://monday.com", pricing: { model: "subscription", startingPrice: 8, currency: "USD", notes: "Starting at $8/month" } },
+        { name: "ClickUp", description: "All-in-one productivity platform", category: "productivity", icon: CheckSquare, link: "https://clickup.com", pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } },
+        { name: "Figma", description: "Design and prototyping tool", category: "productivity", icon: Palette, link: "https://figma.com", pricing: { model: "freemium", startingPrice: 12, currency: "USD", notes: "Free plan available, paid from $12/month" } }
       );
     }
     
     // Communication tools
     if (lowerTitle.includes('marketing') || lowerTitle.includes('campaign') || lowerDesc.includes('marketing') || lowerTitle.includes('promotion') || lowerTitle.includes('outreach') || lowerTitle.includes('communication')) {
       tools.push(
-        { name: "Mailchimp", description: "Email marketing and automation", category: "communication", icon: Mail, link: "https://mailchimp.com" },
-        { name: "Slack", description: "Team communication and collaboration", category: "communication", icon: MessageSquare, link: "https://slack.com" },
-        { name: "Discord", description: "Community and team chat platform", category: "communication", icon: MessageCircle, link: "https://discord.com" },
-        { name: "Zoom", description: "Video conferencing and meetings", category: "communication", icon: Video, link: "https://zoom.us" },
-        { name: "Microsoft Teams", description: "Business communication platform", category: "communication", icon: MessageSquare, link: "https://teams.microsoft.com" },
-        { name: "Intercom", description: "Customer messaging and support", category: "communication", icon: MessageCircle, link: "https://intercom.com" }
+        { name: "Mailchimp", description: "Email marketing and automation", category: "communication", icon: Mail, link: "https://mailchimp.com", pricing: { model: "freemium", startingPrice: 10, currency: "USD", notes: "Free plan available, paid from $10/month" } },
+        { name: "Slack", description: "Team communication and collaboration", category: "communication", icon: MessageSquare, link: "https://slack.com", pricing: { model: "freemium", startingPrice: 7.25, currency: "USD", notes: "Free plan available, paid from $7.25/month" } },
+        { name: "Discord", description: "Community and team chat platform", category: "communication", icon: MessageCircle, link: "https://discord.com", pricing: { model: "freemium", startingPrice: 9.99, currency: "USD", notes: "Free plan available, paid from $9.99/month" } },
+        { name: "Zoom", description: "Video conferencing and meetings", category: "communication", icon: Video, link: "https://zoom.us", pricing: { model: "freemium", startingPrice: 14.99, currency: "USD", notes: "Free plan available, paid from $14.99/month" } },
+        { name: "Microsoft Teams", description: "Business communication platform", category: "communication", icon: MessageSquare, link: "https://teams.microsoft.com", pricing: { model: "subscription", startingPrice: 4, currency: "USD", notes: "Starting at $4/month" } },
+        { name: "Intercom", description: "Customer messaging and support", category: "communication", icon: MessageCircle, link: "https://intercom.com", pricing: { model: "subscription", startingPrice: 39, currency: "USD", notes: "Starting at $39/month" } }
       );
     }
     
     // Storage tools
     if (lowerTitle.includes('launch') || lowerTitle.includes('preparation') || lowerDesc.includes('launch') || lowerTitle.includes('deploy') || lowerTitle.includes('release') || lowerTitle.includes('storage')) {
       tools.push(
-        { name: "Google Drive", description: "Cloud storage and file sharing", category: "storage", icon: Folder, link: "https://drive.google.com" },
-        { name: "Dropbox", description: "File hosting and cloud storage", category: "storage", icon: Upload, link: "https://dropbox.com" },
-        { name: "OneDrive", description: "Microsoft cloud storage solution", category: "storage", icon: Database, link: "https://onedrive.live.com" },
-        { name: "Box", description: "Enterprise file sharing and collaboration", category: "storage", icon: Folder, link: "https://box.com" },
-        { name: "AWS S3", description: "Cloud object storage service", category: "storage", icon: Database, link: "https://aws.amazon.com/s3" },
-        { name: "GitHub", description: "Code repository and version control", category: "storage", icon: Code, link: "https://github.com" }
+        { name: "Google Drive", description: "Cloud storage and file sharing", category: "storage", icon: Folder, link: "https://drive.google.com", pricing: { model: "freemium", startingPrice: 1.99, currency: "USD", notes: "Free plan available, paid from $1.99/month" } },
+        { name: "Dropbox", description: "File hosting and cloud storage", category: "storage", icon: Upload, link: "https://dropbox.com", pricing: { model: "subscription", startingPrice: 9.99, currency: "USD", notes: "Starting at $9.99/month" } },
+        { name: "OneDrive", description: "Microsoft cloud storage solution", category: "storage", icon: Database, link: "https://onedrive.live.com", pricing: { model: "freemium", startingPrice: 1.99, currency: "USD", notes: "Free plan available, paid from $1.99/month" } },
+        { name: "Box", description: "Enterprise file sharing and collaboration", category: "storage", icon: Folder, link: "https://box.com", pricing: { model: "subscription", startingPrice: 5, currency: "USD", notes: "Starting at $5/month" } },
+        { name: "AWS S3", description: "Cloud object storage service", category: "storage", icon: Database, link: "https://aws.amazon.com/s3", pricing: { model: "subscription", startingPrice: 0.023, currency: "USD", notes: "Pay per use, starting at $0.023/GB" } },
+        { name: "GitHub", description: "Code repository and version control", category: "storage", icon: Code, link: "https://github.com", pricing: { model: "freemium", startingPrice: 4, currency: "USD", notes: "Free plan available, paid from $4/month" } }
       );
     }
     
     // Add some general tools for any step
     tools.push(
-      { name: "Google Docs", description: "Document creation and collaboration", category: "productivity", icon: FileText, link: "https://docs.google.com" },
-      { name: "Canva", description: "Graphic design and visual content", category: "productivity", icon: Palette, link: "https://canva.com" },
-      { name: "Loom", description: "Screen recording and video messaging", category: "communication", icon: Video, link: "https://loom.com" },
-      { name: "Airtable", description: "Database and spreadsheet hybrid", category: "storage", icon: Database, link: "https://airtable.com" }
+      { name: "Google Docs", description: "Document creation and collaboration", category: "productivity", icon: FileText, link: "https://docs.google.com", pricing: { model: "free", currency: "USD", notes: "Completely free" } },
+      { name: "Canva", description: "Graphic design and visual content", category: "productivity", icon: Palette, link: "https://canva.com", pricing: { model: "freemium", startingPrice: 12.99, currency: "USD", notes: "Free plan available, paid from $12.99/month" } },
+      { name: "Loom", description: "Screen recording and video messaging", category: "communication", icon: Video, link: "https://loom.com", pricing: { model: "freemium", startingPrice: 8, currency: "USD", notes: "Free plan available, paid from $8/month" } },
+      { name: "Airtable", description: "Database and spreadsheet hybrid", category: "storage", icon: Database, link: "https://airtable.com", pricing: { model: "freemium", startingPrice: 10, currency: "USD", notes: "Free plan available, paid from $10/month" } }
     );
     
     return tools;
   };
 
-  const getFallbackTools = (stepTitle: string): Array<{ name: string; description: string; category: string; icon: any; link?: string }> => {
+  const getFallbackTools = (stepTitle: string): Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }> => {
     return [
-      { name: "Notion", description: "Documentation and project management", category: "productivity", icon: FileText },
-      { name: "Trello", description: "Task management and organization", category: "productivity", icon: CheckSquare },
-      { name: "Google Docs", description: "Collaborative document editing", category: "productivity", icon: FileText },
-      { name: "Slack", description: "Team communication and collaboration", category: "communication", icon: MessageSquare },
-      { name: "Google Drive", description: "Cloud storage and file sharing", category: "storage", icon: Folder },
+      { name: "Notion", description: "Documentation and project management", category: "productivity", icon: FileText, pricing: { model: "freemium", startingPrice: 8, currency: "USD", notes: "Free plan available, paid from $8/month" } },
+      { name: "Trello", description: "Task management and organization", category: "productivity", icon: CheckSquare, pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } },
+      { name: "Google Docs", description: "Collaborative document editing", category: "productivity", icon: FileText, pricing: { model: "free", currency: "USD", notes: "Completely free" } },
+      { name: "Slack", description: "Team communication and collaboration", category: "communication", icon: MessageSquare, pricing: { model: "freemium", startingPrice: 7.25, currency: "USD", notes: "Free plan available, paid from $7.25/month" } },
+      { name: "Google Drive", description: "Cloud storage and file sharing", category: "storage", icon: Folder, pricing: { model: "freemium", startingPrice: 1.99, currency: "USD", notes: "Free plan available, paid from $1.99/month" } },
     ];
   };
 
@@ -1004,9 +1004,47 @@ const WorkflowDesigner = () => {
                                             <div className="flex-1">
                                               <div className="flex items-center justify-between mb-1">
                                                 <h5 className="font-medium text-sm">{tool.name}</h5>
-                                                <Badge variant="outline" className="text-xs">{tool.category}</Badge>
+                                                <div className="flex items-center space-x-2">
+                                                  <Badge variant="outline" className="text-xs">{tool.category}</Badge>
+                                                  <Badge 
+                                                    variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
+                                                    className={`text-xs ${
+                                                      tool.pricing.model === 'free' 
+                                                        ? 'bg-green-100 text-green-800 border-green-200' 
+                                                        : 'bg-blue-100 text-blue-800 border-blue-200'
+                                                    }`}
+                                                  >
+                                                    {tool.pricing.model === 'free' ? 'FREE' : 
+                                                     tool.pricing.model === 'freemium' ? 'FREEMIUM' :
+                                                     tool.pricing.model === 'subscription' ? 'PAID' :
+                                                     tool.pricing.model === 'one-time' ? 'ONE-TIME' :
+                                                     'ENTERPRISE'}
+                                                  </Badge>
+                                                </div>
                                               </div>
                                               <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                              
+                                              {/* Pricing Information */}
+                                              <div className="mb-2">
+                                                {tool.pricing.model === 'free' ? (
+                                                  <p className="text-xs text-green-600 font-medium">FREE - {tool.pricing.notes}</p>
+                                                ) : tool.pricing.model === 'freemium' ? (
+                                                  <p className="text-xs text-blue-600 font-medium">
+                                                    {tool.pricing.startingPrice && `From $${tool.pricing.startingPrice}/${tool.pricing.currency === 'USD' ? 'month' : tool.pricing.currency}`} - {tool.pricing.notes}
+                                                  </p>
+                                                ) : tool.pricing.model === 'subscription' ? (
+                                                  <p className="text-xs text-blue-600 font-medium">
+                                                    {tool.pricing.startingPrice && `$${tool.pricing.startingPrice}/${tool.pricing.currency === 'USD' ? 'month' : tool.pricing.currency}`} - {tool.pricing.notes}
+                                                  </p>
+                                                ) : tool.pricing.model === 'one-time' ? (
+                                                  <p className="text-xs text-blue-600 font-medium">
+                                                    {tool.pricing.startingPrice && `$${tool.pricing.startingPrice}`} - {tool.pricing.notes}
+                                                  </p>
+                                                ) : (
+                                                  <p className="text-xs text-blue-600 font-medium">{tool.pricing.notes}</p>
+                                                )}
+                                              </div>
+                                              
                                               <div className="flex gap-2">
                                                 {tool.link && (
                                                   <Button
