@@ -64,21 +64,27 @@ const MyFlows = () => {
         
         if (result.success && result.data) {
           // Transform database data to match component expectations
-          const transformedFlows = result.data.map((flow: any) => ({
-            id: flow.id,
-            title: flow.name,
-            description: flow.description || '',
-            status: flow.status || 'draft',
-            progress: flow.current_step || 0,
-            dueDate: flow.updated_at ? new Date(flow.updated_at).toISOString().split('T')[0] : '',
-            priority: 'medium', // Default priority
-            tags: [], // No tags in current schema
-            collaborators: [], // No collaborators in current schema
-            totalSteps: flow.workflow_steps?.length || 0,
-            completedSteps: flow.completed_steps?.length || 0,
-            created_at: flow.created_at,
-            updated_at: flow.updated_at,
-          }));
+          const transformedFlows = result.data.map((flow: any) => {
+            const totalSteps = flow.workflow_steps?.length || 0;
+            const completedSteps = flow.workflow_steps?.filter((step: any) => step.is_completed)?.length || 0;
+            const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+            
+            return {
+              id: flow.id,
+              title: flow.name,
+              description: flow.description || '',
+              status: flow.status || 'draft',
+              progress: progress,
+              dueDate: flow.updated_at ? new Date(flow.updated_at).toISOString().split('T')[0] : '',
+              priority: 'medium', // Default priority
+              tags: [], // No tags in current schema
+              collaborators: [], // No collaborators in current schema
+              totalSteps: totalSteps,
+              completedSteps: completedSteps,
+              created_at: flow.created_at,
+              updated_at: flow.updated_at,
+            };
+          });
           setFlows(transformedFlows);
         } else {
           setError(result.error || 'Failed to fetch flows');
@@ -93,31 +99,6 @@ const MyFlows = () => {
 
     fetchFlows();
   }, []);
-    {
-      id: "5",
-      title: "Team Building Event",
-      description: "Plan and execute quarterly team building activities",
-      status: "active",
-      progress: 60,
-      dueDate: "2023-06-30",
-      priority: "medium",
-      tags: ["Team", "Events"],
-      collaborators: [
-        {
-          id: "7",
-          name: "Jordan",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
-        },
-        {
-          id: "8",
-          name: "Parker",
-          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Parker",
-        },
-      ],
-      totalSteps: 6,
-      completedSteps: 4,
-    },
-  ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");

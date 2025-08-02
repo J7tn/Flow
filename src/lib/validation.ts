@@ -33,6 +33,13 @@ export const flowSchema = z.object({
     title: z.string().min(1, 'Step title is required').max(100),
     description: z.string().max(500).optional(),
     order: z.number().int().min(0),
+    type: z.enum(['goal', 'task', 'decision', 'milestone', 'automation']).optional(),
+    status: z.enum(['pending', 'in-progress', 'completed', 'blocked']).optional(),
+    estimatedTime: z.number().optional(),
+    cost: z.number().optional(),
+    dependencies: z.array(z.string()).optional(),
+    subFlow: z.array(z.any()).optional(),
+    selectedCategory: z.string().optional(),
   })),
   tags: z.array(z.string().max(50)).max(10, 'Maximum 10 tags allowed'),
   isPublic: z.boolean().default(false),
@@ -40,9 +47,11 @@ export const flowSchema = z.object({
 
 // User profile validation
 export const userProfileSchema = z.object({
-  displayName: nameSchema.optional(),
-  bio: z.string().max(500).optional(),
-  avatar: z.string().url().optional(),
+  full_name: nameSchema.optional(),
+  email: emailSchema.optional(),
+  avatar_url: z.string().url().optional(),
+  company: z.string().max(100).optional(),
+  role: z.string().max(100).optional(),
   preferences: z.object({
     theme: z.enum(['light', 'dark', 'system']).default('system'),
     notifications: z.boolean().default(true),

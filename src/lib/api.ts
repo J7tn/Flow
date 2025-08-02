@@ -289,7 +289,42 @@ export class SecureApi {
 // Flow-specific API functions
 export const flowApi = {
   async getFlows(userId?: string) {
-    return SecureApi.get('workflow_instances', { userId });
+    try {
+      const client = supabase();
+      if (!client) {
+        return { success: false, error: 'Supabase client not available' };
+      }
+
+      const { data: { user }, error: authError } = await client.auth.getUser();
+      if (authError) {
+        return { success: false, error: `Authentication error: ${authError.message}` };
+      }
+      
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      const { data, error } = await client
+        .from('workflow_instances')
+        .select(`
+          *,
+          workflow_steps (*)
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return { success: false, error: `Failed to fetch flows: ${error.message}` };
+      }
+
+      return { success: true, data: data || [], error: null };
+    } catch (error) {
+      console.error('Error fetching flows:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to fetch flows' 
+      };
+    }
   },
 
   async createFlow(flowData: any) {
@@ -316,7 +351,18 @@ export const flowApi = {
         status: 'draft',
         current_step: 0,
         completed_steps: [],
-        customizations: {},
+        customizations: {
+          richStepData: flowData.steps.map((step: any) => ({
+            id: step.id,
+            type: step.type,
+            status: step.status,
+            estimatedTime: step.estimatedTime,
+            cost: step.cost,
+            dependencies: step.dependencies,
+            subFlow: step.subFlow,
+            selectedCategory: step.selectedCategory,
+          })),
+        },
         notes: [],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -340,27 +386,28 @@ export const flowApi = {
           workflow_instance_id: workflowInstance.id,
           title: step.title,
           description: step.description || '',
-          step_type: 'task',
+          step_type: step.type || 'task',
           order_index: index,
-          estimated_duration_min: 1,
-          estimated_duration_max: 2,
+          estimated_duration_min: step.estimatedTime || 1,
+          estimated_duration_max: step.estimatedTime ? step.estimatedTime + 1 : 2,
           duration_unit: 'days',
           required_skills: [],
-          required_tools: [],
-          dependencies: [],
+          required_tools: step.selectedCategory ? [step.selectedCategory] : [],
+          dependencies: step.dependencies || [],
           deliverables: [],
           acceptance_criteria: [],
           risk_level: 'medium',
-          cost_estimate_min: 0,
-          cost_estimate_max: 0,
+          cost_estimate_min: step.cost || 0,
+          cost_estimate_max: step.cost || 0,
           cost_currency: 'USD',
           automation_potential: 0,
           optimization_tips: [],
-          is_completed: false,
+          is_completed: step.status === 'completed',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }));
 
+        console.log('Creating workflow steps:', stepsData);
         const { error: stepsError } = await client
           .from('workflow_steps')
           .insert(stepsData);
@@ -368,6 +415,8 @@ export const flowApi = {
         if (stepsError) {
           console.error('Error creating workflow steps:', stepsError);
           // Don't fail the whole operation if steps creation fails
+        } else {
+          console.log('Successfully created workflow steps');
         }
       }
 
@@ -507,7 +556,7 @@ export const userApi = {
     if (!client) throw new Error('Supabase client not available');
 
     const { data, error } = await client
-      .from('profiles')
+      .from('user_profiles')
       .select('*')
       .eq('id', userId.id)
       .single();
@@ -524,8 +573,58 @@ export const userApi = {
     if (!client) throw new Error('Supabase client not available');
 
     const { data, error } = await client
-      .from('profiles')
+      .from('user_profiles')
       .update(profileData)
+      .eq('id', userId.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async uploadAvatar(file: File) {
+    const userId = await getCurrentUser();
+    if (!userId) throw new Error('Authentication required');
+
+    const client = supabase();
+    if (!client) throw new Error('Supabase client not available');
+
+    // Validate file type and size
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const maxSize = 1024 * 1024; // 1MB
+
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error('Invalid file type. Please upload JPG, PNG, or GIF.');
+    }
+
+    if (file.size > maxSize) {
+      throw new Error('File size too large. Please upload a file smaller than 1MB.');
+    }
+
+    // Generate unique filename
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId.id}-${Date.now()}.${fileExt}`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await client.storage
+      .from('avatars')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: urlData } = client.storage
+      .from('avatars')
+      .getPublicUrl(fileName);
+
+    // Update profile with new avatar URL
+    const { data, error } = await client
+      .from('user_profiles')
+      .update({ avatar_url: urlData.publicUrl })
       .eq('id', userId.id)
       .select()
       .single();

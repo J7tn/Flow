@@ -3,6 +3,13 @@
 
 -- Note: JWT secret is managed by Supabase automatically
 
+-- Storage bucket for user avatars
+-- Note: This needs to be created in the Supabase Dashboard under Storage
+-- Bucket name: 'avatars'
+-- Public bucket: true
+-- File size limit: 1MB
+-- Allowed MIME types: image/jpeg, image/png, image/gif
+
 -- Create custom types
 CREATE TYPE workflow_status AS ENUM ('draft', 'active', 'completed', 'archived');
 CREATE TYPE template_category AS ENUM (

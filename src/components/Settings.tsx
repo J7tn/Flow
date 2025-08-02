@@ -17,9 +17,9 @@ import {
 } from "./ui/card";
 import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import PermanentDashboard from "./shared/PermanentDashboard";
+import { ProfileManager } from "./ProfileManager";
 
 const Settings = () => {
   return (
@@ -42,59 +42,7 @@ const Settings = () => {
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="h-5 w-5 mr-2" />
-                  Profile Information
-                </CardTitle>
-                <CardDescription>
-                  Update your personal information and profile settings.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center space-x-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" />
-                    <AvatarFallback>UN</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <Button variant="outline">Change Avatar</Button>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      JPG, GIF or PNG. 1MB max.
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      First Name
-                    </label>
-                    <Input placeholder="John" defaultValue="John" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Last Name
-                    </label>
-                    <Input placeholder="Doe" defaultValue="Doe" />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Email
-                  </label>
-                  <Input
-                    placeholder="john@example.com"
-                    defaultValue="john@example.com"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Bio</label>
-                  <Input placeholder="Tell us about yourself" />
-                </div>
-                <Button>Save Changes</Button>
-              </CardContent>
-            </Card>
+            <ProfileManager />
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">

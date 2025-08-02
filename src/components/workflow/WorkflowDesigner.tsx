@@ -850,11 +850,19 @@ const WorkflowDesigner = () => {
           title: step.title,
           description: step.description || "",
           order: index,
+          type: step.type,
+          status: step.status,
+          estimatedTime: step.estimatedTime,
+          cost: step.cost,
+          dependencies: step.dependencies,
+          subFlow: step.subFlow,
+          selectedCategory: step.selectedCategory,
         })),
         tags: [],
         isPublic: false,
       };
 
+      console.log('Saving flow with data:', flowData);
       const result = await flowApi.createFlow(flowData);
       
       if (result.success) {
