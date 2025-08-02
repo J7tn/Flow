@@ -214,4 +214,51 @@ describe('WorkflowDesigner Goal Validation', () => {
     expect(screen.getByText(/FREEMIUM/)).toBeInTheDocument();
     expect(screen.getByText(/From \$8\/month/)).toBeInTheDocument();
   });
+
+  it('should display new tool categories in filter buttons', async () => {
+    renderWithRouter(<WorkflowDesigner />);
+    
+    // Check for new category buttons in the AI suggestions panel
+    // These buttons appear after the goal is validated and steps are generated
+    const goalInput = screen.getByPlaceholderText(/e.g., Launch a new product/i);
+    fireEvent.change(goalInput, { target: { value: 'Create a mobile game' } });
+    
+    // Mock successful goal validation
+    const { Chat2APIService } = await import('@/lib/chat2api');
+    Chat2APIService.createChatCompletion.mockResolvedValue({
+      choices: [{
+        message: {
+          content: JSON.stringify({
+            isValid: true,
+            isGibberish: false,
+            needsClarity: false,
+            suggestions: ['Great goal!'],
+            confidence: 0.9
+          })
+        }
+      }]
+    });
+    
+    const validateButton = screen.getByText('Validate Goal');
+    fireEvent.click(validateButton);
+    
+    // Wait for validation to complete and steps to be generated
+    await waitFor(() => {
+      expect(screen.getByText('Generate Steps')).not.toBeDisabled();
+    });
+    
+    const generateButton = screen.getByText('Generate Steps');
+    fireEvent.click(generateButton);
+    
+    // Wait for the AI suggestions panel to appear with category buttons
+    await waitFor(() => {
+      expect(screen.getByText('creative')).toBeInTheDocument();
+      expect(screen.getByText('gaming')).toBeInTheDocument();
+      expect(screen.getByText('education')).toBeInTheDocument();
+      expect(screen.getByText('health')).toBeInTheDocument();
+      expect(screen.getByText('finance')).toBeInTheDocument();
+      expect(screen.getByText('social')).toBeInTheDocument();
+      expect(screen.getByText('research')).toBeInTheDocument();
+    });
+  });
 }); 

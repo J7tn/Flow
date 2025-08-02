@@ -64,6 +64,21 @@ import {
   ChevronLeft,
   ChevronUp,
   ChevronDown,
+  PenTool,
+  Edit,
+  Image,
+  BookOpen,
+  Monitor,
+  GraduationCap,
+  Activity,
+  Heart,
+  Package,
+  Award,
+  Calculator,
+  RefreshCw,
+  HelpCircle,
+  Cube,
+  Gamepad2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
@@ -149,13 +164,19 @@ const WorkflowDesigner = () => {
     // Analyze goal complexity and context
     const isComplex = words.length > 5 || lowerGoal.includes('launch') || lowerGoal.includes('campaign') || lowerGoal.includes('development');
     const isBusiness = lowerGoal.includes('business') || lowerGoal.includes('company') || lowerGoal.includes('startup') || lowerGoal.includes('enterprise');
-    const isCreative = lowerGoal.includes('design') || lowerGoal.includes('creative') || lowerGoal.includes('art') || lowerGoal.includes('content');
+    const isCreative = lowerGoal.includes('design') || lowerGoal.includes('creative') || lowerGoal.includes('art') || lowerGoal.includes('content') || lowerGoal.includes('visual');
     const isTechnical = lowerGoal.includes('development') || lowerGoal.includes('coding') || lowerGoal.includes('software') || lowerGoal.includes('app');
     const isMarketing = lowerGoal.includes('marketing') || lowerGoal.includes('promotion') || lowerGoal.includes('advertising') || lowerGoal.includes('campaign');
     const isSales = lowerGoal.includes('sales') || lowerGoal.includes('revenue') || lowerGoal.includes('conversion') || lowerGoal.includes('leads');
     const isEvent = lowerGoal.includes('event') || lowerGoal.includes('conference') || lowerGoal.includes('meeting') || lowerGoal.includes('workshop');
     const isProduct = lowerGoal.includes('product') || lowerGoal.includes('launch') || lowerGoal.includes('development') || lowerGoal.includes('create');
     const isCustomer = lowerGoal.includes('customer') || lowerGoal.includes('user') || lowerGoal.includes('onboarding') || lowerGoal.includes('support');
+    const isGame = lowerGoal.includes('game') || lowerGoal.includes('gaming') || lowerGoal.includes('play') || lowerGoal.includes('entertainment');
+    const isEducation = lowerGoal.includes('learn') || lowerGoal.includes('education') || lowerGoal.includes('course') || lowerGoal.includes('training') || lowerGoal.includes('tutorial');
+    const isHealth = lowerGoal.includes('health') || lowerGoal.includes('fitness') || lowerGoal.includes('wellness') || lowerGoal.includes('medical') || lowerGoal.includes('therapy');
+    const isFinance = lowerGoal.includes('finance') || lowerGoal.includes('money') || lowerGoal.includes('investment') || lowerGoal.includes('budget') || lowerGoal.includes('financial');
+    const isSocial = lowerGoal.includes('social') || lowerGoal.includes('community') || lowerGoal.includes('network') || lowerGoal.includes('connect') || lowerGoal.includes('relationship');
+    const isResearch = lowerGoal.includes('research') || lowerGoal.includes('study') || lowerGoal.includes('analysis') || lowerGoal.includes('investigation') || lowerGoal.includes('explore');
     
     let steps: Array<{ title: string; description: string; type: FlowStep["type"]; icon: any; color: string }> = [];
     
@@ -204,6 +225,69 @@ const WorkflowDesigner = () => {
         { title: "Support System Setup", description: "Implement customer support tools and processes", type: "task", icon: MessageCircle, color: "bg-orange-500" },
         { title: "Success Metrics Definition", description: "Define and track customer success metrics", type: "task", icon: Target, color: "bg-indigo-500" },
         { title: "Feedback Loop Implementation", description: "Create systems for continuous customer feedback", type: "milestone", icon: MessageSquare, color: "bg-red-500" },
+      ];
+    } else if (isCreative) {
+      steps = [
+        { title: "Creative Brief Development", description: "Define project scope, style guidelines, and creative direction", type: "task", icon: FileText, color: "bg-blue-500" },
+        { title: "Mood Board Creation", description: "Create visual inspiration and style references", type: "task", icon: Palette, color: "bg-green-500" },
+        { title: "Concept Sketching", description: "Develop initial concepts and rough sketches", type: "task", icon: PenTool, color: "bg-purple-500" },
+        { title: "Design Iteration", description: "Refine designs based on feedback and requirements", type: "task", icon: Edit, color: "bg-orange-500" },
+        { title: "Asset Creation", description: "Produce final design assets and deliverables", type: "task", icon: Image, color: "bg-indigo-500" },
+        { title: "Design Review and Approval", description: "Present designs and gather final approvals", type: "milestone", icon: CheckCircle, color: "bg-red-500" },
+      ];
+    } else if (isGame) {
+      steps = [
+        { title: "Game Concept Development", description: "Define game mechanics, story, and target audience", type: "task", icon: Lightbulb, color: "bg-blue-500" },
+        { title: "Game Design Document", description: "Create comprehensive game design documentation", type: "task", icon: FileText, color: "bg-green-500" },
+        { title: "Artwork Creation", description: "Design characters, environments, and visual assets", type: "task", icon: Palette, color: "bg-purple-500" },
+        { title: "Prototype Development", description: "Build playable prototype to test core mechanics", type: "task", icon: Code, color: "bg-orange-500" },
+        { title: "Playtesting and Iteration", description: "Test with users and refine gameplay experience", type: "task", icon: Users, color: "bg-indigo-500" },
+        { title: "Game Launch Preparation", description: "Prepare for release and marketing campaign", type: "milestone", icon: Rocket, color: "bg-red-500" },
+      ];
+    } else if (isEducation) {
+      steps = [
+        { title: "Learning Objectives Definition", description: "Define clear learning goals and outcomes", type: "task", icon: Target, color: "bg-blue-500" },
+        { title: "Curriculum Development", description: "Create structured learning content and materials", type: "task", icon: BookOpen, color: "bg-green-500" },
+        { title: "Content Creation", description: "Develop educational videos, documents, and resources", type: "task", icon: Video, color: "bg-purple-500" },
+        { title: "Assessment Design", description: "Create quizzes, tests, and evaluation methods", type: "task", icon: CheckSquare, color: "bg-orange-500" },
+        { title: "Platform Setup", description: "Set up learning management system and delivery platform", type: "task", icon: Monitor, color: "bg-indigo-500" },
+        { title: "Course Launch and Monitoring", description: "Launch course and track student progress", type: "milestone", icon: GraduationCap, color: "bg-red-500" },
+      ];
+    } else if (isHealth) {
+      steps = [
+        { title: "Health Assessment", description: "Evaluate current health status and identify goals", type: "task", icon: Activity, color: "bg-blue-500" },
+        { title: "Wellness Plan Creation", description: "Develop personalized health and fitness plan", type: "task", icon: Heart, color: "bg-green-500" },
+        { title: "Resource Gathering", description: "Identify tools, apps, and support systems needed", type: "task", icon: Package, color: "bg-purple-500" },
+        { title: "Progress Tracking Setup", description: "Set up monitoring and measurement systems", type: "task", icon: BarChart3, color: "bg-orange-500" },
+        { title: "Implementation and Consistency", description: "Execute plan and maintain healthy habits", type: "task", icon: Calendar, color: "bg-indigo-500" },
+        { title: "Health Goal Achievement", description: "Reach health milestones and maintain progress", type: "milestone", icon: Award, color: "bg-red-500" },
+      ];
+    } else if (isFinance) {
+      steps = [
+        { title: "Financial Assessment", description: "Analyze current financial situation and goals", type: "task", icon: DollarSign, color: "bg-blue-500" },
+        { title: "Budget Planning", description: "Create comprehensive budget and spending plan", type: "task", icon: Calculator, color: "bg-green-500" },
+        { title: "Investment Strategy", description: "Develop investment portfolio and strategy", type: "task", icon: TrendingUp, color: "bg-purple-500" },
+        { title: "Financial Tools Setup", description: "Set up tracking apps and financial management tools", type: "task", icon: Settings, color: "bg-orange-500" },
+        { title: "Regular Review and Adjustment", description: "Monitor progress and adjust financial plans", type: "task", icon: RefreshCw, color: "bg-indigo-500" },
+        { title: "Financial Goal Achievement", description: "Reach financial milestones and targets", type: "milestone", icon: Target, color: "bg-red-500" },
+      ];
+    } else if (isSocial) {
+      steps = [
+        { title: "Community Research", description: "Identify target community and understand needs", type: "task", icon: Search, color: "bg-blue-500" },
+        { title: "Platform Selection", description: "Choose appropriate social platforms and tools", type: "task", icon: Share2, color: "bg-green-500" },
+        { title: "Content Strategy", description: "Develop engaging content and communication plan", type: "task", icon: MessageSquare, color: "bg-purple-500" },
+        { title: "Community Building", description: "Create and grow online community engagement", type: "task", icon: Users, color: "bg-orange-500" },
+        { title: "Relationship Management", description: "Maintain and strengthen community connections", type: "task", icon: Heart, color: "bg-indigo-500" },
+        { title: "Community Growth and Impact", description: "Scale community and measure social impact", type: "milestone", icon: TrendingUp, color: "bg-red-500" },
+      ];
+    } else if (isResearch) {
+      steps = [
+        { title: "Research Question Formulation", description: "Define clear research objectives and questions", type: "task", icon: HelpCircle, color: "bg-blue-500" },
+        { title: "Literature Review", description: "Review existing research and gather background information", type: "task", icon: BookOpen, color: "bg-green-500" },
+        { title: "Methodology Design", description: "Design research methods and data collection strategies", type: "task", icon: Clipboard, color: "bg-purple-500" },
+        { title: "Data Collection", description: "Gather research data through surveys, interviews, or experiments", type: "task", icon: Database, color: "bg-orange-500" },
+        { title: "Data Analysis", description: "Analyze collected data and identify patterns", type: "task", icon: BarChart3, color: "bg-indigo-500" },
+        { title: "Research Publication", description: "Document findings and share research results", type: "milestone", icon: FileText, color: "bg-red-500" },
       ];
     } else if (isTechnical) {
       steps = [
@@ -325,6 +409,90 @@ const WorkflowDesigner = () => {
         { name: "Box", description: "Enterprise file sharing and collaboration", category: "storage", icon: Folder, link: "https://box.com", pricing: { model: "subscription", startingPrice: 5, currency: "USD", notes: "Starting at $5/month" } },
         { name: "AWS S3", description: "Cloud object storage service", category: "storage", icon: Database, link: "https://aws.amazon.com/s3", pricing: { model: "subscription", startingPrice: 0.023, currency: "USD", notes: "Pay per use, starting at $0.023/GB" } },
         { name: "GitHub", description: "Code repository and version control", category: "storage", icon: Code, link: "https://github.com", pricing: { model: "freemium", startingPrice: 4, currency: "USD", notes: "Free plan available, paid from $4/month" } }
+      );
+    }
+    
+    // Creative and Design tools
+    if (lowerTitle.includes('design') || lowerTitle.includes('creative') || lowerTitle.includes('art') || lowerTitle.includes('visual') || lowerTitle.includes('artwork') || lowerTitle.includes('sketch')) {
+      tools.push(
+        { name: "Adobe Creative Suite", description: "Professional design and creative software", category: "creative", icon: Palette, link: "https://adobe.com/creativecloud", pricing: { model: "subscription", startingPrice: 52.99, currency: "USD", notes: "Starting at $52.99/month" } },
+        { name: "Figma", description: "Collaborative design and prototyping tool", category: "creative", icon: Palette, link: "https://figma.com", pricing: { model: "freemium", startingPrice: 12, currency: "USD", notes: "Free plan available, paid from $12/month" } },
+        { name: "Sketch", description: "Digital design for Mac users", category: "creative", icon: PenTool, link: "https://sketch.com", pricing: { model: "subscription", startingPrice: 9, currency: "USD", notes: "Starting at $9/month" } },
+        { name: "Canva Pro", description: "Graphic design platform with templates", category: "creative", icon: Image, link: "https://canva.com", pricing: { model: "subscription", startingPrice: 12.99, currency: "USD", notes: "Starting at $12.99/month" } },
+        { name: "Procreate", description: "Digital painting and illustration app", category: "creative", icon: PenTool, link: "https://procreate.art", pricing: { model: "one-time", startingPrice: 9.99, currency: "USD", notes: "One-time purchase for iPad" } },
+        { name: "Blender", description: "Free 3D creation suite", category: "creative", icon: Cube, link: "https://blender.org", pricing: { model: "free", currency: "USD", notes: "Completely free open-source software" } }
+      );
+    }
+    
+    // Game Development tools
+    if (lowerTitle.includes('game') || lowerTitle.includes('gaming') || lowerTitle.includes('play') || lowerTitle.includes('entertainment') || lowerTitle.includes('prototype')) {
+      tools.push(
+        { name: "Unity", description: "Game development engine and platform", category: "gaming", icon: Gamepad2, link: "https://unity.com", pricing: { model: "freemium", startingPrice: 25, currency: "USD", notes: "Free plan available, paid from $25/month" } },
+        { name: "Unreal Engine", description: "Advanced game development engine", category: "gaming", icon: Gamepad2, link: "https://unrealengine.com", pricing: { model: "subscription", startingPrice: 0, currency: "USD", notes: "Free until $1M revenue, then 5% royalty" } },
+        { name: "Godot", description: "Free and open-source game engine", category: "gaming", icon: Gamepad2, link: "https://godotengine.org", pricing: { model: "free", currency: "USD", notes: "Completely free open-source engine" } },
+        { name: "GameMaker Studio", description: "2D game development platform", category: "gaming", icon: Gamepad2, link: "https://gamemaker.io", pricing: { model: "subscription", startingPrice: 39, currency: "USD", notes: "Starting at $39/month" } },
+        { name: "Construct", description: "No-code 2D game development", category: "gaming", icon: Gamepad2, link: "https://construct.net", pricing: { model: "subscription", startingPrice: 8.99, currency: "USD", notes: "Starting at $8.99/month" } },
+        { name: "Aseprite", description: "Pixel art and animation tool", category: "gaming", icon: PenTool, link: "https://aseprite.org", pricing: { model: "one-time", startingPrice: 19.99, currency: "USD", notes: "One-time purchase" } }
+      );
+    }
+    
+    // Education and Learning tools
+    if (lowerTitle.includes('learn') || lowerTitle.includes('education') || lowerTitle.includes('course') || lowerTitle.includes('training') || lowerTitle.includes('tutorial') || lowerTitle.includes('curriculum')) {
+      tools.push(
+        { name: "Coursera", description: "Online courses from top universities", category: "education", icon: GraduationCap, link: "https://coursera.org", pricing: { model: "subscription", startingPrice: 39, currency: "USD", notes: "Starting at $39/month" } },
+        { name: "Udemy", description: "Online learning platform with courses", category: "education", icon: BookOpen, link: "https://udemy.com", pricing: { model: "one-time", startingPrice: 9.99, currency: "USD", notes: "Individual course pricing" } },
+        { name: "Khan Academy", description: "Free educational content and courses", category: "education", icon: GraduationCap, link: "https://khanacademy.org", pricing: { model: "free", currency: "USD", notes: "Completely free" } },
+        { name: "Skillshare", description: "Creative and business skill courses", category: "education", icon: BookOpen, link: "https://skillshare.com", pricing: { model: "subscription", startingPrice: 15, currency: "USD", notes: "Starting at $15/month" } },
+        { name: "Moodle", description: "Learning management system", category: "education", icon: Monitor, link: "https://moodle.org", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free open-source, hosting costs vary" } },
+        { name: "Google Classroom", description: "Classroom management and learning platform", category: "education", icon: Monitor, link: "https://classroom.google.com", pricing: { model: "free", currency: "USD", notes: "Free for educational institutions" } }
+      );
+    }
+    
+    // Health and Wellness tools
+    if (lowerTitle.includes('health') || lowerTitle.includes('fitness') || lowerTitle.includes('wellness') || lowerTitle.includes('medical') || lowerTitle.includes('therapy') || lowerTitle.includes('workout')) {
+      tools.push(
+        { name: "MyFitnessPal", description: "Calorie tracking and nutrition app", category: "health", icon: Activity, link: "https://myfitnesspal.com", pricing: { model: "freemium", startingPrice: 9.99, currency: "USD", notes: "Free plan available, paid from $9.99/month" } },
+        { name: "Fitbit", description: "Fitness tracking and health monitoring", category: "health", icon: Heart, link: "https://fitbit.com", pricing: { model: "subscription", startingPrice: 9.99, currency: "USD", notes: "Starting at $9.99/month" } },
+        { name: "Headspace", description: "Meditation and mindfulness app", category: "health", icon: Heart, link: "https://headspace.com", pricing: { model: "subscription", startingPrice: 12.99, currency: "USD", notes: "Starting at $12.99/month" } },
+        { name: "Calm", description: "Sleep and meditation app", category: "health", icon: Heart, link: "https://calm.com", pricing: { model: "subscription", startingPrice: 14.99, currency: "USD", notes: "Starting at $14.99/month" } },
+        { name: "Strava", description: "Social fitness tracking platform", category: "health", icon: Activity, link: "https://strava.com", pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } },
+        { name: "Noom", description: "Weight loss and behavior change program", category: "health", icon: Heart, link: "https://noom.com", pricing: { model: "subscription", startingPrice: 59, currency: "USD", notes: "Starting at $59/month" } }
+      );
+    }
+    
+    // Financial Management tools
+    if (lowerTitle.includes('finance') || lowerTitle.includes('money') || lowerTitle.includes('investment') || lowerTitle.includes('budget') || lowerTitle.includes('financial') || lowerTitle.includes('trading')) {
+      tools.push(
+        { name: "Mint", description: "Personal finance and budgeting app", category: "finance", icon: DollarSign, link: "https://mint.intuit.com", pricing: { model: "free", currency: "USD", notes: "Completely free" } },
+        { name: "YNAB", description: "You Need A Budget - budgeting software", category: "finance", icon: Calculator, link: "https://youneedabudget.com", pricing: { model: "subscription", startingPrice: 11.99, currency: "USD", notes: "Starting at $11.99/month" } },
+        { name: "Robinhood", description: "Commission-free stock trading app", category: "finance", icon: TrendingUp, link: "https://robinhood.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free trading, premium features available" } },
+        { name: "Acorns", description: "Automated investing and savings app", category: "finance", icon: TrendingUp, link: "https://acorns.com", pricing: { model: "subscription", startingPrice: 3, currency: "USD", notes: "Starting at $3/month" } },
+        { name: "Personal Capital", description: "Wealth management and financial planning", category: "finance", icon: DollarSign, link: "https://personalcapital.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free plan available, advisory services extra" } },
+        { name: "Coinbase", description: "Cryptocurrency exchange and wallet", category: "finance", icon: DollarSign, link: "https://coinbase.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free trading, fees apply" } }
+      );
+    }
+    
+    // Social and Community tools
+    if (lowerTitle.includes('social') || lowerTitle.includes('community') || lowerTitle.includes('network') || lowerTitle.includes('connect') || lowerTitle.includes('relationship') || lowerTitle.includes('engagement')) {
+      tools.push(
+        { name: "Discord", description: "Community chat and voice platform", category: "social", icon: MessageCircle, link: "https://discord.com", pricing: { model: "freemium", startingPrice: 9.99, currency: "USD", notes: "Free plan available, paid from $9.99/month" } },
+        { name: "Slack", description: "Team communication and collaboration", category: "social", icon: MessageSquare, link: "https://slack.com", pricing: { model: "freemium", startingPrice: 7.25, currency: "USD", notes: "Free plan available, paid from $7.25/month" } },
+        { name: "Mighty Networks", description: "Community platform for creators", category: "social", icon: Users, link: "https://mightybell.com", pricing: { model: "subscription", startingPrice: 23, currency: "USD", notes: "Starting at $23/month" } },
+        { name: "Circle", description: "Community platform for creators and businesses", category: "social", icon: Users, link: "https://circle.so", pricing: { model: "subscription", startingPrice: 39, currency: "USD", notes: "Starting at $39/month" } },
+        { name: "Kajabi", description: "All-in-one platform for creators", category: "social", icon: Users, link: "https://kajabi.com", pricing: { model: "subscription", startingPrice: 119, currency: "USD", notes: "Starting at $119/month" } },
+        { name: "Patreon", description: "Membership platform for creators", category: "social", icon: Heart, link: "https://patreon.com", pricing: { model: "subscription", startingPrice: 0, currency: "USD", notes: "Free to start, 5-12% platform fees" } }
+      );
+    }
+    
+    // Research and Analysis tools
+    if (lowerTitle.includes('research') || lowerTitle.includes('study') || lowerTitle.includes('analysis') || lowerTitle.includes('investigation') || lowerTitle.includes('explore') || lowerTitle.includes('data')) {
+      tools.push(
+        { name: "Google Scholar", description: "Academic research and literature search", category: "research", icon: Search, link: "https://scholar.google.com", pricing: { model: "free", currency: "USD", notes: "Completely free" } },
+        { name: "SurveyMonkey", description: "Online survey and questionnaire platform", category: "research", icon: Clipboard, link: "https://surveymonkey.com", pricing: { model: "freemium", startingPrice: 25, currency: "USD", notes: "Free plan available, paid from $25/month" } },
+        { name: "Qualtrics", description: "Advanced survey and research platform", category: "research", icon: Clipboard, link: "https://qualtrics.com", pricing: { model: "subscription", startingPrice: 0, currency: "USD", notes: "Contact for pricing" } },
+        { name: "SPSS", description: "Statistical analysis software", category: "research", icon: BarChart3, link: "https://ibm.com/spss", pricing: { model: "subscription", startingPrice: 99, currency: "USD", notes: "Starting at $99/month" } },
+        { name: "R Studio", description: "Open-source statistical computing", category: "research", icon: BarChart3, link: "https://rstudio.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free open-source, commercial licenses available" } },
+        { name: "Tableau", description: "Data visualization and business intelligence", category: "research", icon: BarChart3, link: "https://tableau.com", pricing: { model: "subscription", startingPrice: 70, currency: "USD", notes: "Starting at $70/month" } }
       );
     }
     
@@ -484,7 +652,7 @@ const WorkflowDesigner = () => {
     <div className="mt-4 space-y-2">
       <div className="text-sm font-medium text-gray-700 mb-2">Tools & Resources:</div>
       <div className="flex flex-wrap gap-2">
-        {["all", "management", "productivity", "communication", "storage"].map((category) => (
+        {["all", "management", "productivity", "communication", "storage", "creative", "gaming", "education", "health", "finance", "social", "research"].map((category) => (
           <Button
             key={category}
             variant={step.selectedCategory === category ? "default" : "outline"}
@@ -660,15 +828,6 @@ const WorkflowDesigner = () => {
         <div className="border-b bg-white px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/workflows")}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Flows
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
               <div>
                 <Input
                   value={workflowName}
@@ -976,7 +1135,7 @@ const WorkflowDesigner = () => {
                                 {/* Category Filter Buttons */}
                                 <div className="mb-4">
                                   <div className="flex flex-wrap gap-2">
-                                    {["all", "management", "productivity", "communication", "storage"].map((category) => (
+                                    {["all", "management", "productivity", "communication", "storage", "creative", "gaming", "education", "health", "finance", "social", "research"].map((category) => (
                                       <Button
                                         key={category}
                                         variant={selectedCategory === category ? "default" : "outline"}
