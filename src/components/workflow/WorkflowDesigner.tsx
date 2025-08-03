@@ -784,7 +784,7 @@ const WorkflowDesigner = () => {
     
     return (
       <div className="mt-4 space-y-2">
-        <div className="text-sm font-medium text-gray-700 mb-2">Tools & Resources:</div>
+        <div className="text-sm font-medium text-foreground mb-2">Tools & Resources:</div>
         <div className="flex flex-wrap gap-2">
           {relevantCategories.map((category) => (
             <Button
@@ -1296,25 +1296,21 @@ const WorkflowDesigner = () => {
                                   <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                       {currentStepTools.map((tool, index) => (
-                                        <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                                        <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-card">
                                           <div className="flex items-start space-x-3">
-                                            <div className="p-2 rounded-lg bg-gray-100">
+                                            <div className="p-2 rounded-lg bg-muted">
                                               {tool.icon && React.createElement(tool.icon, {
-                                                className: "h-5 w-5 text-gray-600"
+                                                className: "h-5 w-5 text-muted-foreground"
                                               })}
                                             </div>
-                                            <div className="flex-1">
-                                              <div className="flex items-center justify-between mb-1">
-                                                <h5 className="font-medium text-sm">{tool.name}</h5>
-                                                <div className="flex items-center space-x-2">
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-center justify-between mb-2">
+                                                <h5 className="font-medium text-sm truncate">{tool.name}</h5>
+                                                <div className="flex items-center space-x-1 flex-shrink-0">
                                                   <Badge variant="outline" className="text-xs">{tool.category}</Badge>
                                                   <Badge 
                                                     variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
-                                                    className={`text-xs ${
-                                                      tool.pricing.model === 'free' 
-                                                        ? 'bg-primary/10 text-primary border-primary/30' 
-                                                        : 'bg-primary/10 text-primary border-primary/30'
-                                                    }`}
+                                                    className="text-xs"
                                                   >
                                                     {tool.pricing.model === 'free' ? 'FREE' : 
                                                      tool.pricing.model === 'freemium' ? 'FREEMIUM' :
@@ -1324,10 +1320,10 @@ const WorkflowDesigner = () => {
                                                   </Badge>
                                                 </div>
                                               </div>
-                                              <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                              <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{tool.description}</p>
                                               
                                               {/* Pricing Information */}
-                                              <div className="mb-2">
+                                              <div className="mb-3">
                                                 {tool.pricing.model === 'free' ? (
                                                   <p className="text-xs text-primary font-medium">FREE - {tool.pricing.notes}</p>
                                                 ) : tool.pricing.model === 'freemium' ? (
@@ -1359,27 +1355,6 @@ const WorkflowDesigner = () => {
                                                     <ChevronRight className="h-3 w-3 ml-1" />
                                                   </Button>
                                                 )}
-                                                <Button
-                                                  variant="outline"
-                                                  size="sm"
-                                                  className="h-6 px-2 text-xs"
-                                                  onClick={() => {
-                                                    const newSubStep = {
-                                                      title: `Use ${tool.name}`,
-                                                      description: `Implement ${tool.name} for ${suggestedSteps[currentStepIndex]?.title}`,
-                                                      type: "task" as FlowStep["type"],
-                                                      icon: tool.icon,
-                                                      color: "bg-primary"
-                                                    };
-                                                    // Add to the current step if it exists in the main flow
-                                                    if (steps.length > 0) {
-                                                      addSubStep(steps[steps.length - 1].id, newSubStep);
-                                                    }
-                                                  }}
-                                                >
-                                                  Add as Sub-Step
-                                                  <Plus className="h-3 w-3 ml-1" />
-                                                </Button>
                                               </div>
                                             </div>
                                           </div>
@@ -1425,7 +1400,7 @@ const WorkflowDesigner = () => {
                            </div>
                            <div className="flex items-center justify-between">
                              <div className="text-xs text-muted-foreground">
-                               Define a clear, measurable goal to help guide your flow design
+                               Define a clear, measurable goal
                              </div>
                              <Button
                                onClick={() => generateAISteps(workflowGoal)}
@@ -1463,7 +1438,7 @@ const WorkflowDesigner = () => {
                        {steps.map((step) => (
                          <div key={step.id}>
                            <Card 
-                             className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 ${
+                             className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 !bg-gradient-to-br !from-primary/5 !to-primary/10 ${
                              selectedStep === step.id ? 'ring-2 ring-blue-500' : ''
                            }`}
                              onClick={() => setSelectedStep(step.id)}
