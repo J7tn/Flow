@@ -629,9 +629,10 @@ const WorkflowDesigner = () => {
   };
 
   const addStep = (suggestedStep: { title: string; description: string; type: FlowStep["type"]; icon: any; color: string }) => {
+    const stepNumber = steps.length + 1;
     const newStep: FlowStep = {
       id: crypto.randomUUID(),
-      title: suggestedStep.title,
+      title: `Step ${stepNumber} ${suggestedStep.title}`,
       description: suggestedStep.description,
       type: suggestedStep.type,
       status: "pending",
@@ -639,7 +640,7 @@ const WorkflowDesigner = () => {
       subFlow: [], // Initialize empty sub-flow
       selectedCategory: "all"
     };
-    setSteps(prev => [newStep, ...prev]);
+    setSteps(prev => [...prev, newStep]);
   };
 
   const updateStep = (id: string, updates: Partial<FlowStep>) => {
@@ -1257,6 +1258,74 @@ const WorkflowDesigner = () => {
                          </div>
                        </CardHeader>
                      </Card>
+
+                     {/* Miniaturized Step Blocks - Directly below Goal Block */}
+                     {steps.length > 0 && (
+                       <div className="mt-3">
+                         <div className="flex items-center justify-between mb-3">
+                           <h3 className="font-semibold text-lg">Flow Steps</h3>
+                           <Badge variant="secondary">{steps.length} steps added</Badge>
+                         </div>
+                         <div className="space-y-2">
+                           {steps.map((step, index) => (
+                             <div key={step.id}>
+                               <Card 
+                                 className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-card dark:bg-card ${
+                                 selectedStep === step.id ? 'ring-2 ring-accent' : ''
+                               }`}
+                                 onClick={() => {
+                                   setSelectedStep(step.id);
+                                   // Generate tools for this added step
+                                   generateToolsForStep(step.title, step.description);
+                                 }}
+                               >
+                                 <CardHeader className="pb-4">
+                                   <div className="flex items-center justify-between">
+                                     <div className="flex items-center space-x-2">
+                                       <div className={`w-3 h-3 rounded-full ${getStepColor(step)}`} />
+                                       <Badge variant="outline" className="text-xs">
+                                         {index + 1}
+                                       </Badge>
+                                     </div>
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         deleteStep(step.id);
+                                       }}
+                                     >
+                                       <Trash2 className="h-3 w-3" />
+                                     </Button>
+                                   </div>
+                                   <CardTitle className="text-base break-words">{step.title}</CardTitle>
+                                 </CardHeader>
+                                 <CardContent className="pt-0 space-y-4">
+                                   <CardDescription className="text-sm break-words overflow-hidden leading-relaxed">
+                                     {step.description || "No description"}
+                                   </CardDescription>
+                                   
+                                   <div className="space-y-1 text-xs text-muted-foreground pt-2 border-t">
+                                     {step.estimatedTime && (
+                                       <div className="flex items-center">
+                                         <Clock className="h-3 w-3 mr-1" />
+                                         {step.estimatedTime}h
+                                       </div>
+                                     )}
+                                     {step.cost && (
+                                       <div className="flex items-center">
+                                         <DollarSign className="h-3 w-3 mr-1" />
+                                         ${step.cost}
+                                       </div>
+                                     )}
+                                   </div>
+                                 </CardContent>
+                               </Card>
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+                     )}
                    </div>
 
                    {/* Roadmap Steps Area - Right Side */}
@@ -1275,29 +1344,9 @@ const WorkflowDesigner = () => {
                        </div>
                      )}
 
-                     {/* Roadmap Steps with Connecting Lines */}
+                     {/* Roadmap Steps */}
                      {suggestedSteps.length > 0 && !isGeneratingSteps && (
                        <div className="relative">
-                         {/* Connecting Lines Container */}
-                         <div className="absolute inset-0 pointer-events-none">
-                           {/* Lines will be drawn here */}
-                           <svg className="w-full h-full absolute top-0 left-0">
-                             {/* Goal to Steps connecting lines */}
-                             {suggestedSteps.map((_, index) => (
-                               <line
-                                 key={`line-${index}`}
-                                 x1="0"
-                                 y1="50%"
-                                 x2="25%"
-                                 y2={`${(index + 1) * (100 / (suggestedSteps.length + 1))}%`}
-                                 stroke="currentColor"
-                                 strokeWidth="2"
-                                 strokeDasharray="5,5"
-                                 className="text-primary/30"
-                               />
-                             ))}
-                           </svg>
-                         </div>
 
                          {/* Step Blocks */}
                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
@@ -1317,8 +1366,7 @@ const WorkflowDesigner = () => {
                                  onClick={() => {
                                    // Fade out other steps and select this one
                                    setSelectedRoadmapStep(`suggested-${index}`);
-                                   // Generate tools for this step
-                                   generateToolsForStep(step.title, step.description);
+                                   // Don't generate tools for suggested steps - only for added steps
                                  }}
                                >
                                  <CardHeader className="pb-3">
@@ -1357,256 +1405,17 @@ const WorkflowDesigner = () => {
                            ))}
                          </div>
 
-                         {/* Selected Step Tools Panel */}
-                         {selectedRoadmapStep && selectedRoadmapStep.startsWith('suggested-') && (
-                           <div className="mt-8">
-                             <Card className="shadow-lg">
-                               <CardHeader>
-                                 <div className="flex items-center justify-between">
-                                   <h3 className="font-semibold">Tools for Selected Step</h3>
-                                   <Button
-                                     variant="outline"
-                                     size="sm"
-                                     onClick={() => setSelectedRoadmapStep(null)}
-                                   >
-                                     <X className="h-4 w-4 mr-2" />
-                                     Close
-                                   </Button>
-                                 </div>
-                               </CardHeader>
-                               <CardContent>
-                                 <div className="space-y-4">
-                                   {/* Category Filter Buttons */}
-                                   <div className="flex flex-wrap gap-2">
-                                     {getRelevantCategories(workflowGoal).map((category) => (
-                                       <Button
-                                         key={category}
-                                         variant={selectedCategory === category ? "default" : "outline"}
-                                         size="sm"
-                                         className="text-xs capitalize"
-                                         onClick={() => handleCategorySelect(category)}
-                                       >
-                                         {category === "all" ? "All Tools" : category}
-                                       </Button>
-                                     ))}
-                                   </div>
-
-                                   {/* Tools Grid */}
-                                   {currentStepTools.length > 0 && (
-                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                       {currentStepTools.map((tool, index) => (
-                                         <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-card">
-                                           <div className="flex items-start space-x-3">
-                                             <div className="p-2 rounded-lg bg-muted flex-shrink-0">
-                                               {tool.icon && React.createElement(tool.icon, {
-                                                 className: "h-5 w-5 text-muted-foreground"
-                                               })}
-                                             </div>
-                                             <div className="flex-1 min-w-0">
-                                               <div className="flex items-center justify-between mb-1">
-                                                 <h5 className="font-medium text-sm truncate">{tool.name}</h5>
-                                                 <Badge 
-                                                   variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
-                                                   className="text-xs"
-                                                 >
-                                                   {tool.pricing.model === 'free' ? 'FREE' : 'PAID'}
-                                                 </Badge>
-                                               </div>
-                                               <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
-                                               {tool.link && (
-                                                 <Button
-                                                   variant="ghost"
-                                                   size="sm"
-                                                   className="h-6 px-2 text-xs"
-                                                   onClick={() => window.open(tool.link, '_blank')}
-                                                 >
-                                                   Visit Tool
-                                                   <ChevronRight className="h-3 w-3 ml-1" />
-                                                 </Button>
-                                               )}
-                                             </div>
-                                           </div>
-                                         </div>
-                                       ))}
-                                     </div>
-                                   )}
-                                 </div>
-                               </CardContent>
-                             </Card>
-                           </div>
-                         )}
+                         {/* Tools panel removed for suggested steps - only show for added steps */}
                        </div>
                      )}
                    </div>
                  </div>
 
-                 {/* Step Blocks Grid */}
-                 {steps.length > 0 && (
-                   <div>
-                     <div className="flex items-center justify-between mb-4">
-                       <h3 className="font-semibold text-lg">Your Flow Steps</h3>
-                       <Badge variant="secondary">{steps.length} steps added</Badge>
-                     </div>
-                     <div className="space-y-6">
-                       {steps.map((step) => (
-                         <div key={step.id}>
-                           <Card 
-                             className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-card dark:bg-card ${
-                             selectedStep === step.id ? 'ring-2 ring-accent' : ''
-                           }`}
-                             onClick={() => setSelectedStep(step.id)}
-                           >
-                             <CardHeader className="pb-4 relative">
-                               {/* Icon at top left */}
-                               <div className="absolute top-4 left-4">
-                                 <div className={`w-4 h-4 rounded-full ${getStepColor(step)}`} />
-                               </div>
-                               
-                               {/* Description at top right */}
-                               <div className="absolute top-4 right-4 max-w-[200px] text-right">
-                                 <p className="text-xs text-muted-foreground line-clamp-2">
-                                   {step.description || "No description"}
-                                 </p>
-                               </div>
-                               
-                               <div className="flex items-center justify-between mt-6">
-                                 <div className="flex items-center space-x-2">
-                                   <Badge variant="outline" className="text-xs">
-                                     {step.type}
-                                   </Badge>
-                                   {step.subFlow && step.subFlow.length > 0 && (
-                                     <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                                       {step.subFlow.length} sub-step{step.subFlow.length !== 1 ? 's' : ''}
-                                     </Badge>
-                                   )}
-                                 </div>
-                                 <div className="flex items-center space-x-1">
-                                   {step.subFlow && step.subFlow.length > 0 && (
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={(e) => {
-                                         e.stopPropagation();
-                                         toggleStepExpansion(step.id);
-                                       }}
-                                     >
-                                       {expandedStep === step.id ? (
-                                         <ChevronUp className="h-3 w-3" />
-                                       ) : (
-                                         <ChevronDown className="h-3 w-3" />
-                                       )}
-                                     </Button>
-                                   )}
-                                   <Button
-                                     variant="ghost"
-                                     size="sm"
-                                     onClick={(e) => {
-                                       e.stopPropagation();
-                                       deleteStep(step.id);
-                                     }}
-                                   >
-                                     <Trash2 className="h-3 w-3" />
-                                   </Button>
-                                 </div>
-                               </div>
-                               <CardTitle className="text-base break-words mt-4">{step.title}</CardTitle>
-                             </CardHeader>
-                             <CardContent className="pt-0 space-y-4">
-                               
-                               {/* Category Buttons */}
-                               {renderCategoryButtons(step)}
-                               
-                               <div className="space-y-1 text-xs text-muted-foreground pt-2 border-t">
-                                 {step.assignee && (
-                                   <div className="flex items-center">
-                                     <Users className="h-3 w-3 mr-1" />
-                                     {step.assignee}
-                                   </div>
-                                 )}
-                                 {step.estimatedTime && (
-                                   <div className="flex items-center">
-                                     <Clock className="h-3 w-3 mr-1" />
-                                     {step.estimatedTime}h
-                                   </div>
-                                 )}
-                                 {step.cost && (
-                                   <div className="flex items-center">
-                                     <DollarSign className="h-3 w-3 mr-1" />
-                                     ${step.cost}
-                                   </div>
-                                 )}
-                               </div>
-                             </CardContent>
-                           </Card>
-                         
-                         {/* Expanded Sub-Flow */}
-                         {expandedStep === step.id && step.subFlow && step.subFlow.length > 0 && (
-                           <div className="mt-4 ml-6 border-l-2 border-gray-200 pl-4">
-                             <div className="space-y-3">
-                               <div className="flex items-center justify-between">
-                                 <h4 className="text-sm font-medium text-foreground">Sub-Steps:</h4>
-                                 <span className="text-xs text-muted-foreground">Click sub-steps to select them</span>
-                               </div>
-                               {step.subFlow.map((subStep) => (
-                                 <div 
-                                   key={subStep.id} 
-                                   className={`bg-card rounded-lg p-3 border border-border cursor-pointer transition-all hover:bg-accent hover:shadow-sm ${
-                                     selectedSubStep === subStep.id ? 'ring-2 ring-blue-500 bg-primary/10 shadow-md' : ''
-                                   }`}
-                                   onClick={() => handleSubStepClick(subStep.id)}
-                                 >
-                                   <div className="flex items-center justify-between">
-                                     <div className="flex-1">
-                                       <div className="flex items-center space-x-2 mb-1">
-                                         <div className={`w-2 h-2 rounded-full ${getStepColor(subStep)}`} />
-                                         <span className="text-sm font-medium">{subStep.title}</span>
-                                         <Badge variant="outline" className="text-xs">
-                                           {subStep.type}
-                                         </Badge>
-                                         {selectedSubStep === subStep.id && (
-                                           <Badge variant="default" className="text-xs bg-blue-500">
-                                             Selected
-                                           </Badge>
-                                         )}
-                                       </div>
-                                       <p className="text-xs text-muted-foreground">{subStep.description}</p>
-                                       {selectedSubStep === subStep.id && (
-                                         <div className="mt-2 p-2 bg-card rounded border">
-                                           <p className="text-xs text-muted-foreground">
-                                             <strong>Sub-step selected:</strong> This sub-step is now active. 
-                                             You can remove it using the delete button on the right.
-                                           </p>
-                                         </div>
-                                       )}
-                                     </div>
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={(e) => {
-                                         e.stopPropagation();
-                                         deleteSubStep(step.id, subStep.id);
-                                       }}
-                                       className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
-                                       title="Remove this sub-step"
-                                     >
-                                       <Trash2 className="h-3 w-3" />
-                                     </Button>
-                                   </div>
-                                 </div>
-                               ))}
-                             </div>
-                           </div>
-                         )}
-                       </div>
-                     ))}
-                   </div>
-                 </div>
-               )}
+               </div>
              </div>
            </div>
-         </div>
 
-                                {/* Right Sidebar - Step Properties & Flow Statistics */}
+           {/* Right Sidebar - Step Properties & Flow Statistics */}
            <div className="w-80 border-l bg-muted/30 p-4 overflow-y-auto">
              {/* Flow Statistics */}
              <div className="mb-6">
@@ -1743,6 +1552,73 @@ const WorkflowDesigner = () => {
                      </div>
                    </TabsContent>
                  </Tabs>
+
+                 {/* Tools for Selected Step */}
+                 {currentStepTools.length > 0 && (
+                   <div className="mt-6">
+                     <Separator className="my-4" />
+                     <div className="flex items-center justify-between mb-4">
+                       <h3 className="font-semibold">Tools for Selected Step</h3>
+                     </div>
+                     
+                     <div className="space-y-4">
+                       {/* Category Filter Buttons */}
+                       <div className="flex flex-wrap gap-2">
+                         {getRelevantCategories(workflowGoal).map((category) => (
+                           <Button
+                             key={category}
+                             variant={selectedCategory === category ? "default" : "outline"}
+                             size="sm"
+                             className="text-xs capitalize"
+                             onClick={() => handleCategorySelect(category, selectedStep)}
+                           >
+                             {category === "all" ? "All Tools" : category}
+                           </Button>
+                         ))}
+                       </div>
+
+                       {/* Tools Grid */}
+                       {currentStepTools.length > 0 && (
+                         <div className="space-y-3">
+                           {currentStepTools.map((tool, index) => (
+                             <div key={index} className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card">
+                               <div className="flex items-start space-x-3">
+                                 <div className="p-2 rounded-lg bg-muted flex-shrink-0">
+                                   {tool.icon && React.createElement(tool.icon, {
+                                     className: "h-4 w-4 text-muted-foreground"
+                                   })}
+                                 </div>
+                                 <div className="flex-1 min-w-0">
+                                   <div className="flex items-center justify-between mb-1">
+                                     <h5 className="font-medium text-sm truncate">{tool.name}</h5>
+                                     <Badge 
+                                       variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
+                                       className="text-xs"
+                                     >
+                                       {tool.pricing.model === 'free' ? 'FREE' : 'PAID'}
+                                     </Badge>
+                                   </div>
+                                   <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                   {tool.link && (
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       className="h-6 px-2 text-xs"
+                                       onClick={() => window.open(tool.link, '_blank')}
+                                     >
+                                       Visit Tool
+                                       <ChevronRight className="h-3 w-3 ml-1" />
+                                     </Button>
+                                   )}
+                                 </div>
+                               </div>
+                             </div>
+                           ))}
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 )}
                </div>
              ) : (
                <div className="text-center text-muted-foreground py-8">

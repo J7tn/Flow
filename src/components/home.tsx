@@ -371,33 +371,7 @@ const Home = () => {
             </TabsContent>
           </Tabs>
 
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Quick Actions</h3>
-            </div>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <Button
-                 variant="outline"
-                 className="h-24 flex flex-col items-center justify-center"
-                 asChild
-               >
-                 <Link to="/workflow/new">
-                   <PlusCircle className="h-8 w-8 mb-2" />
-                   New Flow
-                 </Link>
-               </Button>
-               <Button
-                 variant="outline"
-                 className="h-24 flex flex-col items-center justify-center"
-                 asChild
-               >
-                 <Link to="/analytics">
-                   <BarChart className="h-8 w-8 mb-2" />
-                   View Analytics
-                 </Link>
-               </Button>
-             </div>
-          </div>
+
         </main>
       </div>
     </PermanentDashboard>
