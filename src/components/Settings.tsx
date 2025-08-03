@@ -6,6 +6,7 @@ import {
   Shield,
   Palette,
   Globe,
+  Check,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -18,10 +19,26 @@ import {
 import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Badge } from "./ui/badge";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 import PermanentDashboard from "./shared/PermanentDashboard";
 import { ProfileManager } from "./ProfileManager";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const Settings = () => {
+  const { theme, setTheme, accentColor, setAccentColor, isDark } = useTheme();
+
+  const accentColors = [
+    { name: 'blue', class: 'bg-blue-500', value: 'blue' as const },
+    { name: 'green', class: 'bg-green-500', value: 'green' as const },
+    { name: 'purple', class: 'bg-purple-500', value: 'purple' as const },
+    { name: 'red', class: 'bg-red-500', value: 'red' as const },
+    { name: 'yellow', class: 'bg-yellow-500', value: 'yellow' as const },
+    { name: 'orange', class: 'bg-orange-500', value: 'orange' as const },
+    { name: 'pink', class: 'bg-pink-500', value: 'pink' as const },
+    { name: 'indigo', class: 'bg-indigo-500', value: 'indigo' as const },
+  ];
+
   return (
     <PermanentDashboard>
       <div className="flex-1 p-6">
@@ -152,39 +169,108 @@ const Settings = () => {
                   Customize the look and feel of your workspace.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div>
-                  <h4 className="font-medium mb-2">Theme</h4>
+                  <h4 className="font-medium mb-4">Theme</h4>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="border rounded-lg p-4 cursor-pointer hover:bg-accent">
-                      <div className="w-full h-20 bg-white border rounded mb-2"></div>
-                      <p className="text-sm text-center">Light</p>
+                    <div 
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                        theme === 'light' 
+                          ? 'border-primary bg-primary/5' 
+                          : 'hover:bg-accent'
+                      }`}
+                      onClick={() => setTheme('light')}
+                    >
+                      <div className="w-full h-20 bg-white border rounded mb-2 flex items-center justify-center">
+                        {theme === 'light' && <Check className="h-6 w-6 text-primary" />}
+                      </div>
+                      <p className="text-sm text-center font-medium">Light</p>
                     </div>
-                    <div className="border rounded-lg p-4 cursor-pointer hover:bg-accent">
-                      <div className="w-full h-20 bg-gray-900 border rounded mb-2"></div>
-                      <p className="text-sm text-center">Dark</p>
+                    <div 
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                        theme === 'dark' 
+                          ? 'border-primary bg-primary/5' 
+                          : 'hover:bg-accent'
+                      }`}
+                      onClick={() => setTheme('dark')}
+                    >
+                      <div className="w-full h-20 bg-gray-900 border rounded mb-2 flex items-center justify-center">
+                        {theme === 'dark' && <Check className="h-6 w-6 text-primary" />}
+                      </div>
+                      <p className="text-sm text-center font-medium">Dark</p>
                     </div>
-                    <div className="border rounded-lg p-4 cursor-pointer hover:bg-accent">
-                      <div className="w-full h-20 bg-gradient-to-br from-white to-gray-900 border rounded mb-2"></div>
-                      <p className="text-sm text-center">Auto</p>
+                    <div 
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                        theme === 'auto' 
+                          ? 'border-primary bg-primary/5' 
+                          : 'hover:bg-accent'
+                      }`}
+                      onClick={() => setTheme('auto')}
+                    >
+                      <div className="w-full h-20 bg-gradient-to-br from-white to-gray-900 border rounded mb-2 flex items-center justify-center">
+                        {theme === 'auto' && <Check className="h-6 w-6 text-primary" />}
+                      </div>
+                      <p className="text-sm text-center font-medium">Auto</p>
+                      <p className="text-xs text-center text-muted-foreground">System</p>
                     </div>
                   </div>
                 </div>
+                
                 <div>
-                  <h4 className="font-medium mb-2">Accent Color</h4>
-                  <div className="flex space-x-2">
-                    {[
-                      "bg-blue-500",
-                      "bg-green-500",
-                      "bg-purple-500",
-                      "bg-red-500",
-                      "bg-yellow-500",
-                    ].map((color) => (
+                  <h4 className="font-medium mb-4">Accent Color</h4>
+                  <div className="grid grid-cols-4 gap-3">
+                    {accentColors.map((color) => (
                       <div
-                        key={color}
-                        className={`w-8 h-8 rounded-full ${color} cursor-pointer border-2 border-transparent hover:border-gray-300`}
-                      ></div>
+                        key={color.value}
+                        className={`w-12 h-12 rounded-full ${color.class} cursor-pointer border-2 transition-all hover:scale-110 ${
+                          accentColor === color.value 
+                            ? 'border-foreground ring-2 ring-primary ring-offset-2' 
+                            : 'border-transparent hover:border-foreground/20'
+                        }`}
+                        onClick={() => setAccentColor(color.value)}
+                      >
+                        {accentColor === color.value && (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Check className="h-5 w-5 text-white" />
+                          </div>
+                        )}
+                      </div>
                     ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Selected: {accentColor.charAt(0).toUpperCase() + accentColor.slice(1)}
+                  </p>
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Preview</h4>
+                      <p className="text-sm text-muted-foreground">
+                        See how your theme looks
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="preview-mode" className="text-sm">
+                        Show preview
+                      </Label>
+                      <Switch id="preview-mode" />
+                    </div>
+                  </div>
+                  <div className="mt-4 p-4 border rounded-lg bg-card">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-full bg-primary"></div>
+                      <div>
+                        <p className="font-medium">Sample Card</p>
+                        <p className="text-sm text-muted-foreground">
+                          This shows how your theme will look
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex space-x-2">
+                      <Button size="sm">Primary Action</Button>
+                      <Button variant="outline" size="sm">Secondary</Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>

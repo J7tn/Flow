@@ -3,6 +3,13 @@
 ## Project Overview
 This is a React TypeScript web application built with Vite, featuring workflow management, analytics, and modern UI components. The app uses Tailwind CSS, shadcn/ui components, Supabase backend, and includes comprehensive testing.
 
+## Environment Configuration
+- **IMPORTANT**: The project already has a `.env` file in the root directory with all required Supabase configuration
+- Supabase URL and anon key are already configured
+- Chat2API configuration is also present
+- Do NOT ask about creating .env files or missing environment variables
+- The .env file contains: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_CHAT2API_URL, VITE_CHAT2API_AUTHORIZATION
+
 ## Technology Stack
 - **Frontend**: React 18, TypeScript, Vite
 - **Styling**: Tailwind CSS, shadcn/ui components, Framer Motion

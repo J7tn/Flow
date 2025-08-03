@@ -22,6 +22,8 @@ const createSupabaseClient = () => {
     return null;
   }
 
+  console.log('Creating new Supabase client with URL:', config.supabaseUrl);
+
   return createClient(config.supabaseUrl, config.supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
@@ -47,6 +49,13 @@ export const supabase = () => {
     supabaseInstance = createSupabaseClient();
   }
   return supabaseInstance;
+};
+
+// Force refresh the Supabase client (useful when buckets are created)
+export const refreshSupabaseClient = () => {
+  console.log('Refreshing Supabase client...');
+  supabaseInstance = null;
+  return supabase();
 };
 
 // Security helper functions

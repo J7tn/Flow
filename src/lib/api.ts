@@ -1,6 +1,5 @@
-import { supabase } from './supabase';
+import { supabase, getCurrentUser, refreshSupabaseClient } from './supabase';
 import { RateLimiter } from './validation';
-import { getCurrentUser } from './supabase';
 import type { 
   FlowTemplate, 
   TemplateReview, 
@@ -549,46 +548,139 @@ export const flowApi = {
 // User profile API functions
 export const userApi = {
   async getProfile() {
-    const userId = await getCurrentUser();
-    if (!userId) throw new Error('Authentication required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Authentication required');
 
     const client = supabase();
     if (!client) throw new Error('Supabase client not available');
+
+    console.log('Getting profile for user:', user.id);
 
     const { data, error } = await client
       .from('user_profiles')
       .select('*')
-      .eq('id', userId.id)
+      .eq('id', user.id)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error getting profile:', error);
+      
+      // If profile doesn't exist, create one
+      if (error.code === 'PGRST116') {
+        console.log('Profile not found, creating new profile...');
+        return await this.createProfile(user);
+      }
+      
+      throw error;
+    }
+    
+    console.log('Profile data retrieved:', data);
+    return data;
+  },
+
+  async createProfile(user: any) {
+    const client = supabase();
+    if (!client) throw new Error('Supabase client not available');
+
+    const profileData = {
+      id: user.id,
+      email: user.email,
+      full_name: user.user_metadata?.full_name || '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    console.log('Creating new profile with data:', profileData);
+
+    const { data, error } = await client
+      .from('user_profiles')
+      .insert(profileData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating profile:', error);
+      throw error;
+    }
+
+    console.log('Profile created successfully:', data);
     return data;
   },
 
   async updateProfile(profileData: any) {
-    const userId = await getCurrentUser();
-    if (!userId) throw new Error('Authentication required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Authentication required');
 
     const client = supabase();
     if (!client) throw new Error('Supabase client not available');
 
+    console.log('Updating profile for user:', user.id, 'with data:', profileData);
+
+    // Ensure we have the required fields and add updated_at timestamp
+    const updateData = {
+      ...profileData,
+      updated_at: new Date().toISOString(),
+    };
+
+    // Remove any undefined or null values that might cause issues
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined || updateData[key] === null) {
+        delete updateData[key];
+      }
+    });
+
+    console.log('Cleaned update data:', updateData);
+
     const { data, error } = await client
       .from('user_profiles')
-      .update(profileData)
-      .eq('id', userId.id)
+      .update(updateData)
+      .eq('id', user.id)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error updating profile:', error);
+      
+      // If profile doesn't exist, try to create it first
+      if (error.code === 'PGRST116') {
+        console.log('Profile not found, creating new profile...');
+        const newProfileData = {
+          id: user.id,
+          email: user.email,
+          ...updateData,
+          created_at: new Date().toISOString(),
+        };
+        
+        const { data: createdData, error: createError } = await client
+          .from('user_profiles')
+          .insert(newProfileData)
+          .select()
+          .single();
+          
+        if (createError) {
+          console.error('Error creating profile during update:', createError);
+          throw createError;
+        }
+        
+        console.log('Profile created successfully during update:', createdData);
+        return createdData;
+      }
+      
+      throw error;
+    }
+    
+    console.log('Profile updated successfully:', data);
     return data;
   },
 
   async uploadAvatar(file: File) {
-    const userId = await getCurrentUser();
-    if (!userId) throw new Error('Authentication required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Authentication required');
 
     const client = supabase();
     if (!client) throw new Error('Supabase client not available');
+
+    console.log('Starting avatar upload for user:', user.id);
 
     // Validate file type and size
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -602,35 +694,159 @@ export const userApi = {
       throw new Error('File size too large. Please upload a file smaller than 1MB.');
     }
 
-    // Generate unique filename
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${userId.id}-${Date.now()}.${fileExt}`;
+    // Generate unique filename with proper extension
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
 
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await client.storage
+    console.log('Uploading file:', fileName, 'Type:', file.type, 'Size:', file.size);
+
+    // Try to upload directly to the avatars bucket
+    let { data: uploadData, error: uploadError } = await client.storage
       .from('avatars')
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      
+      // If it's a bucket not found error, try with refreshed client
+      if (uploadError.message.includes('bucket') || uploadError.message.includes('not found')) {
+        console.log('Bucket not found, trying with refreshed client...');
+        
+        // Refresh the client and try again
+        const refreshedClient = refreshSupabaseClient();
+        if (!refreshedClient) throw new Error('Failed to refresh Supabase client');
+        
+        const { data: refreshedUploadData, error: refreshedUploadError } = await refreshedClient.storage
+          .from('avatars')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        if (refreshedUploadError) {
+          console.error('Upload error with refreshed client:', refreshedUploadError);
+          throw new Error('Avatar storage not configured. Please ensure the avatars bucket exists with proper policies.');
+        }
+        
+        uploadData = refreshedUploadData;
+        uploadError = null;
+        client = refreshedClient; // Use refreshed client for subsequent operations
+      } else if (uploadError.message.includes('permission') || uploadError.message.includes('policy')) {
+        throw new Error('Permission denied. Please check storage policies for the avatars bucket.');
+      } else if (uploadError.message.includes('duplicate')) {
+        throw new Error('File already exists. Please try again.');
+      } else {
+        throw new Error(`Upload failed: ${uploadError.message}`);
+      }
+    }
+
+    console.log('File uploaded successfully:', uploadData);
 
     // Get public URL
     const { data: urlData } = client.storage
       .from('avatars')
       .getPublicUrl(fileName);
 
+    console.log('Public URL generated:', urlData.publicUrl);
+
     // Update profile with new avatar URL
     const { data, error } = await client
       .from('user_profiles')
       .update({ avatar_url: urlData.publicUrl })
-      .eq('id', userId.id)
+      .eq('id', user.id)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error updating profile with avatar URL:', error);
+      throw new Error('Avatar uploaded but failed to update profile. Please try again.');
+    }
+
+    console.log('Profile updated with new avatar:', data);
     return data;
+  },
+
+  // Test function to diagnose storage issues
+  async testStorageAccess() {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Authentication required');
+
+    console.log('Testing storage access for user:', user.id);
+
+    try {
+      // First, try with current client
+      let client = supabase();
+      if (!client) throw new Error('Supabase client not available');
+
+      console.log('Testing with current Supabase client...');
+
+      // Test 1: Try to list buckets
+      const { data: buckets, error: bucketsError } = await client.storage.listBuckets();
+      console.log('Buckets list result:', { buckets, error: bucketsError });
+      
+      if (bucketsError) {
+        console.error('Cannot list buckets:', bucketsError);
+        return { canListBuckets: false, error: bucketsError.message };
+      }
+
+      // Test 2: Check if avatars bucket exists
+      const avatarsBucket = buckets?.find(bucket => bucket.name === 'avatars');
+      console.log('Avatars bucket found:', avatarsBucket);
+      
+      if (!avatarsBucket) {
+        console.log('Avatars bucket not found in current client, trying with refreshed client...');
+        
+        // Try with refreshed client
+        client = refreshSupabaseClient();
+        if (!client) throw new Error('Failed to refresh Supabase client');
+
+        const { data: refreshedBuckets, error: refreshedBucketsError } = await client.storage.listBuckets();
+        console.log('Refreshed buckets list result:', { refreshedBuckets, error: refreshedBucketsError });
+        
+        if (refreshedBucketsError) {
+          console.error('Cannot list buckets with refreshed client:', refreshedBucketsError);
+          return { canListBuckets: false, error: refreshedBucketsError.message };
+        }
+
+        const refreshedAvatarsBucket = refreshedBuckets?.find(bucket => bucket.name === 'avatars');
+        console.log('Avatars bucket found with refreshed client:', refreshedAvatarsBucket);
+        
+        if (!refreshedAvatarsBucket) {
+          return { 
+            canListBuckets: true, 
+            avatarsBucketExists: false, 
+            error: 'avatars bucket not found even after client refresh',
+            allBuckets: refreshedBuckets?.map(b => b.name) || []
+          };
+        }
+
+        // Continue with refreshed client
+        client = refreshSupabaseClient();
+      }
+
+      // Test 3: Try to list files in avatars bucket
+      const { data: files, error: filesError } = await client.storage
+        .from('avatars')
+        .list();
+      
+      console.log('Files in avatars bucket:', { files, error: filesError });
+      
+      return { 
+        canListBuckets: true, 
+        avatarsBucketExists: true, 
+        canListFiles: !filesError,
+        filesError: filesError?.message,
+        bucketInfo: avatarsBucket || 'Found with refreshed client',
+        allBuckets: buckets?.map(b => b.name) || []
+      };
+      
+    } catch (error) {
+      console.error('Storage test error:', error);
+      return { error: error instanceof Error ? error.message : 'Unknown error' };
+    }
   },
 }; 
 

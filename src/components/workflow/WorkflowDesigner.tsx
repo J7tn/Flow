@@ -968,7 +968,7 @@ const WorkflowDesigner = () => {
     <PermanentDashboard>
       <div className="flex-1 flex flex-col h-full">
         {/* Header */}
-        <div className="border-b bg-white px-6 py-4">
+        <div className="border-b bg-card px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div>
@@ -1007,7 +1007,7 @@ const WorkflowDesigner = () => {
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <Target className="h-5 w-5 text-blue-500" />
+                          <Target className="h-5 w-5 text-primary" />
                           {workflowName}
                         </CardTitle>
                         {workflowDescription && (
@@ -1016,11 +1016,11 @@ const WorkflowDesigner = () => {
                       </CardHeader>
                       {workflowGoal && (
                         <CardContent>
-                          <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
-                            <div className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
+                          <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                            <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
                             <div>
-                              <h4 className="font-medium text-purple-900 mb-1">Goal</h4>
-                              <p className="text-sm text-purple-700">{workflowGoal}</p>
+                              <h4 className="font-medium text-foreground mb-1">Goal</h4>
+                              <p className="text-sm text-muted-foreground">{workflowGoal}</p>
                             </div>
                           </div>
                         </CardContent>
@@ -1032,7 +1032,7 @@ const WorkflowDesigner = () => {
                       <Card>
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <List className="h-5 w-5 text-green-500" />
+                            <List className="h-5 w-5 text-primary" />
                             Flow Steps ({steps.length})
                           </CardTitle>
                         </CardHeader>
@@ -1040,7 +1040,7 @@ const WorkflowDesigner = () => {
                           <div className="space-y-4">
                             {steps.map((step, index) => (
                               <div key={step.id} className="flex items-start gap-4 p-4 border rounded-lg">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-600">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
                                   {index + 1}
                                 </div>
                                 <div className="flex-1">
@@ -1097,17 +1097,17 @@ const WorkflowDesigner = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="text-center p-4 bg-blue-50 rounded-lg">
-                            <div className="text-2xl font-bold text-blue-600">{steps.length}</div>
-                            <div className="text-sm text-blue-700">Total Steps</div>
+                          <div className="text-center p-4 bg-primary/10 rounded-lg">
+                            <div className="text-2xl font-bold text-primary">{steps.length}</div>
+                            <div className="text-sm text-muted-foreground">Total Steps</div>
                           </div>
-                          <div className="text-center p-4 bg-green-50 rounded-lg">
-                            <div className="text-2xl font-bold text-green-600">{calculateTotalTime()}</div>
-                            <div className="text-sm text-green-700">Total Time (min)</div>
+                          <div className="text-center p-4 bg-primary/10 rounded-lg">
+                            <div className="text-2xl font-bold text-primary">{calculateTotalTime()}</div>
+                            <div className="text-sm text-muted-foreground">Total Time (min)</div>
                           </div>
-                          <div className="text-center p-4 bg-purple-50 rounded-lg">
-                            <div className="text-2xl font-bold text-purple-600">${calculateTotalCost()}</div>
-                            <div className="text-sm text-purple-700">Total Cost</div>
+                          <div className="text-center p-4 bg-primary/10 rounded-lg">
+                            <div className="text-2xl font-bold text-primary">${calculateTotalCost()}</div>
+                            <div className="text-sm text-muted-foreground">Total Cost</div>
                           </div>
                         </div>
                       </CardContent>
@@ -1172,9 +1172,9 @@ const WorkflowDesigner = () => {
                  {/* Main Content */}
          <div className="flex-1 flex overflow-hidden">
            {/* Center - Flow Canvas */}
-           <div className="flex-1 bg-white relative overflow-auto">
+           <div className="flex-1 bg-background relative overflow-auto">
              <div className="p-6 min-h-full">
-                              <div className="canvas-container w-full h-full min-h-[600px] bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+                              <div className="canvas-container w-full h-full min-h-[600px] bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/20 p-6">
                  {/* Main Content Grid - AI-Guided Flow and Goal Input side by side */}
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                    {/* AI-Guided Flow Block - Left Side */}
@@ -1186,7 +1186,7 @@ const WorkflowDesigner = () => {
                      <Card className="w-full max-w-2xl mx-auto shadow-lg">
                        <CardContent className="p-6">
                          <div className="text-center">
-                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-3"></div>
+                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
                            <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
                          </div>
                        </CardContent>
@@ -1201,7 +1201,7 @@ const WorkflowDesigner = () => {
                         <CardHeader className="pb-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                              <Sparkles className="h-5 w-5 text-purple-500" />
+                              <Sparkles className="h-5 w-5 text-primary" />
                               <h3 className="font-semibold">AI-Guided Flow</h3>
                               <Badge variant="secondary">Step {currentStepIndex + 1} of {suggestedSteps.length}</Badge>
                             </div>
@@ -1312,8 +1312,8 @@ const WorkflowDesigner = () => {
                                                     variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
                                                     className={`text-xs ${
                                                       tool.pricing.model === 'free' 
-                                                        ? 'bg-green-100 text-green-800 border-green-200' 
-                                                        : 'bg-blue-100 text-blue-800 border-blue-200'
+                                                        ? 'bg-primary/10 text-primary border-primary/30' 
+                                                        : 'bg-primary/10 text-primary border-primary/30'
                                                     }`}
                                                   >
                                                     {tool.pricing.model === 'free' ? 'FREE' : 
@@ -1329,21 +1329,21 @@ const WorkflowDesigner = () => {
                                               {/* Pricing Information */}
                                               <div className="mb-2">
                                                 {tool.pricing.model === 'free' ? (
-                                                  <p className="text-xs text-green-600 font-medium">FREE - {tool.pricing.notes}</p>
+                                                  <p className="text-xs text-primary font-medium">FREE - {tool.pricing.notes}</p>
                                                 ) : tool.pricing.model === 'freemium' ? (
-                                                  <p className="text-xs text-blue-600 font-medium">
+                                                  <p className="text-xs text-primary font-medium">
                                                     {tool.pricing.startingPrice && `From $${tool.pricing.startingPrice}/${tool.pricing.currency === 'USD' ? 'month' : tool.pricing.currency}`} - {tool.pricing.notes}
                                                   </p>
                                                 ) : tool.pricing.model === 'subscription' ? (
-                                                  <p className="text-xs text-blue-600 font-medium">
+                                                  <p className="text-xs text-primary font-medium">
                                                     {tool.pricing.startingPrice && `$${tool.pricing.startingPrice}/${tool.pricing.currency === 'USD' ? 'month' : tool.pricing.currency}`} - {tool.pricing.notes}
                                                   </p>
                                                 ) : tool.pricing.model === 'one-time' ? (
-                                                  <p className="text-xs text-blue-600 font-medium">
+                                                  <p className="text-xs text-primary font-medium">
                                                     {tool.pricing.startingPrice && `$${tool.pricing.startingPrice}`} - {tool.pricing.notes}
                                                   </p>
                                                 ) : (
-                                                  <p className="text-xs text-blue-600 font-medium">{tool.pricing.notes}</p>
+                                                  <p className="text-xs text-primary font-medium">{tool.pricing.notes}</p>
                                                 )}
                                               </div>
                                               
@@ -1369,7 +1369,7 @@ const WorkflowDesigner = () => {
                                                       description: `Implement ${tool.name} for ${suggestedSteps[currentStepIndex]?.title}`,
                                                       type: "task" as FlowStep["type"],
                                                       icon: tool.icon,
-                                                      color: "bg-blue-500"
+                                                      color: "bg-primary"
                                                     };
                                                     // Add to the current step if it exists in the main flow
                                                     if (steps.length > 0) {
@@ -1399,17 +1399,17 @@ const WorkflowDesigner = () => {
 
                    {/* Goal Input Block - Right Side */}
                    <div className="order-1 lg:order-2">
-                     <Card className="w-full shadow-lg border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
+                     <Card className="w-full max-w-md mx-auto shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
                        <CardHeader className="pb-4">
                          <div className="flex items-center space-x-2 mb-3">
-                           <div className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
-                           <Badge variant="outline" className="text-xs bg-purple-100 text-purple-800 border-purple-300">
+                           <div className="w-4 h-4 rounded-full bg-gradient-to-r from-primary to-primary/80" />
+                           <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
                              Goal
                            </Badge>
                          </div>
                          <div className="space-y-3">
                            <div>
-                             <label htmlFor="workflow-goal" className="text-sm font-medium text-purple-900 mb-2 block">
+                             <label htmlFor="workflow-goal" className="text-sm font-medium text-foreground mb-2 block">
                                What is the goal of this flow?
                              </label>
                              <div className="relative">
@@ -1418,13 +1418,13 @@ const WorkflowDesigner = () => {
                                  value={workflowGoal}
                                  onChange={(e) => updateGoal(e.target.value)}
                                  placeholder="e.g., Launch a new product, Optimize customer onboarding, Create a marketing campaign..."
-                                 className="w-full border-purple-200 focus:border-purple-400"
+                                 className="w-full"
                                  rows={3}
                                />
                              </div>
                            </div>
                            <div className="flex items-center justify-between">
-                             <div className="text-xs text-purple-700">
+                             <div className="text-xs text-muted-foreground">
                                Define a clear, measurable goal to help guide your flow design
                              </div>
                              <Button
@@ -1463,7 +1463,7 @@ const WorkflowDesigner = () => {
                        {steps.map((step) => (
                          <div key={step.id}>
                            <Card 
-                             className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] ${
+                             className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 ${
                              selectedStep === step.id ? 'ring-2 ring-blue-500' : ''
                            }`}
                              onClick={() => setSelectedStep(step.id)}
@@ -1476,7 +1476,7 @@ const WorkflowDesigner = () => {
                                      {step.type}
                                    </Badge>
                                    {step.subFlow && step.subFlow.length > 0 && (
-                                     <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                                     <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
                                        {step.subFlow.length} sub-step{step.subFlow.length !== 1 ? 's' : ''}
                                      </Badge>
                                    )}
@@ -1548,14 +1548,14 @@ const WorkflowDesigner = () => {
                            <div className="mt-4 ml-6 border-l-2 border-gray-200 pl-4">
                              <div className="space-y-3">
                                <div className="flex items-center justify-between">
-                                 <h4 className="text-sm font-medium text-gray-700">Sub-Steps:</h4>
-                                 <span className="text-xs text-gray-500">Click sub-steps to select them</span>
+                                 <h4 className="text-sm font-medium text-foreground">Sub-Steps:</h4>
+                                 <span className="text-xs text-muted-foreground">Click sub-steps to select them</span>
                                </div>
                                {step.subFlow.map((subStep) => (
                                  <div 
                                    key={subStep.id} 
-                                   className={`bg-gray-50 rounded-lg p-3 border cursor-pointer transition-all hover:bg-gray-100 hover:shadow-sm ${
-                                     selectedSubStep === subStep.id ? 'ring-2 ring-blue-500 bg-blue-50 shadow-md' : ''
+                                   className={`bg-card rounded-lg p-3 border border-border cursor-pointer transition-all hover:bg-accent hover:shadow-sm ${
+                                     selectedSubStep === subStep.id ? 'ring-2 ring-blue-500 bg-primary/10 shadow-md' : ''
                                    }`}
                                    onClick={() => handleSubStepClick(subStep.id)}
                                  >
@@ -1575,8 +1575,8 @@ const WorkflowDesigner = () => {
                                        </div>
                                        <p className="text-xs text-muted-foreground">{subStep.description}</p>
                                        {selectedSubStep === subStep.id && (
-                                         <div className="mt-2 p-2 bg-white rounded border">
-                                           <p className="text-xs text-gray-600">
+                                         <div className="mt-2 p-2 bg-card rounded border">
+                                           <p className="text-xs text-muted-foreground">
                                              <strong>Sub-step selected:</strong> This sub-step is now active. 
                                              You can remove it using the delete button on the right.
                                            </p>
@@ -1590,7 +1590,7 @@ const WorkflowDesigner = () => {
                                          e.stopPropagation();
                                          deleteSubStep(step.id, subStep.id);
                                        }}
-                                       className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                       className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
                                        title="Remove this sub-step"
                                      >
                                        <Trash2 className="h-3 w-3" />
@@ -1611,7 +1611,7 @@ const WorkflowDesigner = () => {
          </div>
 
                                 {/* Right Sidebar - Step Properties & Flow Statistics */}
-           <div className="w-80 border-l bg-gray-50 p-4 overflow-y-auto">
+           <div className="w-80 border-l bg-muted/30 p-4 overflow-y-auto">
              {/* Flow Statistics */}
              <div className="mb-6">
                <h3 className="font-semibold mb-3">Flow Statistics</h3>

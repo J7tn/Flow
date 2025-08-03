@@ -35,6 +35,47 @@
       --radius: 0.5rem;
     }
 
+    /* Accent color variants */
+    .accent-blue {
+      --primary: 221.2 83.2% 53.3%;
+      --primary-foreground: 210 40% 98%;
+    }
+
+    .accent-green {
+      --primary: 142.1 76.2% 36.3%;
+      --primary-foreground: 355.7 100% 97.3%;
+    }
+
+    .accent-purple {
+      --primary: 262.1 83.3% 57.8%;
+      --primary-foreground: 210 40% 98%;
+    }
+
+    .accent-red {
+      --primary: 0 84.2% 60.2%;
+      --primary-foreground: 210 40% 98%;
+    }
+
+    .accent-yellow {
+      --primary: 47.9 95.8% 53.1%;
+      --primary-foreground: 26 83.3% 14.1%;
+    }
+
+    .accent-orange {
+      --primary: 24.6 95% 53.1%;
+      --primary-foreground: 60 9.1% 97.8%;
+    }
+
+    .accent-pink {
+      --primary: 346.8 77.2% 49.8%;
+      --primary-foreground: 355.7 100% 97.3%;
+    }
+
+    .accent-indigo {
+      --primary: 221.2 83.2% 53.3%;
+      --primary-foreground: 210 40% 98%;
+    }
+
     .dark {
       --background: 222.2 84% 4.9%;
       --foreground: 210 40% 98%;
@@ -63,6 +104,47 @@
       --border: 217.2 32.6% 17.5%;
       --input: 217.2 32.6% 17.5%;
       --ring: 212.7 26.8% 83.9%;
+    }
+
+    /* Dark mode accent color variants */
+    .dark.accent-blue {
+      --primary: 217.2 91.2% 59.8%;
+      --primary-foreground: 222.2 47.4% 11.2%;
+    }
+
+    .dark.accent-green {
+      --primary: 142.1 70.6% 45.3%;
+      --primary-foreground: 144.9 80.4% 10%;
+    }
+
+    .dark.accent-purple {
+      --primary: 263.4 70% 50.4%;
+      --primary-foreground: 210 40% 98%;
+    }
+
+    .dark.accent-red {
+      --primary: 0 72.2% 50.6%;
+      --primary-foreground: 210 40% 98%;
+    }
+
+    .dark.accent-yellow {
+      --primary: 48 96% 89%;
+      --primary-foreground: 26 83.3% 14.1%;
+    }
+
+    .dark.accent-orange {
+      --primary: 24.6 95% 53.1%;
+      --primary-foreground: 60 9.1% 97.8%;
+    }
+
+    .dark.accent-pink {
+      --primary: 346.8 77.2% 49.8%;
+      --primary-foreground: 355.7 100% 97.3%;
+    }
+
+    .dark.accent-indigo {
+      --primary: 217.2 91.2% 59.8%;
+      --primary-foreground: 222.2 47.4% 11.2%;
     }
   }
 

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { useRoutes } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Login } from "./components/auth/Login";
 import { Signup } from "./components/auth/Signup";
@@ -165,10 +166,12 @@ function App() {
   const element = useRoutes(allRoutes);
 
   return (
-    <AuthProvider>
-      <Suspense fallback={<p>Loading...</p>}>{element}</Suspense>
-      <Toaster />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Suspense fallback={<p>Loading...</p>}>{element}</Suspense>
+        <Toaster />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

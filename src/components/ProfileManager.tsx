@@ -61,13 +61,19 @@ export function ProfileManager({ className }: ProfileManagerProps) {
     try {
       setIsLoading(true);
       
+      console.log('Starting profile update with form data:', formData);
+      
       // Validate form data
       const validatedData = userProfileSchema.parse({
         ...profile,
         ...formData,
       });
 
+      console.log('Validated data:', validatedData);
+
       const updatedProfile = await userApi.updateProfile(validatedData);
+      console.log('Profile updated successfully:', updatedProfile);
+      
       setProfile(updatedProfile);
       setIsEditing(false);
       
@@ -77,9 +83,25 @@ export function ProfileManager({ className }: ProfileManagerProps) {
       });
     } catch (error) {
       console.error('Error updating profile:', error);
+      
+      let errorMessage = 'Failed to update profile';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Provide more specific error messages
+        if (error.message.includes('Authentication required')) {
+          errorMessage = 'Please log in to update your profile';
+        } else if (error.message.includes('Supabase client not available')) {
+          errorMessage = 'Connection error. Please try again.';
+        } else if (error.message.includes('PGRST116')) {
+          errorMessage = 'Profile not found. Please try again.';
+        }
+      }
+      
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to update profile',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -125,6 +147,8 @@ export function ProfileManager({ className }: ProfileManagerProps) {
     }
   };
 
+
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -163,6 +187,7 @@ export function ProfileManager({ className }: ProfileManagerProps) {
               <AvatarImage 
                 src={profile?.avatar_url} 
                 alt={profile?.full_name || 'User avatar'} 
+                className="object-cover"
               />
               <AvatarFallback>
                 {profile?.full_name ? getInitials(profile.full_name) : 'U'}
@@ -184,6 +209,7 @@ export function ProfileManager({ className }: ProfileManagerProps) {
               <Upload className="h-4 w-4 mr-2" />
               {isUploading ? 'Uploading...' : 'Change Avatar'}
             </Button>
+            
             <input
               ref={fileInputRef}
               type="file"
@@ -192,7 +218,7 @@ export function ProfileManager({ className }: ProfileManagerProps) {
               className="hidden"
             />
             <p className="text-sm text-muted-foreground">
-              JPG, PNG or GIF. 1MB max.
+              JPG, PNG, or GIF (including animated GIFs). 1MB max.
             </p>
           </div>
         </div>

@@ -66,18 +66,7 @@ const PermanentDashboard = ({ children }: PermanentDashboardProps) => {
           })}
         </nav>
 
-        <div className="mt-auto pt-4 border-t">
-          <div className="flex items-center px-3 py-2">
-            <Avatar className="h-8 w-8 mr-2">
-              <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-medium">User Name</p>
-              <p className="text-xs text-muted-foreground">user@example.com</p>
-            </div>
-          </div>
-        </div>
+
       </div>
 
       {/* Main Content */}
