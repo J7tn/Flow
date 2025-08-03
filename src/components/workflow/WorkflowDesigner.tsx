@@ -80,6 +80,7 @@ import {
   HelpCircle,
   Box,
   Gamepad2,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
@@ -126,6 +127,9 @@ const WorkflowDesigner = () => {
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
   const [selectedSubStep, setSelectedSubStep] = useState<string | null>(null);
   const [priceSort, setPriceSort] = useState<"none" | "low-to-high" | "high-to-low">("none");
+  
+  // Roadmap interaction state
+  const [selectedRoadmapStep, setSelectedRoadmapStep] = useState<string | null>(null);
 
   // Load template from URL parameter
   useEffect(() => {
@@ -1253,6 +1257,186 @@ const WorkflowDesigner = () => {
                          </div>
                        </CardHeader>
                      </Card>
+                   </div>
+
+                   {/* Roadmap Steps Area - Right Side */}
+                   <div className="lg:w-2/3">
+                     {/* Loading State */}
+                     {isGeneratingSteps && (
+                       <div className="flex items-center justify-center h-64">
+                         <Card className="w-full max-w-md shadow-lg">
+                           <CardContent className="p-6">
+                             <div className="text-center">
+                               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+                               <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
+                             </div>
+                           </CardContent>
+                         </Card>
+                       </div>
+                     )}
+
+                     {/* Roadmap Steps with Connecting Lines */}
+                     {suggestedSteps.length > 0 && !isGeneratingSteps && (
+                       <div className="relative">
+                         {/* Connecting Lines Container */}
+                         <div className="absolute inset-0 pointer-events-none">
+                           {/* Lines will be drawn here */}
+                           <svg className="w-full h-full absolute top-0 left-0">
+                             {/* Goal to Steps connecting lines */}
+                             {suggestedSteps.map((_, index) => (
+                               <line
+                                 key={`line-${index}`}
+                                 x1="0"
+                                 y1="50%"
+                                 x2="25%"
+                                 y2={`${(index + 1) * (100 / (suggestedSteps.length + 1))}%`}
+                                 stroke="currentColor"
+                                 strokeWidth="2"
+                                 strokeDasharray="5,5"
+                                 className="text-primary/30"
+                               />
+                             ))}
+                           </svg>
+                         </div>
+
+                         {/* Step Blocks */}
+                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
+                           {suggestedSteps.map((step, index) => (
+                             <div
+                               key={index}
+                               className={`transition-all duration-300 ${
+                                 selectedRoadmapStep === `suggested-${index}` ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-80'
+                               }`}
+                             >
+                               <Card 
+                                 className={`shadow-lg hover:shadow-xl transition-all cursor-pointer border-2 ${
+                                   selectedRoadmapStep === `suggested-${index}` 
+                                     ? 'border-primary ring-2 ring-primary/20' 
+                                     : 'border-muted hover:border-primary/50'
+                                 }`}
+                                 onClick={() => {
+                                   // Fade out other steps and select this one
+                                   setSelectedRoadmapStep(`suggested-${index}`);
+                                   // Generate tools for this step
+                                   generateToolsForStep(step.title, step.description);
+                                 }}
+                               >
+                                 <CardHeader className="pb-3">
+                                   <div className="flex items-center space-x-2">
+                                     <div className={`p-2 rounded-lg ${step.color} bg-opacity-10`}>
+                                       {step.icon && React.createElement(step.icon, {
+                                         className: `h-5 w-5 ${step.color.replace('bg-', 'text-')}`
+                                       })}
+                                     </div>
+                                     <Badge variant="outline" className="text-xs">
+                                       Step {index + 1}
+                                     </Badge>
+                                   </div>
+                                   <CardTitle className="text-sm font-medium">{step.title}</CardTitle>
+                                 </CardHeader>
+                                 <CardContent className="pt-0">
+                                   <p className="text-xs text-muted-foreground mb-3">{step.description}</p>
+                                   <Button 
+                                     size="sm" 
+                                     className="w-full text-xs"
+                                     variant={selectedRoadmapStep === `suggested-${index}` ? "default" : "outline"}
+                                     onClick={(e) => {
+                                       e.stopPropagation();
+                                       if (selectedRoadmapStep === `suggested-${index}`) {
+                                         // Add the selected step to the workflow
+                                         addStep(step);
+                                         setSelectedRoadmapStep(null);
+                                       }
+                                     }}
+                                   >
+                                     {selectedRoadmapStep === `suggested-${index}` ? "Add to Flow" : "Choose This Step"}
+                                   </Button>
+                                 </CardContent>
+                               </Card>
+                             </div>
+                           ))}
+                         </div>
+
+                         {/* Selected Step Tools Panel */}
+                         {selectedRoadmapStep && selectedRoadmapStep.startsWith('suggested-') && (
+                           <div className="mt-8">
+                             <Card className="shadow-lg">
+                               <CardHeader>
+                                 <div className="flex items-center justify-between">
+                                   <h3 className="font-semibold">Tools for Selected Step</h3>
+                                   <Button
+                                     variant="outline"
+                                     size="sm"
+                                     onClick={() => setSelectedRoadmapStep(null)}
+                                   >
+                                     <X className="h-4 w-4 mr-2" />
+                                     Close
+                                   </Button>
+                                 </div>
+                               </CardHeader>
+                               <CardContent>
+                                 <div className="space-y-4">
+                                   {/* Category Filter Buttons */}
+                                   <div className="flex flex-wrap gap-2">
+                                     {getRelevantCategories(workflowGoal).map((category) => (
+                                       <Button
+                                         key={category}
+                                         variant={selectedCategory === category ? "default" : "outline"}
+                                         size="sm"
+                                         className="text-xs capitalize"
+                                         onClick={() => handleCategorySelect(category)}
+                                       >
+                                         {category === "all" ? "All Tools" : category}
+                                       </Button>
+                                     ))}
+                                   </div>
+
+                                   {/* Tools Grid */}
+                                   {currentStepTools.length > 0 && (
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                       {currentStepTools.map((tool, index) => (
+                                         <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-card">
+                                           <div className="flex items-start space-x-3">
+                                             <div className="p-2 rounded-lg bg-muted flex-shrink-0">
+                                               {tool.icon && React.createElement(tool.icon, {
+                                                 className: "h-5 w-5 text-muted-foreground"
+                                               })}
+                                             </div>
+                                             <div className="flex-1 min-w-0">
+                                               <div className="flex items-center justify-between mb-1">
+                                                 <h5 className="font-medium text-sm truncate">{tool.name}</h5>
+                                                 <Badge 
+                                                   variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
+                                                   className="text-xs"
+                                                 >
+                                                   {tool.pricing.model === 'free' ? 'FREE' : 'PAID'}
+                                                 </Badge>
+                                               </div>
+                                               <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                               {tool.link && (
+                                                 <Button
+                                                   variant="ghost"
+                                                   size="sm"
+                                                   className="h-6 px-2 text-xs"
+                                                   onClick={() => window.open(tool.link, '_blank')}
+                                                 >
+                                                   Visit Tool
+                                                   <ChevronRight className="h-3 w-3 ml-1" />
+                                                 </Button>
+                                               )}
+                                             </div>
+                                           </div>
+                                         </div>
+                                       ))}
+                                     </div>
+                                   )}
+                                 </div>
+                               </CardContent>
+                             </Card>
+                           </div>
+                         )}
+                       </div>
+                     )}
                    </div>
                  </div>
 
