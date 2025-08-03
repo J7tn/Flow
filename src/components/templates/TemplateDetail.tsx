@@ -560,16 +560,18 @@ export const TemplateDetail: React.FC = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {template.recommendedTools.map((tool) => (
-                  <Card key={tool.id} className="p-4">
-                    <div className="space-y-3">
+                  <Card key={tool.id} className="p-4 h-full flex flex-col">
+                    <div className="space-y-3 flex-1 flex flex-col h-full">
                       <div className="flex justify-between items-start">
-                        <div>
+                        <div className="flex-1">
                           <h3 className="font-medium">{tool.name}</h3>
-                          <p className="text-sm text-muted-foreground">{tool.description}</p>
+                          <div className="mt-1">
+                            <Badge variant="outline" className="capitalize text-xs">
+                              {tool.category}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-2 line-clamp-2 min-h-[2.5rem]">{tool.description}</p>
                         </div>
-                        <Badge variant="outline" className="capitalize">
-                          {tool.category}
-                        </Badge>
                       </div>
 
                       <div className="space-y-2">
@@ -641,7 +643,7 @@ export const TemplateDetail: React.FC = () => {
                       </div>
 
                       {tool.website && (
-                        <Button variant="outline" size="sm" className="w-full">
+                        <Button variant="outline" size="sm" className="w-full mt-auto">
                           <ExternalLink className="h-4 w-4 mr-2" />
                           Visit Website
                         </Button>

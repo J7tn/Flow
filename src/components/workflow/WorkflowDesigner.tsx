@@ -1253,7 +1253,7 @@ const WorkflowDesigner = () => {
                                   </div>
                                 </div>
                                 <Button 
-                                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                                   onClick={() => addStep(suggestedSteps[currentStepIndex])}
                                 >
                                   <Plus className="h-4 w-4 mr-2" />
@@ -1296,18 +1296,17 @@ const WorkflowDesigner = () => {
                                   <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                       {currentStepTools.map((tool, index) => (
-                                        <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-card">
-                                          <div className="flex items-start space-x-3">
-                                            <div className="p-2 rounded-lg bg-muted">
+                                        <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-card h-full flex flex-col">
+                                          <div className="flex items-start space-x-3 flex-1">
+                                            <div className="p-2 rounded-lg bg-muted flex-shrink-0">
                                               {tool.icon && React.createElement(tool.icon, {
                                                 className: "h-5 w-5 text-muted-foreground"
                                               })}
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                              <div className="flex items-center justify-between mb-2">
+                                            <div className="flex-1 min-w-0 flex flex-col h-full">
+                                              <div className="flex items-center justify-between mb-1">
                                                 <h5 className="font-medium text-sm truncate">{tool.name}</h5>
                                                 <div className="flex items-center space-x-1 flex-shrink-0">
-                                                  <Badge variant="outline" className="text-xs">{tool.category}</Badge>
                                                   <Badge 
                                                     variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
                                                     className="text-xs"
@@ -1320,7 +1319,10 @@ const WorkflowDesigner = () => {
                                                   </Badge>
                                                 </div>
                                               </div>
-                                              <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{tool.description}</p>
+                                              <div className="mb-2">
+                                                <Badge variant="outline" className="text-xs capitalize">{tool.category}</Badge>
+                                              </div>
+                                              <p className="text-xs text-muted-foreground mb-3 line-clamp-2 min-h-[2.5rem]">{tool.description}</p>
                                               
                                               {/* Pricing Information */}
                                               <div className="mb-3">
@@ -1343,7 +1345,7 @@ const WorkflowDesigner = () => {
                                                 )}
                                               </div>
                                               
-                                              <div className="flex gap-2">
+                                              <div className="flex gap-2 mt-auto">
                                                 {tool.link && (
                                                   <Button
                                                     variant="ghost"
@@ -1438,15 +1440,26 @@ const WorkflowDesigner = () => {
                        {steps.map((step) => (
                          <div key={step.id}>
                            <Card 
-                             className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 !bg-gradient-to-br !from-primary/5 !to-primary/10 ${
-                             selectedStep === step.id ? 'ring-2 ring-blue-500' : ''
+                             className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-card dark:bg-card ${
+                             selectedStep === step.id ? 'ring-2 ring-accent' : ''
                            }`}
                              onClick={() => setSelectedStep(step.id)}
                            >
-                             <CardHeader className="pb-4">
-                               <div className="flex items-center justify-between">
+                             <CardHeader className="pb-4 relative">
+                               {/* Icon at top left */}
+                               <div className="absolute top-4 left-4">
+                                 <div className={`w-4 h-4 rounded-full ${getStepColor(step)}`} />
+                               </div>
+                               
+                               {/* Description at top right */}
+                               <div className="absolute top-4 right-4 max-w-[200px] text-right">
+                                 <p className="text-xs text-muted-foreground line-clamp-2">
+                                   {step.description || "No description"}
+                                 </p>
+                               </div>
+                               
+                               <div className="flex items-center justify-between mt-6">
                                  <div className="flex items-center space-x-2">
-                                   <div className={`w-3 h-3 rounded-full ${getStepColor(step)}`} />
                                    <Badge variant="outline" className="text-xs">
                                      {step.type}
                                    </Badge>
@@ -1485,12 +1498,9 @@ const WorkflowDesigner = () => {
                                    </Button>
                                  </div>
                                </div>
-                               <CardTitle className="text-base break-words">{step.title}</CardTitle>
+                               <CardTitle className="text-base break-words mt-4">{step.title}</CardTitle>
                              </CardHeader>
                              <CardContent className="pt-0 space-y-4">
-                               <CardDescription className="text-sm break-words overflow-hidden leading-relaxed">
-                                 {step.description || "No description"}
-                               </CardDescription>
                                
                                {/* Category Buttons */}
                                {renderCategoryButtons(step)}
