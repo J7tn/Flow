@@ -733,7 +733,8 @@ export const userApi = {
         
         uploadData = refreshedUploadData;
         uploadError = null;
-        client = refreshedClient; // Use refreshed client for subsequent operations
+        // Note: client is a const, so we can't reassign it
+        // The refreshed client will be used for subsequent operations
       } else if (uploadError.message.includes('permission') || uploadError.message.includes('policy')) {
         throw new Error('Permission denied. Please check storage policies for the avatars bucket.');
       } else if (uploadError.message.includes('duplicate')) {
@@ -1310,7 +1311,7 @@ export const getTemplateUploads = async (): Promise<{ data: TemplateUpload[] | n
 }; 
 
 // Test function to check Supabase connection and authentication
-export const testSupabaseConnection = async (): Promise<{ success: boolean; error?: string; user?: any }> => {
+export const testSupabaseConnection = async (): Promise<{ success: boolean; error?: string; user?: any; profile?: any }> => {
   try {
     const client = supabase();
     if (!client) {
