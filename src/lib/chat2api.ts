@@ -221,7 +221,7 @@ export class FlowAI {
     const messages: ChatMessage[] = [
       {
         role: 'system',
-        content: `You are an expert workflow designer. Based on the project description, suggest a step-by-step workflow that teams can follow. 
+        content: `You are an expert flow designer. Based on the project description, suggest a step-by-step workflow that teams can follow. 
         Focus on practical, actionable steps that help teams stay organized and efficient. 
         Return the response as a clear, structured workflow with numbered steps.`
       },

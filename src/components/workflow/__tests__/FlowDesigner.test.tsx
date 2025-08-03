@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import WorkflowDesigner from '../WorkflowDesigner';
+import FlowDesigner from '../FlowDesigner';
 
 // Mock the Chat2API service
 const mockCreateChatCompletion = vi.fn();
@@ -29,33 +29,33 @@ const renderWithRouter = (component: React.ReactElement) => {
   );
 };
 
-describe('WorkflowDesigner Goal Validation', () => {
+describe('FlowDesigner Goal Validation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should show goal input field', () => {
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     expect(screen.getByPlaceholderText(/e.g., Launch a new product/i)).toBeInTheDocument();
     // Remove this line as it's causing issues with multiple empty textareas
   });
 
   it('should show validation button', () => {
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     expect(screen.getByText('Validate Goal')).toBeInTheDocument();
   });
 
   it('should disable validation button when goal is empty', () => {
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     const validateButton = screen.getByText('Validate Goal');
     expect(validateButton).toBeDisabled();
   });
 
   it('should enable validation button when goal has content', () => {
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     const goalInput = screen.getByPlaceholderText(/e.g., Launch a new product/i);
     fireEvent.change(goalInput, { target: { value: 'Test goal' } });
@@ -69,7 +69,7 @@ describe('WorkflowDesigner Goal Validation', () => {
       new Promise(resolve => setTimeout(resolve, 100))
     );
 
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     const goalInput = screen.getByPlaceholderText(/e.g., Launch a new product/i);
     fireEvent.change(goalInput, { target: { value: 'Test goal' } });
@@ -95,7 +95,7 @@ describe('WorkflowDesigner Goal Validation', () => {
       }]
     });
 
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     const goalInput = screen.getByPlaceholderText(/e.g., Launch a new product/i);
     fireEvent.change(goalInput, { target: { value: 'asdfasdf asdf asdf' } });
@@ -125,7 +125,7 @@ describe('WorkflowDesigner Goal Validation', () => {
       }]
     });
 
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     const goalInput = screen.getByPlaceholderText(/e.g., Launch a new product/i);
     fireEvent.change(goalInput, { target: { value: 'Do something' } });
@@ -154,7 +154,7 @@ describe('WorkflowDesigner Goal Validation', () => {
       }]
     });
 
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     const goalInput = screen.getByPlaceholderText(/e.g., Launch a new product/i);
     fireEvent.change(goalInput, { target: { value: 'Launch a new product with comprehensive marketing strategy' } });
@@ -183,7 +183,7 @@ describe('WorkflowDesigner Goal Validation', () => {
       }]
     });
 
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     const goalInput = screen.getByPlaceholderText(/e.g., Launch a new product/i);
     fireEvent.change(goalInput, { target: { value: 'asdfasdf asdf asdf' } });
@@ -198,7 +198,7 @@ describe('WorkflowDesigner Goal Validation', () => {
   });
 
   it('should display tool pricing information', async () => {
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     // Wait for tools to be generated
     await waitFor(() => {
@@ -212,7 +212,7 @@ describe('WorkflowDesigner Goal Validation', () => {
   });
 
   it('should display new tool categories in filter buttons', async () => {
-    renderWithRouter(<WorkflowDesigner />);
+    renderWithRouter(<FlowDesigner />);
     
     // Check for new category buttons in the AI suggestions panel
     // These buttons appear after the goal is validated and steps are generated
@@ -254,6 +254,42 @@ describe('WorkflowDesigner Goal Validation', () => {
       expect(screen.getByText('finance')).toBeInTheDocument();
       expect(screen.getByText('social')).toBeInTheDocument();
       expect(screen.getByText('research')).toBeInTheDocument();
+    });
+  });
+
+  describe('Add Tool Functionality', () => {
+    it('should add tool to step when Add Tool button is clicked', async () => {
+      render(<FlowDesigner />);
+      
+      // Add a step first
+      const goalInput = screen.getByPlaceholderText('Enter your workflow goal...');
+      fireEvent.change(goalInput, { target: { value: 'Test goal' } });
+      
+      // Wait for suggested steps to appear and add one
+      await waitFor(() => {
+        const addStepButton = screen.getByText('Add Step');
+        fireEvent.click(addStepButton);
+      });
+      
+      // Click on the added step to select it and show tools
+      const stepCard = screen.getByText('Test goal');
+      fireEvent.click(stepCard);
+      
+      // Wait for tools to be generated
+      await waitFor(() => {
+        const addToolButton = screen.getByText('Add Tool');
+        expect(addToolButton).toBeInTheDocument();
+      });
+      
+      // Click Add Tool button
+      const addToolButton = screen.getByText('Add Tool');
+      fireEvent.click(addToolButton);
+      
+      // Verify tool was added to the step
+      await waitFor(() => {
+        const addedToolsSection = screen.getByText('Added Tools:');
+        expect(addedToolsSection).toBeInTheDocument();
+      });
     });
   });
 }); 

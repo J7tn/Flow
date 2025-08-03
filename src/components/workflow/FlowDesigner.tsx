@@ -101,9 +101,10 @@ interface FlowStep {
   dependencies: string[];
   subFlow?: FlowStep[]; // New: nested flow within this step
   selectedCategory?: string; // New: selected tool category for this step
+  addedTools?: Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }>; // New: tools added to this step
 }
 
-const WorkflowDesigner = () => {
+const FlowDesigner = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
@@ -130,6 +131,9 @@ const WorkflowDesigner = () => {
   
   // Roadmap interaction state
   const [selectedRoadmapStep, setSelectedRoadmapStep] = useState<string | null>(null);
+  
+  // Panel display state - controls which panel shows in the right sidebar
+  const [activePanel, setActivePanel] = useState<"suggested-steps" | "tools">("suggested-steps");
 
   // Load template from URL parameter
   useEffect(() => {
@@ -687,6 +691,35 @@ const WorkflowDesigner = () => {
     }));
   };
 
+  const addToolToStep = (stepId: string, tool: { name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }) => {
+    setSteps(steps.map(step => {
+      if (step.id === stepId) {
+        const existingTools = step.addedTools || [];
+        // Check if tool is already added to avoid duplicates
+        const isAlreadyAdded = existingTools.some(existingTool => existingTool.name === tool.name);
+        if (isAlreadyAdded) {
+          toast({
+            title: "Tool Already Added",
+            description: `${tool.name} is already added to this step`,
+            variant: "destructive",
+          });
+          return step;
+        }
+        
+        return {
+          ...step,
+          addedTools: [...existingTools, tool]
+        };
+      }
+      return step;
+    }));
+    
+    toast({
+      title: "Tool Added",
+      description: `${tool.name} has been added to the step`,
+    });
+  };
+
   const toggleStepExpansion = (stepId: string) => {
     setExpandedStep(expandedStep === stepId ? null : stepId);
     setSelectedSubStep(null); // Clear sub-step selection when expanding/collapsing
@@ -1208,7 +1241,14 @@ const WorkflowDesigner = () => {
                  <div className="flex flex-col lg:flex-row gap-8 mb-8">
                    {/* Goal Input Block - Left Side */}
                    <div className="lg:w-1/3">
-                     <Card className="w-full max-w-md mx-auto shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                     <Card 
+                       className="w-full max-w-md mx-auto shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 cursor-pointer hover:shadow-xl transition-shadow"
+                       onClick={() => {
+                         setActivePanel("suggested-steps");
+                         setSelectedStep(null);
+                         setCurrentStepTools([]);
+                       }}
+                     >
                        <CardHeader className="pb-4">
                          <div className="flex items-center space-x-2 mb-3">
                            <div className="w-4 h-4 rounded-full bg-gradient-to-r from-primary to-primary/80" />
@@ -1268,13 +1308,17 @@ const WorkflowDesigner = () => {
                          </div>
                          <div className="space-y-2">
                            {steps.map((step, index) => (
-                             <div key={step.id}>
+                             <div key={step.id} className="relative z-10">
                                <Card 
-                                 className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-card dark:bg-card ${
+                                 className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-card dark:bg-card cursor-pointer ${
                                  selectedStep === step.id ? 'ring-2 ring-accent' : ''
                                }`}
-                                 onClick={() => {
+                                 onClick={(e) => {
+                                   e.preventDefault();
+                                   e.stopPropagation();
+                                   console.log('Added step clicked:', step.id, step.title);
                                    setSelectedStep(step.id);
+                                   setActivePanel("tools");
                                    // Generate tools for this added step
                                    generateToolsForStep(step.title, step.description);
                                  }}
@@ -1319,6 +1363,20 @@ const WorkflowDesigner = () => {
                                        </div>
                                      )}
                                    </div>
+                                   
+                                   {/* Added Tools Display */}
+                                   {step.addedTools && step.addedTools.length > 0 && (
+                                     <div className="space-y-2 pt-2 border-t">
+                                       <div className="text-xs font-medium text-muted-foreground">Added Tools:</div>
+                                       <div className="flex flex-wrap gap-1">
+                                         {step.addedTools.map((tool, toolIndex) => (
+                                           <Badge key={toolIndex} variant="secondary" className="text-xs">
+                                             {tool.name}
+                                           </Badge>
+                                         ))}
+                                       </div>
+                                     </div>
+                                   )}
                                  </CardContent>
                                </Card>
                              </div>
@@ -1328,84 +1386,314 @@ const WorkflowDesigner = () => {
                      )}
                    </div>
 
-                   {/* Roadmap Steps Area - Right Side */}
+                   {/* Dynamic Panel Area - Right Side */}
                    <div className="lg:w-2/3">
-                     {/* Loading State */}
-                     {isGeneratingSteps && (
-                       <div className="flex items-center justify-center h-64">
-                         <Card className="w-full max-w-md shadow-lg">
-                           <CardContent className="p-6">
-                             <div className="text-center">
-                               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
-                               <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
-                             </div>
-                           </CardContent>
-                         </Card>
-                       </div>
-                     )}
-
-                     {/* Roadmap Steps */}
-                     {suggestedSteps.length > 0 && !isGeneratingSteps && (
-                       <div className="relative">
-
-                         {/* Step Blocks */}
-                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
-                           {suggestedSteps.map((step, index) => (
-                             <div
-                               key={index}
-                               className={`transition-all duration-300 ${
-                                 selectedRoadmapStep === `suggested-${index}` ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-80'
-                               }`}
-                             >
-                               <Card 
-                                 className={`shadow-lg hover:shadow-xl transition-all cursor-pointer border-2 ${
-                                   selectedRoadmapStep === `suggested-${index}` 
-                                     ? 'border-primary ring-2 ring-primary/20' 
-                                     : 'border-muted hover:border-primary/50'
-                                 }`}
-                                 onClick={() => {
-                                   // Fade out other steps and select this one
-                                   setSelectedRoadmapStep(`suggested-${index}`);
-                                   // Don't generate tools for suggested steps - only for added steps
-                                 }}
-                               >
-                                 <CardHeader className="pb-3">
-                                   <div className="flex items-center space-x-2">
-                                     <div className={`p-2 rounded-lg ${step.color} bg-opacity-10`}>
-                                       {step.icon && React.createElement(step.icon, {
-                                         className: `h-5 w-5 ${step.color.replace('bg-', 'text-')}`
-                                       })}
-                                     </div>
-                                     <Badge variant="outline" className="text-xs">
-                                       Step {index + 1}
-                                     </Badge>
-                                   </div>
-                                   <CardTitle className="text-sm font-medium">{step.title}</CardTitle>
-                                 </CardHeader>
-                                 <CardContent className="pt-0">
-                                   <p className="text-xs text-muted-foreground mb-3">{step.description}</p>
-                                   <Button 
-                                     size="sm" 
-                                     className="w-full text-xs"
-                                     variant={selectedRoadmapStep === `suggested-${index}` ? "default" : "outline"}
-                                     onClick={(e) => {
-                                       e.stopPropagation();
-                                       if (selectedRoadmapStep === `suggested-${index}`) {
-                                         // Add the selected step to the workflow
-                                         addStep(step);
-                                         setSelectedRoadmapStep(null);
-                                       }
-                                     }}
-                                   >
-                                     {selectedRoadmapStep === `suggested-${index}` ? "Add to Flow" : "Choose This Step"}
-                                   </Button>
-                                 </CardContent>
-                               </Card>
-                             </div>
-                           ))}
+                     {activePanel === "suggested-steps" ? (
+                       /* Suggested Steps Panel */
+                       <div>
+                         <div className="flex items-center justify-between mb-4">
+                           <h3 className="font-semibold text-lg">Suggested Steps</h3>
+                           {suggestedSteps.length > 0 && (
+                             <Badge variant="secondary">{suggestedSteps.length} steps</Badge>
+                           )}
                          </div>
 
-                         {/* Tools panel removed for suggested steps - only show for added steps */}
+                         {/* Loading State */}
+                         {isGeneratingSteps && (
+                           <div className="flex items-center justify-center h-64">
+                             <Card className="w-full max-w-md shadow-lg">
+                               <CardContent className="p-6">
+                                 <div className="text-center">
+                                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+                                   <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
+                                 </div>
+                               </CardContent>
+                             </Card>
+                           </div>
+                         )}
+
+                         {/* Suggested Steps Grid */}
+                         {suggestedSteps.length > 0 && !isGeneratingSteps && (
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             {suggestedSteps.map((step, index) => (
+                               <div
+                                 key={index}
+                                 className={`transition-all duration-300 ${
+                                   selectedRoadmapStep === `suggested-${index}` ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-80'
+                                 }`}
+                               >
+                                 <Card 
+                                   className={`shadow-lg hover:shadow-xl transition-all cursor-pointer border-2 ${
+                                     selectedRoadmapStep === `suggested-${index}` 
+                                       ? 'border-primary ring-2 ring-primary/20' 
+                                       : 'border-muted hover:border-primary/50'
+                                   }`}
+                                   onClick={() => {
+                                     setSelectedRoadmapStep(`suggested-${index}`);
+                                   }}
+                                 >
+                                   <CardHeader className="pb-3">
+                                     <div className="flex items-center space-x-2">
+                                       <div className={`p-2 rounded-lg ${step.color} bg-opacity-10`}>
+                                         {step.icon && React.createElement(step.icon, {
+                                           className: `h-5 w-5 ${step.color.replace('bg-', 'text-')}`
+                                         })}
+                                       </div>
+                                       <Badge variant="outline" className="text-xs">
+                                         Step {index + 1}
+                                       </Badge>
+                                     </div>
+                                     <CardTitle className="text-sm font-medium">{step.title}</CardTitle>
+                                   </CardHeader>
+                                   <CardContent className="pt-0">
+                                     <p className="text-xs text-muted-foreground mb-3">{step.description}</p>
+                                     <Button 
+                                       size="sm" 
+                                       className="w-full text-xs"
+                                       variant={selectedRoadmapStep === `suggested-${index}` ? "default" : "outline"}
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         if (selectedRoadmapStep === `suggested-${index}`) {
+                                           addStep(step);
+                                           setSelectedRoadmapStep(null);
+                                         }
+                                       }}
+                                     >
+                                       {selectedRoadmapStep === `suggested-${index}` ? "Add to Flow" : "Choose This Step"}
+                                     </Button>
+                                   </CardContent>
+                                 </Card>
+                               </div>
+                             ))}
+                           </div>
+                         )}
+
+                         {/* Empty state when no suggested steps */}
+                         {suggestedSteps.length === 0 && !isGeneratingSteps && (
+                           <div className="flex items-center justify-center h-64">
+                             <Card className="w-full max-w-md shadow-lg">
+                               <CardContent className="p-6">
+                                 <div className="text-center">
+                                   <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                                   <p className="text-sm text-muted-foreground">Enter a goal and click "Generate Steps" to get started</p>
+                                 </div>
+                               </CardContent>
+                             </Card>
+                           </div>
+                         )}
+                       </div>
+                     ) : (
+                       /* Tools for Selected Step Panel */
+                       <div>
+                         {selectedStep ? (
+                           <div>
+                             <div className="flex items-center justify-between mb-4">
+                               <h3 className="font-semibold text-lg">Tools for Selected Step</h3>
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 onClick={() => setSelectedStep(null)}
+                               >
+                                 ×
+                               </Button>
+                             </div>
+                             
+                             {/* Step Properties */}
+                             <Card className="mb-6">
+                               <CardHeader>
+                                 <CardTitle className="text-base">Step Properties</CardTitle>
+                               </CardHeader>
+                               <CardContent>
+                                 <Tabs defaultValue="general" className="w-full">
+                                   <TabsList className="grid w-full grid-cols-2">
+                                     <TabsTrigger value="general">General</TabsTrigger>
+                                     <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                                   </TabsList>
+                                   <TabsContent value="general" className="space-y-4">
+                                     <div>
+                                       <label className="text-sm font-medium">Title</label>
+                                       <Input
+                                         value={steps.find(s => s.id === selectedStep)?.title || ""}
+                                         onChange={(e) => updateStep(selectedStep, { title: e.target.value })}
+                                         className="mt-1"
+                                       />
+                                     </div>
+                                     <div>
+                                       <label className="text-sm font-medium">Description</label>
+                                       <Textarea
+                                         value={steps.find(s => s.id === selectedStep)?.description || ""}
+                                         onChange={(e) => updateStep(selectedStep, { description: e.target.value })}
+                                         className="mt-1"
+                                         rows={3}
+                                       />
+                                     </div>
+                                     <div>
+                                       <label className="text-sm font-medium">Assignee</label>
+                                       <Input
+                                         value={steps.find(s => s.id === selectedStep)?.assignee || ""}
+                                         onChange={(e) => updateStep(selectedStep, { assignee: e.target.value })}
+                                         className="mt-1"
+                                         placeholder="Enter assignee name"
+                                       />
+                                     </div>
+                                     <div className="grid grid-cols-2 gap-4 items-start">
+                                       <div className="flex flex-col">
+                                         <label className="text-sm font-medium mb-1 whitespace-nowrap">Estimated Time (hours)</label>
+                                         <Input
+                                           type="number"
+                                           value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
+                                           onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
+                                           className="h-10"
+                                         />
+                                       </div>
+                                       <div className="flex flex-col">
+                                         <label className="text-sm font-medium mb-1 whitespace-nowrap">Cost ($)</label>
+                                         <Input
+                                           type="number"
+                                           value={steps.find(s => s.id === selectedStep)?.cost || ""}
+                                           onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
+                                           className="h-10"
+                                         />
+                                       </div>
+                                     </div>
+                                   </TabsContent>
+                                   <TabsContent value="advanced" className="space-y-4">
+                                     <div>
+                                       <label className="text-sm font-medium">Status</label>
+                                       <select
+                                         value={steps.find(s => s.id === selectedStep)?.status || "pending"}
+                                         onChange={(e) => updateStep(selectedStep, { status: e.target.value as FlowStep["status"] })}
+                                         className="mt-1 w-full p-2 border rounded-md"
+                                       >
+                                         <option value="pending">Pending</option>
+                                         <option value="in-progress">In Progress</option>
+                                         <option value="completed">Completed</option>
+                                         <option value="blocked">Blocked</option>
+                                       </select>
+                                     </div>
+                                     <div>
+                                       <label className="text-sm font-medium">Dependencies</label>
+                                       <div className="mt-1 space-y-2">
+                                         {steps
+                                           .filter(s => s.id !== selectedStep && s.type !== "goal")
+                                           .map(step => (
+                                             <label key={step.id} className="flex items-center space-x-2">
+                                               <input
+                                                 type="checkbox"
+                                                 checked={steps.find(s => s.id === selectedStep)?.dependencies.includes(step.id) || false}
+                                                 onChange={(e) => {
+                                                   const currentStep = steps.find(s => s.id === selectedStep);
+                                                   if (currentStep) {
+                                                     const newDependencies = e.target.checked
+                                                       ? [...currentStep.dependencies, step.id]
+                                                       : currentStep.dependencies.filter(id => id !== step.id);
+                                                     updateStep(selectedStep, { dependencies: newDependencies });
+                                                   }
+                                                 }}
+                                               />
+                                               <span className="text-sm">{step.title}</span>
+                                             </label>
+                                           ))}
+                                       </div>
+                                     </div>
+                                   </TabsContent>
+                                 </Tabs>
+                               </CardContent>
+                             </Card>
+
+                             {/* Tools for Selected Step */}
+                             {currentStepTools.length > 0 && (
+                               <div>
+                                 <div className="flex items-center justify-between mb-4">
+                                   <h3 className="font-semibold text-lg">Available Tools</h3>
+                                 </div>
+                                 
+                                 <div className="space-y-4">
+                                   {/* Category Filter Buttons */}
+                                   <div className="flex flex-wrap gap-2">
+                                     {getRelevantCategories(workflowGoal).map((category) => (
+                                       <Button
+                                         key={category}
+                                         variant={selectedCategory === category ? "default" : "outline"}
+                                         size="sm"
+                                         className="text-xs capitalize"
+                                         onClick={() => handleCategorySelect(category, selectedStep)}
+                                       >
+                                         {category === "all" ? "All Tools" : category}
+                                       </Button>
+                                     ))}
+                                   </div>
+
+                                   {/* Tools Grid */}
+                                   {currentStepTools.length > 0 && (
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                       {currentStepTools.map((tool, index) => (
+                                         <div key={index} className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card">
+                                           <div className="flex items-start space-x-3">
+                                             <div className="p-2 rounded-lg bg-muted flex-shrink-0">
+                                               {tool.icon && React.createElement(tool.icon, {
+                                                 className: "h-4 w-4 text-muted-foreground"
+                                               })}
+                                             </div>
+                                             <div className="flex-1 min-w-0">
+                                               <div className="flex items-center justify-between mb-1">
+                                                 <h5 className="font-medium text-sm truncate">{tool.name}</h5>
+                                                 <Badge 
+                                                   variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
+                                                   className="text-xs"
+                                                 >
+                                                   {tool.pricing.model === 'free' ? 'FREE' : 'PAID'}
+                                                 </Badge>
+                                               </div>
+                                               <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                               <div className="flex gap-2">
+                                                 {tool.link && (
+                                                   <Button
+                                                     variant="ghost"
+                                                     size="sm"
+                                                     className="h-6 px-2 text-xs"
+                                                     onClick={() => window.open(tool.link, '_blank')}
+                                                   >
+                                                     Visit Tool
+                                                     <ChevronRight className="h-3 w-3 ml-1" />
+                                                   </Button>
+                                                 )}
+                                                 <Button
+                                                   variant="outline"
+                                                   size="sm"
+                                                   className="h-6 px-2 text-xs"
+                                                   onClick={(e) => {
+                                                     e.stopPropagation();
+                                                     if (selectedStep) {
+                                                       addToolToStep(selectedStep, tool);
+                                                     }
+                                                   }}
+                                                 >
+                                                   Add Tool
+                                                 </Button>
+                                               </div>
+                                             </div>
+                                           </div>
+                                         </div>
+                                       ))}
+                                     </div>
+                                   )}
+                                 </div>
+                               </div>
+                             )}
+                           </div>
+                         ) : (
+                           <div className="flex items-center justify-center h-64">
+                             <Card className="w-full max-w-md shadow-lg">
+                               <CardContent className="p-6">
+                                 <div className="text-center">
+                                   <Info className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                                   <p className="text-sm text-muted-foreground">Select an added step to view its tools</p>
+                                 </div>
+                               </CardContent>
+                             </Card>
+                           </div>
+                         )}
                        </div>
                      )}
                    </div>
@@ -1415,7 +1703,7 @@ const WorkflowDesigner = () => {
              </div>
            </div>
 
-           {/* Right Sidebar - Step Properties & Flow Statistics */}
+                      {/* Right Sidebar - Flow Statistics */}
            <div className="w-80 border-l bg-muted/30 p-4 overflow-y-auto">
              {/* Flow Statistics */}
              <div className="mb-6">
@@ -1441,191 +1729,6 @@ const WorkflowDesigner = () => {
                  </div>
                </div>
              </div>
-
-             <Separator className="my-4" />
-
-             {/* Step Properties */}
-             {selectedStep ? (
-               <div>
-                 <div className="flex items-center justify-between mb-4">
-                   <h3 className="font-semibold">Step Properties</h3>
-                   <Button
-                     variant="ghost"
-                     size="sm"
-                     onClick={() => setSelectedStep(null)}
-                   >
-                     ×
-                   </Button>
-                 </div>
-                 
-                 <Tabs defaultValue="general" className="w-full">
-                   <TabsList className="grid w-full grid-cols-2">
-                     <TabsTrigger value="general">General</TabsTrigger>
-                     <TabsTrigger value="advanced">Advanced</TabsTrigger>
-                   </TabsList>
-                   <TabsContent value="general" className="space-y-4">
-                     <div>
-                       <label className="text-sm font-medium">Title</label>
-                       <Input
-                         value={steps.find(s => s.id === selectedStep)?.title || ""}
-                         onChange={(e) => updateStep(selectedStep, { title: e.target.value })}
-                         className="mt-1"
-                       />
-                     </div>
-                     <div>
-                       <label className="text-sm font-medium">Description</label>
-                       <Textarea
-                         value={steps.find(s => s.id === selectedStep)?.description || ""}
-                         onChange={(e) => updateStep(selectedStep, { description: e.target.value })}
-                         className="mt-1"
-                         rows={3}
-                       />
-                     </div>
-                     <div>
-                       <label className="text-sm font-medium">Assignee</label>
-                       <Input
-                         value={steps.find(s => s.id === selectedStep)?.assignee || ""}
-                         onChange={(e) => updateStep(selectedStep, { assignee: e.target.value })}
-                         className="mt-1"
-                         placeholder="Enter assignee name"
-                       />
-                     </div>
-                           <div className="grid grid-cols-2 gap-4 items-start">
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1 whitespace-nowrap">Estimated Time (hours)</label>
-          <Input
-            type="number"
-            value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
-            onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
-            className="h-10"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1 whitespace-nowrap">Cost ($)</label>
-          <Input
-            type="number"
-            value={steps.find(s => s.id === selectedStep)?.cost || ""}
-            onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
-            className="h-10"
-          />
-        </div>
-      </div>
-                   </TabsContent>
-                   <TabsContent value="advanced" className="space-y-4">
-                     <div>
-                       <label className="text-sm font-medium">Status</label>
-                       <select
-                         value={steps.find(s => s.id === selectedStep)?.status || "pending"}
-                         onChange={(e) => updateStep(selectedStep, { status: e.target.value as FlowStep["status"] })}
-                         className="mt-1 w-full p-2 border rounded-md"
-                       >
-                         <option value="pending">Pending</option>
-                         <option value="in-progress">In Progress</option>
-                         <option value="completed">Completed</option>
-                         <option value="blocked">Blocked</option>
-                       </select>
-                     </div>
-                     <div>
-                       <label className="text-sm font-medium">Dependencies</label>
-                       <div className="mt-1 space-y-2">
-                         {steps
-                           .filter(s => s.id !== selectedStep && s.type !== "goal")
-                           .map(step => (
-                             <label key={step.id} className="flex items-center space-x-2">
-                               <input
-                                 type="checkbox"
-                                 checked={steps.find(s => s.id === selectedStep)?.dependencies.includes(step.id) || false}
-                                 onChange={(e) => {
-                                   const currentStep = steps.find(s => s.id === selectedStep);
-                                   if (currentStep) {
-                                     const newDependencies = e.target.checked
-                                       ? [...currentStep.dependencies, step.id]
-                                       : currentStep.dependencies.filter(id => id !== step.id);
-                                     updateStep(selectedStep, { dependencies: newDependencies });
-                                   }
-                                 }}
-                               />
-                               <span className="text-sm">{step.title}</span>
-                             </label>
-                           ))}
-                       </div>
-                     </div>
-                   </TabsContent>
-                 </Tabs>
-
-                 {/* Tools for Selected Step */}
-                 {currentStepTools.length > 0 && (
-                   <div className="mt-6">
-                     <Separator className="my-4" />
-                     <div className="flex items-center justify-between mb-4">
-                       <h3 className="font-semibold">Tools for Selected Step</h3>
-                     </div>
-                     
-                     <div className="space-y-4">
-                       {/* Category Filter Buttons */}
-                       <div className="flex flex-wrap gap-2">
-                         {getRelevantCategories(workflowGoal).map((category) => (
-                           <Button
-                             key={category}
-                             variant={selectedCategory === category ? "default" : "outline"}
-                             size="sm"
-                             className="text-xs capitalize"
-                             onClick={() => handleCategorySelect(category, selectedStep)}
-                           >
-                             {category === "all" ? "All Tools" : category}
-                           </Button>
-                         ))}
-                       </div>
-
-                       {/* Tools Grid */}
-                       {currentStepTools.length > 0 && (
-                         <div className="space-y-3">
-                           {currentStepTools.map((tool, index) => (
-                             <div key={index} className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card">
-                               <div className="flex items-start space-x-3">
-                                 <div className="p-2 rounded-lg bg-muted flex-shrink-0">
-                                   {tool.icon && React.createElement(tool.icon, {
-                                     className: "h-4 w-4 text-muted-foreground"
-                                   })}
-                                 </div>
-                                 <div className="flex-1 min-w-0">
-                                   <div className="flex items-center justify-between mb-1">
-                                     <h5 className="font-medium text-sm truncate">{tool.name}</h5>
-                                     <Badge 
-                                       variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
-                                       className="text-xs"
-                                     >
-                                       {tool.pricing.model === 'free' ? 'FREE' : 'PAID'}
-                                     </Badge>
-                                   </div>
-                                   <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
-                                   {tool.link && (
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       className="h-6 px-2 text-xs"
-                                       onClick={() => window.open(tool.link, '_blank')}
-                                     >
-                                       Visit Tool
-                                       <ChevronRight className="h-3 w-3 ml-1" />
-                                     </Button>
-                                   )}
-                                 </div>
-                               </div>
-                             </div>
-                           ))}
-                         </div>
-                       )}
-                     </div>
-                   </div>
-                 )}
-               </div>
-             ) : (
-               <div className="text-center text-muted-foreground py-8">
-                 <Info className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                 <p>Select a step to edit its properties</p>
-               </div>
-             )}
            </div>
         </div>
       </div>
@@ -1633,4 +1736,4 @@ const WorkflowDesigner = () => {
   );
 };
 
-export default WorkflowDesigner; 
+export default FlowDesigner; 

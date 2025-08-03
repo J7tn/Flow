@@ -20,7 +20,7 @@ import SavedTemplates from "./components/SavedTemplates";
 import { TemplateDetail } from "./components/templates/TemplateDetail";
 import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
-import WorkflowDesigner from "./components/workflow/WorkflowDesigner";
+import FlowDesigner from "./components/workflow/FlowDesigner";
 import SharedFlowViewer from "./components/workflow/SharedFlowViewer";
 import { TemplateTest } from "./components/TemplateTest";
 import { Toaster } from "./components/ui/toaster";
@@ -135,7 +135,7 @@ function App() {
       path: "/workflow/new",
       element: (
         <ProtectedRoute>
-          <WorkflowDesigner />
+          <FlowDesigner />
         </ProtectedRoute>
       ),
     },
@@ -143,7 +143,7 @@ function App() {
       path: "/workflow/design",
       element: (
         <ProtectedRoute>
-          <WorkflowDesigner />
+          <FlowDesigner />
         </ProtectedRoute>
       ),
     },
