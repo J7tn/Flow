@@ -125,6 +125,7 @@ const WorkflowDesigner = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
   const [selectedSubStep, setSelectedSubStep] = useState<string | null>(null);
+  const [priceSort, setPriceSort] = useState<"none" | "low-to-high" | "high-to-low">("none");
 
   // Load template from URL parameter
   useEffect(() => {
@@ -598,6 +599,29 @@ const WorkflowDesigner = () => {
         await generateToolsForStep(step.title, step.description, category);
       }
     }
+  };
+
+  const sortToolsByPrice = (tools: Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }>) => {
+    if (priceSort === "none") return tools;
+    
+    return [...tools].sort((a, b) => {
+      const getPriceValue = (tool: typeof tools[0]) => {
+        if (tool.pricing.model === 'free') return 0;
+        if (tool.pricing.model === 'freemium') return tool.pricing.startingPrice || 0;
+        if (tool.pricing.model === 'subscription') return tool.pricing.startingPrice || 0;
+        if (tool.pricing.model === 'one-time') return tool.pricing.startingPrice || 0;
+        return 999999; // Enterprise/unknown pricing
+      };
+      
+      const priceA = getPriceValue(a);
+      const priceB = getPriceValue(b);
+      
+      if (priceSort === "low-to-high") {
+        return priceA - priceB;
+      } else {
+        return priceB - priceA;
+      }
+    });
   };
 
   const addStep = (suggestedStep: { title: string; description: string; type: FlowStep["type"]; icon: any; color: string }) => {
@@ -1175,207 +1199,10 @@ const WorkflowDesigner = () => {
            <div className="flex-1 bg-background relative overflow-auto">
              <div className="p-6 min-h-full">
                               <div className="canvas-container w-full h-full min-h-[600px] bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/20 p-6">
-                 {/* Main Content Grid - AI-Guided Flow and Goal Input side by side */}
-                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                   {/* AI-Guided Flow Block - Left Side */}
-                   <div className="order-2 lg:order-1">
-
-                 {/* AI Suggested Steps - Appear below goal */}
-                 {isGeneratingSteps && (
-                   <div className="mb-8">
-                     <Card className="w-full max-w-2xl mx-auto shadow-lg">
-                       <CardContent className="p-6">
-                         <div className="text-center">
-                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
-                           <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
-                         </div>
-                       </CardContent>
-                     </Card>
-                   </div>
-                 )}
-
-                                   {/* Progressive AI Steps */}
-                  {suggestedSteps.length > 0 && !isGeneratingSteps && (
-                    <div className="mb-8">
-                      <Card className="w-full max-w-6xl mx-auto shadow-lg">
-                        <CardHeader className="pb-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <Sparkles className="h-5 w-5 text-primary" />
-                              <h3 className="font-semibold">AI-Guided Flow</h3>
-                              <Badge variant="secondary">Step {currentStepIndex + 1} of {suggestedSteps.length}</Badge>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={moveToPreviousStep}
-                                disabled={currentStepIndex === 0}
-                              >
-                                <ChevronLeft className="h-3 w-3 mr-1" />
-                                Previous
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={moveToNextStep}
-                                disabled={currentStepIndex === suggestedSteps.length - 1}
-                              >
-                                Next
-                                <ChevronRight className="h-3 w-3 ml-1" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => generateAISteps(workflowGoal)}
-                                disabled={!workflowGoal.trim()}
-                              >
-                                <Sparkles className="h-3 w-3 mr-1" />
-                                Regenerate
-                              </Button>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Current Step */}
-                            <div className="lg:col-span-1">
-                              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
-                                <div className="flex items-center space-x-3 mb-4">
-                                  <div className={`p-3 rounded-lg ${suggestedSteps[currentStepIndex]?.color} bg-opacity-10`}>
-                                    {suggestedSteps[currentStepIndex]?.icon && React.createElement(suggestedSteps[currentStepIndex].icon, {
-                                      className: `h-6 w-6 ${suggestedSteps[currentStepIndex]?.color.replace('bg-', 'text-')}`
-                                    })}
-                                  </div>
-                                  <div>
-                                    <h4 className="font-semibold text-lg">{suggestedSteps[currentStepIndex]?.title}</h4>
-                                    <p className="text-sm text-muted-foreground">{suggestedSteps[currentStepIndex]?.description}</p>
-                                  </div>
-                                </div>
-                                <Button 
-                                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                                  onClick={() => addStep(suggestedSteps[currentStepIndex])}
-                                >
-                                  <Plus className="h-4 w-4 mr-2" />
-                                  Add This Step
-                                </Button>
-                              </div>
-                            </div>
-
-                            {/* Tools and Resources */}
-                            <div className="lg:col-span-2">
-                              <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <h4 className="font-semibold">Tools & Resources</h4>
-                                  {isGeneratingTools && (
-                                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                                      <span>AI is finding tools...</span>
-                                    </div>
-                                  )}
-                                </div>
-                                
-                                {/* Category Filter Buttons */}
-                                <div className="mb-4">
-                                  <div className="flex flex-wrap gap-2">
-                                    {getRelevantCategories(workflowGoal).map((category) => (
-                                      <Button
-                                        key={category}
-                                        variant={selectedCategory === category ? "default" : "outline"}
-                                        size="sm"
-                                        className="text-xs capitalize"
-                                        onClick={() => handleCategorySelect(category)}
-                                      >
-                                        {category === "all" ? "All Tools" : category}
-                                      </Button>
-                                    ))}
-                                  </div>
-                                </div>
-
-                                {!isGeneratingTools && currentStepTools.length > 0 && (
-                                  <div className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                      {currentStepTools.map((tool, index) => (
-                                        <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-card h-full flex flex-col">
-                                          <div className="flex items-start space-x-3 flex-1">
-                                            <div className="p-2 rounded-lg bg-muted flex-shrink-0">
-                                              {tool.icon && React.createElement(tool.icon, {
-                                                className: "h-5 w-5 text-muted-foreground"
-                                              })}
-                                            </div>
-                                            <div className="flex-1 min-w-0 flex flex-col h-full">
-                                              <div className="flex items-center justify-between mb-1">
-                                                <h5 className="font-medium text-sm truncate">{tool.name}</h5>
-                                                <div className="flex items-center space-x-1 flex-shrink-0">
-                                                  <Badge 
-                                                    variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
-                                                    className="text-xs"
-                                                  >
-                                                    {tool.pricing.model === 'free' ? 'FREE' : 
-                                                     tool.pricing.model === 'freemium' ? 'FREEMIUM' :
-                                                     tool.pricing.model === 'subscription' ? 'PAID' :
-                                                     tool.pricing.model === 'one-time' ? 'ONE-TIME' :
-                                                     'ENTERPRISE'}
-                                                  </Badge>
-                                                </div>
-                                              </div>
-                                              <div className="mb-2">
-                                                <Badge variant="outline" className="text-xs capitalize">{tool.category}</Badge>
-                                              </div>
-                                              <p className="text-xs text-muted-foreground mb-3 line-clamp-2 min-h-[2.5rem]">{tool.description}</p>
-                                              
-                                              {/* Pricing Information */}
-                                              <div className="mb-3">
-                                                {tool.pricing.model === 'free' ? (
-                                                  <p className="text-xs text-primary font-medium">FREE - {tool.pricing.notes}</p>
-                                                ) : tool.pricing.model === 'freemium' ? (
-                                                  <p className="text-xs text-primary font-medium">
-                                                    {tool.pricing.startingPrice && `From $${tool.pricing.startingPrice}/${tool.pricing.currency === 'USD' ? 'month' : tool.pricing.currency}`} - {tool.pricing.notes}
-                                                  </p>
-                                                ) : tool.pricing.model === 'subscription' ? (
-                                                  <p className="text-xs text-primary font-medium">
-                                                    {tool.pricing.startingPrice && `$${tool.pricing.startingPrice}/${tool.pricing.currency === 'USD' ? 'month' : tool.pricing.currency}`} - {tool.pricing.notes}
-                                                  </p>
-                                                ) : tool.pricing.model === 'one-time' ? (
-                                                  <p className="text-xs text-primary font-medium">
-                                                    {tool.pricing.startingPrice && `$${tool.pricing.startingPrice}`} - {tool.pricing.notes}
-                                                  </p>
-                                                ) : (
-                                                  <p className="text-xs text-primary font-medium">{tool.pricing.notes}</p>
-                                                )}
-                                              </div>
-                                              
-                                              <div className="flex gap-2 mt-auto">
-                                                {tool.link && (
-                                                  <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-6 px-2 text-xs"
-                                                    onClick={() => window.open(tool.link, '_blank')}
-                                                  >
-                                                    Visit Tool
-                                                    <ChevronRight className="h-3 w-3 ml-1" />
-                                                  </Button>
-                                                )}
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )}
-                   </div>
-
-                   {/* Goal Input Block - Right Side */}
-                   <div className="order-1 lg:order-2">
+                 {/* Roadmap Layout - Goal Block at the very left */}
+                 <div className="flex flex-col lg:flex-row gap-8 mb-8">
+                   {/* Goal Input Block - Left Side */}
+                   <div className="lg:w-1/3">
                      <Card className="w-full max-w-md mx-auto shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
                        <CardHeader className="pb-4">
                          <div className="flex items-center space-x-2 mb-3">
@@ -1408,7 +1235,7 @@ const WorkflowDesigner = () => {
                                onClick={() => generateAISteps(workflowGoal)}
                                disabled={!workflowGoal.trim() || isGeneratingSteps}
                                size="sm"
-                               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                               className="bg-accent hover:bg-accent/90 text-accent-foreground"
                              >
                                {isGeneratingSteps ? (
                                  <>
