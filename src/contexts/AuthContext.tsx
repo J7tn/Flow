@@ -89,7 +89,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const client = supabase();
       if (!client) {
-        return { error: { message: 'Authentication service unavailable' } as AuthError };
+        const errorMessage = import.meta.env.PROD 
+          ? 'Authentication service unavailable. Please contact support - Supabase not configured in production.'
+          : 'Authentication service unavailable. Please run setup-env.bat and configure your .env file with Supabase credentials.';
+        return { error: { message: errorMessage } as AuthError };
       }
       
       const { error } = await client.auth.signInWithPassword({
@@ -99,7 +102,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return { error };
     } catch (error) {
       console.error('Error signing in:', error);
-      return { error: { message: 'Authentication service unavailable' } as AuthError };
+      const errorMessage = import.meta.env.PROD 
+        ? 'Authentication service unavailable. Please try again later or contact support.'
+        : 'Authentication service unavailable. Please check your Supabase configuration.';
+      return { error: { message: errorMessage } as AuthError };
     }
   };
 
@@ -107,7 +113,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const client = supabase();
       if (!client) {
-        return { error: { message: 'Authentication service unavailable' } as AuthError };
+        const errorMessage = import.meta.env.PROD 
+          ? 'Authentication service unavailable. Please contact support - Supabase not configured in production.'
+          : 'Authentication service unavailable. Please run setup-env.bat and configure your .env file with Supabase credentials.';
+        return { error: { message: errorMessage } as AuthError };
       }
       
       const { error } = await client.auth.signUp({
@@ -117,7 +126,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return { error };
     } catch (error) {
       console.error('Error signing up:', error);
-      return { error: { message: 'Authentication service unavailable' } as AuthError };
+      const errorMessage = import.meta.env.PROD 
+        ? 'Authentication service unavailable. Please try again later or contact support.'
+        : 'Authentication service unavailable. Please check your Supabase configuration.';
+      return { error: { message: errorMessage } as AuthError };
     }
   };
 

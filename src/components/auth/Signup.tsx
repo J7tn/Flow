@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 const signupSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -37,6 +38,10 @@ export const Signup: React.FC = () => {
   
   const { signUp } = useAuth();
   const navigate = useNavigate();
+
+  // Check Supabase configuration in development
+  const isConfigured = isSupabaseConfigured();
+  const isDevelopment = import.meta.env.DEV;
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -101,6 +106,21 @@ export const Signup: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Development Mode Diagnostic */}
+          {isDevelopment && (
+            <Alert className="mb-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Development Mode:</strong> Supabase is {isConfigured ? '✅ Configured' : '❌ Not Configured'}
+                {!isConfigured && (
+                  <div className="mt-2 text-sm">
+                    Run <code className="bg-muted px-1 rounded">setup-env.bat</code> and update your .env file with Supabase credentials.
+                  </div>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
               <Alert variant="destructive">
