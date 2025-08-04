@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -128,6 +128,14 @@ const FlowDesigner = () => {
   const [shareLink, setShareLink] = useState("");
   const [showPreview, setShowPreview] = useState(false);
 
+  // Auto-save functionality
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [autoSaveInterval, setAutoSaveInterval] = useState(30000); // 30 seconds
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSaveDataRef = useRef<string>("");
+
   // AI-powered step suggestions
   const [isGeneratingSteps, setIsGeneratingSteps] = useState(false);
   const [suggestedSteps, setSuggestedSteps] = useState<Array<{ title: string; description: string; type: FlowStep["type"]; icon: any; color: string }>>([]);
@@ -148,6 +156,148 @@ const FlowDesigner = () => {
   // Tutorial state
   const [showTutorial, setShowTutorial] = useState(true);
   const [tutorialStep, setTutorialStep] = useState(0);
+
+  // Load auto-save settings from localStorage
+  useEffect(() => {
+    const savedAutoSave = localStorage.getItem('flow-auto-save-enabled');
+    if (savedAutoSave !== null) {
+      setAutoSaveEnabled(savedAutoSave === 'true');
+    }
+    
+    const savedInterval = localStorage.getItem('flow-auto-save-interval');
+    if (savedInterval) {
+      setAutoSaveInterval(parseInt(savedInterval, 10));
+    }
+  }, []);
+
+  // Save auto-save settings to localStorage
+  useEffect(() => {
+    localStorage.setItem('flow-auto-save-enabled', autoSaveEnabled.toString());
+  }, [autoSaveEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('flow-auto-save-interval', autoSaveInterval.toString());
+  }, [autoSaveInterval]);
+
+  // Load flow data from localStorage on component mount
+  useEffect(() => {
+    const savedFlowData = localStorage.getItem('flow-draft-data');
+    if (savedFlowData) {
+      try {
+        const parsedData = JSON.parse(savedFlowData);
+        const { timestamp, data } = parsedData;
+        
+        // Only load if the saved data is less than 24 hours old
+        const isRecent = Date.now() - timestamp < 24 * 60 * 60 * 1000;
+        
+        if (isRecent && data) {
+          setWorkflowName(data.workflowName || "New Flow");
+          setWorkflowDescription(data.workflowDescription || "");
+          setWorkflowGoal(data.workflowGoal || "");
+          setSteps(data.steps || []);
+          setUserType(data.userType || "solo");
+          setHasUnsavedChanges(true);
+          
+          toast({
+            title: "Draft Restored",
+            description: "Your previous work has been restored from auto-save",
+          });
+        }
+      } catch (error) {
+        console.error('Error loading saved flow data:', error);
+      }
+    }
+  }, [toast]);
+
+  // Create a serializable version of the current flow data
+  const getCurrentFlowData = useCallback(() => {
+    return {
+      workflowName,
+      workflowDescription,
+      workflowGoal,
+      steps,
+      userType,
+    };
+  }, [workflowName, workflowDescription, workflowGoal, steps, userType]);
+
+  // Save flow data to localStorage
+  const saveToLocalStorage = useCallback((data: any) => {
+    try {
+      const saveData = {
+        timestamp: Date.now(),
+        data,
+      };
+      localStorage.setItem('flow-draft-data', JSON.stringify(saveData));
+      setLastSaved(new Date());
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }, []);
+
+  // Auto-save function
+  const performAutoSave = useCallback(async () => {
+    if (!autoSaveEnabled || !hasUnsavedChanges) return;
+
+    const currentData = getCurrentFlowData();
+    const currentDataString = JSON.stringify(currentData);
+    
+    // Only save if data has actually changed
+    if (currentDataString === lastSaveDataRef.current) return;
+    
+    try {
+      // Save to localStorage
+      saveToLocalStorage(currentData);
+      lastSaveDataRef.current = currentDataString;
+      
+      console.log('Auto-save completed at:', new Date().toLocaleTimeString());
+    } catch (error) {
+      console.error('Auto-save failed:', error);
+    }
+  }, [autoSaveEnabled, hasUnsavedChanges, getCurrentFlowData, saveToLocalStorage]);
+
+  // Set up auto-save interval
+  useEffect(() => {
+    if (autoSaveEnabled && hasUnsavedChanges) {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+      
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        performAutoSave();
+      }, autoSaveInterval);
+    }
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [autoSaveEnabled, hasUnsavedChanges, autoSaveInterval, performAutoSave]);
+
+  // Mark changes when flow data changes
+  useEffect(() => {
+    const currentData = getCurrentFlowData();
+    const currentDataString = JSON.stringify(currentData);
+    
+    if (currentDataString !== lastSaveDataRef.current) {
+      setHasUnsavedChanges(true);
+    }
+  }, [workflowName, workflowDescription, workflowGoal, steps, userType, getCurrentFlowData]);
+
+  // Warn user before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   // Load template from URL parameter
   useEffect(() => {
@@ -173,6 +323,7 @@ const FlowDesigner = () => {
         }));
         
         setSteps(convertedSteps);
+        setHasUnsavedChanges(true);
         
         toast({
           title: "Template Loaded",
@@ -1030,6 +1181,10 @@ Description: ${stepDescription}`
 
     setIsSaving(true);
     try {
+      // First, save to localStorage as backup
+      const currentData = getCurrentFlowData();
+      saveToLocalStorage(currentData);
+      
       const flowData: FlowInput = {
         title: workflowName,
         description: workflowDescription,
@@ -1054,11 +1209,14 @@ Description: ${stepDescription}`
       const result = await flowApi.createFlow(flowData);
       
       if (result.success) {
+        setLastSaved(new Date());
+        setHasUnsavedChanges(false);
+        lastSaveDataRef.current = JSON.stringify(currentData);
+        
         toast({
           title: "Success",
-          description: "Flow saved successfully!",
+          description: "Flow saved successfully to database and local storage!",
         });
-        // Optionally navigate to the saved flow or stay on the page
       } else {
         throw new Error(result.error || "Failed to save flow");
       }
@@ -1152,6 +1310,36 @@ Description: ${stepDescription}`
     }
   };
 
+  // Auto-save management functions
+  const toggleAutoSave = () => {
+    setAutoSaveEnabled(!autoSaveEnabled);
+    if (!autoSaveEnabled && hasUnsavedChanges) {
+      // If enabling auto-save and there are unsaved changes, save immediately
+      performAutoSave();
+    }
+  };
+
+  const clearDraft = () => {
+    localStorage.removeItem('flow-draft-data');
+    setHasUnsavedChanges(false);
+    setLastSaved(null);
+    lastSaveDataRef.current = "";
+    toast({
+      title: "Draft Cleared",
+      description: "Local draft has been cleared",
+    });
+  };
+
+  const saveDraftNow = () => {
+    if (hasUnsavedChanges) {
+      performAutoSave();
+      toast({
+        title: "Draft Saved",
+        description: "Draft saved to local storage",
+      });
+    }
+  };
+
   return (
     <PermanentDashboard>
       <div className="flex-1 flex flex-col h-full">
@@ -1176,6 +1364,44 @@ Description: ${stepDescription}`
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              {/* Auto-save status and controls */}
+              <div className="flex items-center space-x-2 mr-4">
+                <div className="flex items-center space-x-1">
+                  <div className={`w-2 h-2 rounded-full ${hasUnsavedChanges ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`} />
+                  <span className="text-xs text-muted-foreground">
+                    {hasUnsavedChanges ? 'Unsaved' : 'Saved'}
+                  </span>
+                </div>
+                {lastSaved && (
+                  <span className="text-xs text-muted-foreground">
+                    Last saved: {lastSaved.toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
+
+              {/* Auto-save toggle */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleAutoSave}
+                className={`${autoSaveEnabled ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-700'}`}
+              >
+                <RefreshCw className={`h-3 w-3 mr-1 ${autoSaveEnabled ? 'text-green-600' : 'text-gray-500'}`} />
+                Auto-save {autoSaveEnabled ? 'ON' : 'OFF'}
+              </Button>
+
+              {/* Save draft button */}
+              {hasUnsavedChanges && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={saveDraftNow}
+                >
+                  <Save className="h-3 w-3 mr-1" />
+                  Save Draft
+                </Button>
+              )}
+
               <Dialog open={showPreview} onOpenChange={setShowPreview}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">
@@ -1342,6 +1568,85 @@ Description: ${stepDescription}`
                     <p className="text-xs text-muted-foreground">
                       Anyone with this link can view your flow template.
                     </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* Auto-save Settings Dialog */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Auto-save Settings
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Auto-save Settings</DialogTitle>
+                    <DialogDescription>
+                      Configure automatic saving behavior for your flow.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Enable Auto-save</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Automatically save your work to local storage
+                        </p>
+                      </div>
+                      <Button
+                        variant={autoSaveEnabled ? "default" : "outline"}
+                        size="sm"
+                        onClick={toggleAutoSave}
+                      >
+                        {autoSaveEnabled ? "Enabled" : "Disabled"}
+                      </Button>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Auto-save Interval</label>
+                      <select
+                        value={autoSaveInterval / 1000}
+                        onChange={(e) => setAutoSaveInterval(parseInt(e.target.value) * 1000)}
+                        className="w-full p-2 border rounded-md"
+                        disabled={!autoSaveEnabled}
+                      >
+                        <option value={10}>10 seconds</option>
+                        <option value={30}>30 seconds</option>
+                        <option value={60}>1 minute</option>
+                        <option value={300}>5 minutes</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Draft Management</h4>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={saveDraftNow}
+                          disabled={!hasUnsavedChanges}
+                        >
+                          <Save className="h-3 w-3 mr-1" />
+                          Save Draft Now
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={clearDraft}
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Clear Draft
+                        </Button>
+                      </div>
+                    </div>
+
+                    {lastSaved && (
+                      <div className="text-sm text-muted-foreground">
+                        Last saved: {lastSaved.toLocaleString()}
+                      </div>
+                    )}
                   </div>
                 </DialogContent>
               </Dialog>
