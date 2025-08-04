@@ -1118,6 +1118,42 @@ Description: ${stepDescription}`
         solo: { model: "subscription", startingPrice: 8, currency: "USD", notes: "Individual plan from $8/month" },
         team: { model: "subscription", startingPrice: 10, currency: "USD", notes: "Team plan from $10/user/month" },
         enterprise: { model: "subscription", startingPrice: 20, currency: "USD", notes: "Enterprise plan from $20/user/month" }
+      },
+      // Game Development Tools
+      "Unity": {
+        solo: { model: "free", currency: "USD", notes: "Free for personal use and solo developers" },
+        team: { model: "subscription", startingPrice: 25, currency: "USD", notes: "Pro plan from $25/month per seat" },
+        enterprise: { model: "subscription", startingPrice: 200, currency: "USD", notes: "Enterprise plan from $200/month per seat" }
+      },
+      "Unreal Engine": {
+        solo: { model: "free", currency: "USD", notes: "Free until $1M revenue, then 5% royalty" },
+        team: { model: "free", currency: "USD", notes: "Free until $1M revenue, then 5% royalty" },
+        enterprise: { model: "subscription", startingPrice: 1500, currency: "USD", notes: "Enterprise plan from $1500/month" }
+      },
+      "Godot": {
+        solo: { model: "free", currency: "USD", notes: "Completely free and open source" },
+        team: { model: "free", currency: "USD", notes: "Completely free and open source" },
+        enterprise: { model: "free", currency: "USD", notes: "Completely free and open source" }
+      },
+      "Blender": {
+        solo: { model: "free", currency: "USD", notes: "Completely free and open source" },
+        team: { model: "free", currency: "USD", notes: "Completely free and open source" },
+        enterprise: { model: "free", currency: "USD", notes: "Completely free and open source" }
+      },
+      "GIMP": {
+        solo: { model: "free", currency: "USD", notes: "Completely free and open source" },
+        team: { model: "free", currency: "USD", notes: "Completely free and open source" },
+        enterprise: { model: "free", currency: "USD", notes: "Completely free and open source" }
+      },
+      "Audacity": {
+        solo: { model: "free", currency: "USD", notes: "Completely free and open source" },
+        team: { model: "free", currency: "USD", notes: "Completely free and open source" },
+        enterprise: { model: "free", currency: "USD", notes: "Completely free and open source" }
+      },
+      "GitHub": {
+        solo: { model: "free", currency: "USD", notes: "Free for public repositories" },
+        team: { model: "subscription", startingPrice: 4, currency: "USD", notes: "Team plan from $4/user/month" },
+        enterprise: { model: "subscription", startingPrice: 21, currency: "USD", notes: "Enterprise plan from $21/user/month" }
       }
     };
 
