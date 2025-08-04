@@ -1,6 +1,7 @@
 # Flow - Process Optimization Platform
 
 <!-- Updated for Vercel deployment with environment variables -->
+<!-- Fixed Supabase URL format -->
 
 Flow is a comprehensive process optimization platform that helps teams streamline workflows, calculate costs, and choose the right tools for any project.
 
@@ -117,4 +118,5 @@ Flow is a comprehensive process optimization platform that helps teams streamlin
 
 ## 📁 Project Structure
 
+```
 ```
