@@ -81,6 +81,10 @@ import {
   Box,
   Gamepad2,
   X,
+  ArrowRight,
+  ArrowUp,
+  ArrowDown,
+  Building,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
@@ -111,6 +115,7 @@ const FlowDesigner = () => {
   const [workflowName, setWorkflowName] = useState("New Flow");
   const [workflowDescription, setWorkflowDescription] = useState("");
   const [workflowGoal, setWorkflowGoal] = useState("");
+  const [userType, setUserType] = useState<"solo" | "team" | "enterprise">("solo");
   const [selectedStep, setSelectedStep] = useState<string | null>(null);
   const [steps, setSteps] = useState<FlowStep[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -133,7 +138,11 @@ const FlowDesigner = () => {
   const [selectedRoadmapStep, setSelectedRoadmapStep] = useState<string | null>(null);
   
   // Panel display state - controls which panel shows in the right sidebar
-  const [activePanel, setActivePanel] = useState<"suggested-steps" | "tools">("suggested-steps");
+  const [activePanel, setActivePanel] = useState<"suggested-steps" | "tools" | null>(null);
+  
+  // Tutorial state
+  const [showTutorial, setShowTutorial] = useState(true);
+  const [tutorialStep, setTutorialStep] = useState(0);
 
   // Load template from URL parameter
   useEffect(() => {
@@ -187,8 +196,10 @@ const FlowDesigner = () => {
       setSuggestedSteps(aiSteps);
       setCurrentStepIndex(0);
       
-      // Generate tools for the first step
+      // Set active panel to show suggested steps
       if (aiSteps.length > 0) {
+        setActivePanel("suggested-steps");
+        // Generate tools for the first step
         await generateToolsForStep(aiSteps[0].title, aiSteps[0].description);
       }
     } catch (error) {
@@ -199,6 +210,7 @@ const FlowDesigner = () => {
       setCurrentStepIndex(0);
       
       if (fallbackSteps.length > 0) {
+        setActivePanel("suggested-steps");
         await generateToolsForStep(fallbackSteps[0].title, fallbackSteps[0].description);
       }
     } finally {
@@ -416,124 +428,151 @@ const FlowDesigner = () => {
     
     const tools = [];
     
+    // Filter tools based on user type
+    const filterToolsByUserType = (toolList: Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }>) => {
+      return toolList.filter(tool => {
+        const userPricing = getUserSpecificPricing(tool);
+        // For solo users, prioritize free tools
+        if (userType === "solo" && userPricing.model !== "free") {
+          return false;
+        }
+        // For team users, include free and affordable tools
+        if (userType === "team" && userPricing.startingPrice && userPricing.startingPrice > 50) {
+          return false;
+        }
+        // For enterprise users, include all tools
+        return true;
+      });
+    };
+    
     // Management tools
     if (lowerTitle.includes('market') || lowerTitle.includes('research') || lowerDesc.includes('market') || lowerTitle.includes('analysis') || lowerTitle.includes('planning')) {
-      tools.push(
+      const managementTools = [
         { name: "Google Analytics", description: "Track website traffic and user behavior", category: "management", icon: BarChart3, link: "https://analytics.google.com", pricing: { model: "free", currency: "USD", notes: "Free for basic features" } },
         { name: "SEMrush", description: "Competitive analysis and keyword research", category: "management", icon: Search, link: "https://semrush.com", pricing: { model: "subscription", startingPrice: 119, currency: "USD", notes: "Starting at $119/month" } },
         { name: "Ahrefs", description: "SEO and backlink analysis", category: "management", icon: TrendingUp, link: "https://ahrefs.com", pricing: { model: "subscription", startingPrice: 99, currency: "USD", notes: "Starting at $99/month" } },
         { name: "Hotjar", description: "User behavior analytics and heatmaps", category: "management", icon: Eye, link: "https://hotjar.com", pricing: { model: "freemium", startingPrice: 32, currency: "USD", notes: "Free plan available, paid from $32/month" } },
         { name: "Mixpanel", description: "Product analytics and user insights", category: "management", icon: BarChart3, link: "https://mixpanel.com", pricing: { model: "freemium", startingPrice: 25, currency: "USD", notes: "Free plan available, paid from $25/month" } },
         { name: "Tableau", description: "Data visualization and business intelligence", category: "management", icon: BarChart3, link: "https://tableau.com", pricing: { model: "subscription", startingPrice: 70, currency: "USD", notes: "Starting at $70/month" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(managementTools));
     }
     
     // Productivity tools
     if (lowerTitle.includes('product') || lowerTitle.includes('development') || lowerDesc.includes('product') || lowerTitle.includes('build') || lowerTitle.includes('create')) {
-      tools.push(
+      const productivityTools = [
         { name: "Notion", description: "All-in-one workspace for notes and collaboration", category: "productivity", icon: FileText, link: "https://notion.so", pricing: { model: "freemium", startingPrice: 8, currency: "USD", notes: "Free plan available, paid from $8/month" } },
         { name: "Trello", description: "Project management with boards and cards", category: "productivity", icon: CheckSquare, link: "https://trello.com", pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } },
         { name: "Asana", description: "Team collaboration and project tracking", category: "productivity", icon: Target, link: "https://asana.com", pricing: { model: "freemium", startingPrice: 10.99, currency: "USD", notes: "Free plan available, paid from $10.99/month" } },
         { name: "Monday.com", description: "Work management platform", category: "productivity", icon: Calendar, link: "https://monday.com", pricing: { model: "subscription", startingPrice: 8, currency: "USD", notes: "Starting at $8/month" } },
         { name: "ClickUp", description: "All-in-one productivity platform", category: "productivity", icon: CheckSquare, link: "https://clickup.com", pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } },
         { name: "Figma", description: "Design and prototyping tool", category: "productivity", icon: Palette, link: "https://figma.com", pricing: { model: "freemium", startingPrice: 12, currency: "USD", notes: "Free plan available, paid from $12/month" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(productivityTools));
     }
     
     // Communication tools
     if (lowerTitle.includes('marketing') || lowerTitle.includes('campaign') || lowerDesc.includes('marketing') || lowerTitle.includes('promotion') || lowerTitle.includes('outreach') || lowerTitle.includes('communication')) {
-      tools.push(
+      const communicationTools = [
         { name: "Mailchimp", description: "Email marketing and automation", category: "communication", icon: Mail, link: "https://mailchimp.com", pricing: { model: "freemium", startingPrice: 10, currency: "USD", notes: "Free plan available, paid from $10/month" } },
         { name: "Slack", description: "Team communication and collaboration", category: "communication", icon: MessageSquare, link: "https://slack.com", pricing: { model: "freemium", startingPrice: 7.25, currency: "USD", notes: "Free plan available, paid from $7.25/month" } },
         { name: "Discord", description: "Community and team chat platform", category: "communication", icon: MessageCircle, link: "https://discord.com", pricing: { model: "freemium", startingPrice: 9.99, currency: "USD", notes: "Free plan available, paid from $9.99/month" } },
         { name: "Zoom", description: "Video conferencing and meetings", category: "communication", icon: Video, link: "https://zoom.us", pricing: { model: "freemium", startingPrice: 14.99, currency: "USD", notes: "Free plan available, paid from $14.99/month" } },
         { name: "Microsoft Teams", description: "Business communication platform", category: "communication", icon: MessageSquare, link: "https://teams.microsoft.com", pricing: { model: "subscription", startingPrice: 4, currency: "USD", notes: "Starting at $4/month" } },
         { name: "Intercom", description: "Customer messaging and support", category: "communication", icon: MessageCircle, link: "https://intercom.com", pricing: { model: "subscription", startingPrice: 39, currency: "USD", notes: "Starting at $39/month" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(communicationTools));
     }
     
     // Storage tools
     if (lowerTitle.includes('launch') || lowerTitle.includes('preparation') || lowerDesc.includes('launch') || lowerTitle.includes('deploy') || lowerTitle.includes('release') || lowerTitle.includes('storage')) {
-      tools.push(
+      const storageTools = [
         { name: "Google Drive", description: "Cloud storage and file sharing", category: "storage", icon: Folder, link: "https://drive.google.com", pricing: { model: "freemium", startingPrice: 1.99, currency: "USD", notes: "Free plan available, paid from $1.99/month" } },
         { name: "Dropbox", description: "File hosting and cloud storage", category: "storage", icon: Upload, link: "https://dropbox.com", pricing: { model: "subscription", startingPrice: 9.99, currency: "USD", notes: "Starting at $9.99/month" } },
         { name: "OneDrive", description: "Microsoft cloud storage solution", category: "storage", icon: Database, link: "https://onedrive.live.com", pricing: { model: "freemium", startingPrice: 1.99, currency: "USD", notes: "Free plan available, paid from $1.99/month" } },
         { name: "Box", description: "Enterprise file sharing and collaboration", category: "storage", icon: Folder, link: "https://box.com", pricing: { model: "subscription", startingPrice: 5, currency: "USD", notes: "Starting at $5/month" } },
         { name: "AWS S3", description: "Cloud object storage service", category: "storage", icon: Database, link: "https://aws.amazon.com/s3", pricing: { model: "subscription", startingPrice: 0.023, currency: "USD", notes: "Pay per use, starting at $0.023/GB" } },
         { name: "GitHub", description: "Code repository and version control", category: "storage", icon: Code, link: "https://github.com", pricing: { model: "freemium", startingPrice: 4, currency: "USD", notes: "Free plan available, paid from $4/month" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(storageTools));
     }
     
     // Creative and Design tools
     if (lowerTitle.includes('design') || lowerTitle.includes('creative') || lowerTitle.includes('art') || lowerTitle.includes('visual') || lowerTitle.includes('artwork') || lowerTitle.includes('sketch')) {
-      tools.push(
+      const creativeTools = [
         { name: "Adobe Creative Suite", description: "Professional design and creative software", category: "creative", icon: Palette, link: "https://adobe.com/creativecloud", pricing: { model: "subscription", startingPrice: 52.99, currency: "USD", notes: "Starting at $52.99/month" } },
         { name: "Figma", description: "Collaborative design and prototyping tool", category: "creative", icon: Palette, link: "https://figma.com", pricing: { model: "freemium", startingPrice: 12, currency: "USD", notes: "Free plan available, paid from $12/month" } },
         { name: "Sketch", description: "Digital design for Mac users", category: "creative", icon: PenTool, link: "https://sketch.com", pricing: { model: "subscription", startingPrice: 9, currency: "USD", notes: "Starting at $9/month" } },
         { name: "Canva Pro", description: "Graphic design platform with templates", category: "creative", icon: Image, link: "https://canva.com", pricing: { model: "subscription", startingPrice: 12.99, currency: "USD", notes: "Starting at $12.99/month" } },
         { name: "Procreate", description: "Digital painting and illustration app", category: "creative", icon: PenTool, link: "https://procreate.art", pricing: { model: "one-time", startingPrice: 9.99, currency: "USD", notes: "One-time purchase for iPad" } },
         { name: "Blender", description: "Free 3D creation suite", category: "creative", icon: Box, link: "https://blender.org", pricing: { model: "free", currency: "USD", notes: "Completely free open-source software" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(creativeTools));
     }
     
     // Game Development tools
     if (lowerTitle.includes('game') || lowerTitle.includes('gaming') || lowerTitle.includes('play') || lowerTitle.includes('entertainment') || lowerTitle.includes('prototype')) {
-      tools.push(
+      const gamingTools = [
         { name: "Unity", description: "Game development engine and platform", category: "gaming", icon: Gamepad2, link: "https://unity.com", pricing: { model: "freemium", startingPrice: 25, currency: "USD", notes: "Free plan available, paid from $25/month" } },
         { name: "Unreal Engine", description: "Advanced game development engine", category: "gaming", icon: Gamepad2, link: "https://unrealengine.com", pricing: { model: "subscription", startingPrice: 0, currency: "USD", notes: "Free until $1M revenue, then 5% royalty" } },
         { name: "Godot", description: "Free and open-source game engine", category: "gaming", icon: Gamepad2, link: "https://godotengine.org", pricing: { model: "free", currency: "USD", notes: "Completely free open-source engine" } },
         { name: "GameMaker Studio", description: "2D game development platform", category: "gaming", icon: Gamepad2, link: "https://gamemaker.io", pricing: { model: "subscription", startingPrice: 39, currency: "USD", notes: "Starting at $39/month" } },
         { name: "Construct", description: "No-code 2D game development", category: "gaming", icon: Gamepad2, link: "https://construct.net", pricing: { model: "subscription", startingPrice: 8.99, currency: "USD", notes: "Starting at $8.99/month" } },
         { name: "Aseprite", description: "Pixel art and animation tool", category: "gaming", icon: PenTool, link: "https://aseprite.org", pricing: { model: "one-time", startingPrice: 19.99, currency: "USD", notes: "One-time purchase" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(gamingTools));
     }
     
     // Education and Learning tools
     if (lowerTitle.includes('learn') || lowerTitle.includes('education') || lowerTitle.includes('course') || lowerTitle.includes('training') || lowerTitle.includes('tutorial') || lowerTitle.includes('curriculum')) {
-      tools.push(
+      const educationTools = [
         { name: "Coursera", description: "Online courses from top universities", category: "education", icon: GraduationCap, link: "https://coursera.org", pricing: { model: "subscription", startingPrice: 39, currency: "USD", notes: "Starting at $39/month" } },
         { name: "Udemy", description: "Online learning platform with courses", category: "education", icon: BookOpen, link: "https://udemy.com", pricing: { model: "one-time", startingPrice: 9.99, currency: "USD", notes: "Individual course pricing" } },
         { name: "Khan Academy", description: "Free educational content and courses", category: "education", icon: GraduationCap, link: "https://khanacademy.org", pricing: { model: "free", currency: "USD", notes: "Completely free" } },
         { name: "Skillshare", description: "Creative and business skill courses", category: "education", icon: BookOpen, link: "https://skillshare.com", pricing: { model: "subscription", startingPrice: 15, currency: "USD", notes: "Starting at $15/month" } },
         { name: "Moodle", description: "Learning management system", category: "education", icon: Monitor, link: "https://moodle.org", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free open-source, hosting costs vary" } },
         { name: "Google Classroom", description: "Classroom management and learning platform", category: "education", icon: Monitor, link: "https://classroom.google.com", pricing: { model: "free", currency: "USD", notes: "Free for educational institutions" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(educationTools));
     }
     
     // Health and Wellness tools
     if (lowerTitle.includes('health') || lowerTitle.includes('fitness') || lowerTitle.includes('wellness') || lowerTitle.includes('medical') || lowerTitle.includes('therapy') || lowerTitle.includes('workout')) {
-      tools.push(
+      const healthTools = [
         { name: "MyFitnessPal", description: "Calorie tracking and nutrition app", category: "health", icon: Activity, link: "https://myfitnesspal.com", pricing: { model: "freemium", startingPrice: 9.99, currency: "USD", notes: "Free plan available, paid from $9.99/month" } },
         { name: "Fitbit", description: "Fitness tracking and health monitoring", category: "health", icon: Heart, link: "https://fitbit.com", pricing: { model: "subscription", startingPrice: 9.99, currency: "USD", notes: "Starting at $9.99/month" } },
         { name: "Headspace", description: "Meditation and mindfulness app", category: "health", icon: Heart, link: "https://headspace.com", pricing: { model: "subscription", startingPrice: 12.99, currency: "USD", notes: "Starting at $12.99/month" } },
         { name: "Calm", description: "Sleep and meditation app", category: "health", icon: Heart, link: "https://calm.com", pricing: { model: "subscription", startingPrice: 14.99, currency: "USD", notes: "Starting at $14.99/month" } },
         { name: "Strava", description: "Social fitness tracking platform", category: "health", icon: Activity, link: "https://strava.com", pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } },
         { name: "Noom", description: "Weight loss and behavior change program", category: "health", icon: Heart, link: "https://noom.com", pricing: { model: "subscription", startingPrice: 59, currency: "USD", notes: "Starting at $59/month" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(healthTools));
     }
     
     // Financial Management tools
     if (lowerTitle.includes('finance') || lowerTitle.includes('money') || lowerTitle.includes('investment') || lowerTitle.includes('budget') || lowerTitle.includes('financial') || lowerTitle.includes('trading')) {
-      tools.push(
+      const financeTools = [
         { name: "Mint", description: "Personal finance and budgeting app", category: "finance", icon: DollarSign, link: "https://mint.intuit.com", pricing: { model: "free", currency: "USD", notes: "Completely free" } },
         { name: "YNAB", description: "You Need A Budget - budgeting software", category: "finance", icon: Calculator, link: "https://youneedabudget.com", pricing: { model: "subscription", startingPrice: 11.99, currency: "USD", notes: "Starting at $11.99/month" } },
         { name: "Robinhood", description: "Commission-free stock trading app", category: "finance", icon: TrendingUp, link: "https://robinhood.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free trading, premium features available" } },
         { name: "Acorns", description: "Automated investing and savings app", category: "finance", icon: TrendingUp, link: "https://acorns.com", pricing: { model: "subscription", startingPrice: 3, currency: "USD", notes: "Starting at $3/month" } },
         { name: "Personal Capital", description: "Wealth management and financial planning", category: "finance", icon: DollarSign, link: "https://personalcapital.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free plan available, advisory services extra" } },
         { name: "Coinbase", description: "Cryptocurrency exchange and wallet", category: "finance", icon: DollarSign, link: "https://coinbase.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free trading, fees apply" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(financeTools));
     }
     
     // Social and Community tools
     if (lowerTitle.includes('social') || lowerTitle.includes('community') || lowerTitle.includes('network') || lowerTitle.includes('connect') || lowerTitle.includes('relationship') || lowerTitle.includes('engagement')) {
-      tools.push(
+      const socialTools = [
         { name: "Discord", description: "Community chat and voice platform", category: "social", icon: MessageCircle, link: "https://discord.com", pricing: { model: "freemium", startingPrice: 9.99, currency: "USD", notes: "Free plan available, paid from $9.99/month" } },
         { name: "Slack", description: "Team communication and collaboration", category: "social", icon: MessageSquare, link: "https://slack.com", pricing: { model: "freemium", startingPrice: 7.25, currency: "USD", notes: "Free plan available, paid from $7.25/month" } },
         { name: "Mighty Networks", description: "Community platform for creators", category: "social", icon: Users, link: "https://mightybell.com", pricing: { model: "subscription", startingPrice: 23, currency: "USD", notes: "Starting at $23/month" } },
         { name: "Circle", description: "Community platform for creators and businesses", category: "social", icon: Users, link: "https://circle.so", pricing: { model: "subscription", startingPrice: 39, currency: "USD", notes: "Starting at $39/month" } },
         { name: "Kajabi", description: "All-in-one platform for creators", category: "social", icon: Users, link: "https://kajabi.com", pricing: { model: "subscription", startingPrice: 119, currency: "USD", notes: "Starting at $119/month" } },
         { name: "Patreon", description: "Membership platform for creators", category: "social", icon: Heart, link: "https://patreon.com", pricing: { model: "subscription", startingPrice: 0, currency: "USD", notes: "Free to start, 5-12% platform fees" } }
-      );
+      ];
+      tools.push(...filterToolsByUserType(socialTools));
     }
     
     // Research and Analysis tools
@@ -614,10 +653,11 @@ const FlowDesigner = () => {
     
     return [...tools].sort((a, b) => {
       const getPriceValue = (tool: typeof tools[0]) => {
-        if (tool.pricing.model === 'free') return 0;
-        if (tool.pricing.model === 'freemium') return tool.pricing.startingPrice || 0;
-        if (tool.pricing.model === 'subscription') return tool.pricing.startingPrice || 0;
-        if (tool.pricing.model === 'one-time') return tool.pricing.startingPrice || 0;
+        const userPricing = getUserSpecificPricing(tool);
+        if (userPricing.model === 'free') return 0;
+        if (userPricing.model === 'freemium') return userPricing.startingPrice || 0;
+        if (userPricing.model === 'subscription') return userPricing.startingPrice || 0;
+        if (userPricing.model === 'one-time') return userPricing.startingPrice || 0;
         return 999999; // Enterprise/unknown pricing
       };
       
@@ -878,8 +918,79 @@ const FlowDesigner = () => {
     return suggestedStep ? suggestedStep.icon : CheckCircle;
   };
 
+  const getUserSpecificPricing = (tool: { name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }) => {
+    const { pricing } = tool;
+    
+    // Define user-specific pricing for common tools
+    const userSpecificPricing: Record<string, Record<string, { model: string; startingPrice?: number; currency: string; notes: string }>> = {
+      "Notion": {
+        solo: { model: "free", currency: "USD", notes: "Free for personal use" },
+        team: { model: "subscription", startingPrice: 8, currency: "USD", notes: "Team plan from $8/user/month" },
+        enterprise: { model: "subscription", startingPrice: 20, currency: "USD", notes: "Enterprise plan from $20/user/month" }
+      },
+      "Trello": {
+        solo: { model: "free", currency: "USD", notes: "Free for personal use" },
+        team: { model: "subscription", startingPrice: 5, currency: "USD", notes: "Team plan from $5/user/month" },
+        enterprise: { model: "subscription", startingPrice: 17.50, currency: "USD", notes: "Enterprise plan from $17.50/user/month" }
+      },
+      "Asana": {
+        solo: { model: "free", currency: "USD", notes: "Free for personal use" },
+        team: { model: "subscription", startingPrice: 10.99, currency: "USD", notes: "Team plan from $10.99/user/month" },
+        enterprise: { model: "subscription", startingPrice: 24.99, currency: "USD", notes: "Enterprise plan from $24.99/user/month" }
+      },
+      "Slack": {
+        solo: { model: "free", currency: "USD", notes: "Free for personal use" },
+        team: { model: "subscription", startingPrice: 7.25, currency: "USD", notes: "Team plan from $7.25/user/month" },
+        enterprise: { model: "subscription", startingPrice: 12.50, currency: "USD", notes: "Enterprise plan from $12.50/user/month" }
+      },
+      "Figma": {
+        solo: { model: "free", currency: "USD", notes: "Free for personal use" },
+        team: { model: "subscription", startingPrice: 12, currency: "USD", notes: "Team plan from $12/user/month" },
+        enterprise: { model: "subscription", startingPrice: 45, currency: "USD", notes: "Enterprise plan from $45/user/month" }
+      },
+      "Monday.com": {
+        solo: { model: "subscription", startingPrice: 8, currency: "USD", notes: "Individual plan from $8/month" },
+        team: { model: "subscription", startingPrice: 10, currency: "USD", notes: "Team plan from $10/user/month" },
+        enterprise: { model: "subscription", startingPrice: 20, currency: "USD", notes: "Enterprise plan from $20/user/month" }
+      }
+    };
+
+    // Return user-specific pricing if available, otherwise return original pricing
+    if (userSpecificPricing[tool.name] && userSpecificPricing[tool.name][userType]) {
+      return userSpecificPricing[tool.name][userType];
+    }
+    
+    return pricing;
+  };
+
   const updateGoal = (newGoal: string) => {
     setWorkflowGoal(newGoal);
+    // Advance tutorial if user types in goal
+    if (showTutorial && tutorialStep === 0 && newGoal.trim()) {
+      setTutorialStep(1);
+    }
+  };
+
+  const handleTutorialNext = () => {
+    if (tutorialStep < 2) {
+      setTutorialStep(tutorialStep + 1);
+    } else {
+      setShowTutorial(false);
+    }
+  };
+
+  const handleTutorialSkip = () => {
+    setShowTutorial(false);
+  };
+
+  const handleGenerateStepsClick = () => {
+    if (workflowGoal.trim()) {
+      generateAISteps(workflowGoal);
+      // Advance tutorial when generate steps is clicked
+      if (showTutorial && tutorialStep === 1) {
+        setTutorialStep(2);
+      }
+    }
   };
 
   // Save flow functionality
@@ -1238,13 +1349,28 @@ const FlowDesigner = () => {
              <div className="p-6 min-h-full">
                               <div className="canvas-container w-full h-full min-h-[600px] bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/20 p-6">
                  {/* Roadmap Layout - Goal Block at the very left */}
-                 <div className="flex flex-col lg:flex-row gap-8 mb-8">
-                   {/* Goal Input Block - Left Side */}
-                   <div className="lg:w-1/3">
+                                     <div className="flex flex-col lg:flex-row gap-8 mb-8">
+                      {/* Goal Input Block - Left Side */}
+                      <div className="lg:w-1/3 relative">
+                        {/* Tutorial Hint - Outside tutorial block */}
+                        {showTutorial && tutorialStep === 0 && (
+                          <div className="absolute top-1/3 -right-4 z-20 transform -translate-y-1/2">
+                            <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
+                              <ArrowLeft className="h-4 w-4 mr-2" />
+                              <span className="text-sm font-medium">First, type in a goal</span>
+                            </div>
+                          </div>
+                        )}
                      <Card 
-                       className="w-full max-w-md mx-auto shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 cursor-pointer hover:shadow-xl transition-shadow"
+                       className={`w-full max-w-md mx-auto shadow-lg border-2 cursor-pointer hover:shadow-xl transition-shadow ${
+                         showTutorial && tutorialStep === 0 
+                           ? 'border-primary ring-4 ring-primary/30 bg-gradient-to-br from-primary/10 to-primary/5' 
+                           : 'border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10'
+                       }`}
                        onClick={() => {
-                         setActivePanel("suggested-steps");
+                         if (suggestedSteps.length > 0) {
+                           setActivePanel("suggested-steps");
+                         }
                          setSelectedStep(null);
                          setCurrentStepTools([]);
                        }}
@@ -1272,15 +1398,56 @@ const FlowDesigner = () => {
                                />
                              </div>
                            </div>
+                           <div>
+                             <label className="text-sm font-medium text-foreground mb-2 block">
+                               Who is this flow for?
+                             </label>
+                             <div className="flex gap-2">
+                               <Button
+                                 variant={userType === "solo" ? "default" : "outline"}
+                                 size="sm"
+                                 onClick={() => setUserType("solo")}
+                                 className="flex-1"
+                               >
+                                 <UserPlus className="h-4 w-4 mr-2" />
+                                 Solo
+                               </Button>
+                               <Button
+                                 variant={userType === "team" ? "default" : "outline"}
+                                 size="sm"
+                                 onClick={() => setUserType("team")}
+                                 className="flex-1"
+                               >
+                                 <Users className="h-4 w-4 mr-2" />
+                                 Team
+                               </Button>
+                               <Button
+                                 variant={userType === "enterprise" ? "default" : "outline"}
+                                 size="sm"
+                                 onClick={() => setUserType("enterprise")}
+                                 className="flex-1"
+                               >
+                                 <Building className="h-4 w-4 mr-2" />
+                                 Enterprise
+                               </Button>
+                             </div>
+                             <p className="text-xs text-muted-foreground mt-1">
+                               This helps AI select better tools based on your needs
+                             </p>
+                           </div>
                            <div className="flex items-center justify-between">
                              <div className="text-xs text-muted-foreground">
                                Define a clear, measurable goal
                              </div>
                              <Button
-                               onClick={() => generateAISteps(workflowGoal)}
+                               onClick={handleGenerateStepsClick}
                                disabled={!workflowGoal.trim() || isGeneratingSteps}
                                size="sm"
-                               className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                               className={`${
+                                 showTutorial && tutorialStep === 1 
+                                   ? 'bg-primary hover:bg-primary/90 text-primary-foreground ring-4 ring-primary/30' 
+                                   : 'bg-accent hover:bg-accent/90 text-accent-foreground'
+                               }`}
                              >
                                {isGeneratingSteps ? (
                                  <>
@@ -1299,9 +1466,23 @@ const FlowDesigner = () => {
                        </CardHeader>
                      </Card>
 
+                     {/* Tutorial Hint - Outside goal block, below Generate Steps button */}
+                     {showTutorial && tutorialStep === 1 && (
+                       <div className="mt-3 flex justify-end">
+                         <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
+                           <ArrowUp className="h-4 w-4 mr-2" />
+                           <span className="text-sm font-medium">Now, generate steps</span>
+                         </div>
+                       </div>
+                     )}
+
                      {/* Miniaturized Step Blocks - Directly below Goal Block */}
                      {steps.length > 0 && (
-                       <div className="mt-3">
+                       <div className={`mt-3 ${
+                         showTutorial && tutorialStep === 2 
+                           ? 'ring-4 ring-primary/30 rounded-lg p-2 bg-primary/5' 
+                           : ''
+                       }`}>
                          <div className="flex items-center justify-between mb-3">
                            <h3 className="font-semibold text-lg">Flow Steps</h3>
                            <Badge variant="secondary">{steps.length} steps added</Badge>
@@ -1388,14 +1569,12 @@ const FlowDesigner = () => {
 
                    {/* Dynamic Panel Area - Right Side */}
                    <div className="lg:w-2/3">
-                     {activePanel === "suggested-steps" ? (
+                     {activePanel === "suggested-steps" && suggestedSteps.length > 0 ? (
                        /* Suggested Steps Panel */
                        <div>
                          <div className="flex items-center justify-between mb-4">
                            <h3 className="font-semibold text-lg">Suggested Steps</h3>
-                           {suggestedSteps.length > 0 && (
-                             <Badge variant="secondary">{suggestedSteps.length} steps</Badge>
-                           )}
+                           <Badge variant="secondary">{suggestedSteps.length} steps</Badge>
                          </div>
 
                          {/* Loading State */}
@@ -1482,7 +1661,7 @@ const FlowDesigner = () => {
                            </div>
                          )}
                        </div>
-                     ) : (
+                     ) : activePanel === "tools" ? (
                        /* Tools for Selected Step Panel */
                        <div>
                          {selectedStep ? (
@@ -1602,85 +1781,95 @@ const FlowDesigner = () => {
                              </Card>
 
                              {/* Tools for Selected Step */}
-                             {currentStepTools.length > 0 && (
-                               <div>
-                                 <div className="flex items-center justify-between mb-4">
-                                   <h3 className="font-semibold text-lg">Available Tools</h3>
+                             <div>
+                               <div className="flex items-center justify-between mb-4">
+                                 <h3 className="font-semibold text-lg">Available Tools</h3>
+                               </div>
+                               
+                               <div className="space-y-4">
+                                 {/* Category Filter Buttons */}
+                                 <div className="flex flex-wrap gap-2">
+                                   {getRelevantCategories(workflowGoal).map((category) => (
+                                     <Button
+                                       key={category}
+                                       variant={selectedCategory === category ? "default" : "outline"}
+                                       size="sm"
+                                       className="text-xs capitalize"
+                                       onClick={() => handleCategorySelect(category, selectedStep)}
+                                     >
+                                       {category === "all" ? "All Tools" : category}
+                                     </Button>
+                                   ))}
                                  </div>
-                                 
-                                 <div className="space-y-4">
-                                   {/* Category Filter Buttons */}
-                                   <div className="flex flex-wrap gap-2">
-                                     {getRelevantCategories(workflowGoal).map((category) => (
-                                       <Button
-                                         key={category}
-                                         variant={selectedCategory === category ? "default" : "outline"}
-                                         size="sm"
-                                         className="text-xs capitalize"
-                                         onClick={() => handleCategorySelect(category, selectedStep)}
-                                       >
-                                         {category === "all" ? "All Tools" : category}
-                                       </Button>
-                                     ))}
-                                   </div>
 
-                                   {/* Tools Grid */}
-                                   {currentStepTools.length > 0 && (
-                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                       {currentStepTools.map((tool, index) => (
-                                         <div key={index} className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card">
-                                           <div className="flex items-start space-x-3">
-                                             <div className="p-2 rounded-lg bg-muted flex-shrink-0">
-                                               {tool.icon && React.createElement(tool.icon, {
-                                                 className: "h-4 w-4 text-muted-foreground"
-                                               })}
+                                 {/* Tools Grid */}
+                                 {currentStepTools.length > 0 ? (
+                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                     {currentStepTools.map((tool, index) => (
+                                       <div key={index} className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card">
+                                         <div className="flex items-start space-x-3">
+                                           <div className="p-2 rounded-lg bg-muted flex-shrink-0">
+                                             {tool.icon && React.createElement(tool.icon, {
+                                               className: "h-4 w-4 text-muted-foreground"
+                                             })}
+                                           </div>
+                                           <div className="flex-1 min-w-0">
+                                             <div className="flex items-center justify-between mb-1">
+                                               <h5 className="font-medium text-sm truncate">{tool.name}</h5>
+                                               <Badge 
+                                                 variant={getUserSpecificPricing(tool).model === 'free' ? 'secondary' : 'default'}
+                                                 className="text-xs"
+                                               >
+                                                 {getUserSpecificPricing(tool).model === 'free' ? 'FREE' : getUserSpecificPricing(tool).startingPrice ? `$${getUserSpecificPricing(tool).startingPrice}` : 'PAID'}
+                                               </Badge>
                                              </div>
-                                             <div className="flex-1 min-w-0">
-                                               <div className="flex items-center justify-between mb-1">
-                                                 <h5 className="font-medium text-sm truncate">{tool.name}</h5>
-                                                 <Badge 
-                                                   variant={tool.pricing.model === 'free' ? 'secondary' : 'default'}
-                                                   className="text-xs"
-                                                 >
-                                                   {tool.pricing.model === 'free' ? 'FREE' : 'PAID'}
-                                                 </Badge>
-                                               </div>
-                                               <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
-                                               <div className="flex gap-2">
-                                                 {tool.link && (
-                                                   <Button
-                                                     variant="ghost"
-                                                     size="sm"
-                                                     className="h-6 px-2 text-xs"
-                                                     onClick={() => window.open(tool.link, '_blank')}
-                                                   >
-                                                     Visit Tool
-                                                     <ChevronRight className="h-3 w-3 ml-1" />
-                                                   </Button>
-                                                 )}
+                                             <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
+                                             <div className="flex gap-2">
+                                               {tool.link && (
                                                  <Button
-                                                   variant="outline"
+                                                   variant="ghost"
                                                    size="sm"
                                                    className="h-6 px-2 text-xs"
-                                                   onClick={(e) => {
-                                                     e.stopPropagation();
-                                                     if (selectedStep) {
-                                                       addToolToStep(selectedStep, tool);
-                                                     }
-                                                   }}
+                                                   onClick={() => window.open(tool.link, '_blank')}
                                                  >
-                                                   Add Tool
+                                                   Visit Tool
+                                                   <ChevronRight className="h-3 w-3 ml-1" />
                                                  </Button>
-                                               </div>
+                                               )}
+                                               <Button
+                                                 variant="outline"
+                                                 size="sm"
+                                                 className="h-6 px-2 text-xs"
+                                                 onClick={(e) => {
+                                                   e.stopPropagation();
+                                                   if (selectedStep) {
+                                                     addToolToStep(selectedStep, tool);
+                                                   }
+                                                 }}
+                                               >
+                                                 Add Tool
+                                               </Button>
                                              </div>
                                            </div>
                                          </div>
-                                       ))}
-                                     </div>
-                                   )}
-                                 </div>
+                                       </div>
+                                     ))}
+                                   </div>
+                                 ) : (
+                                   <div className="flex items-center justify-center h-32">
+                                     <Card className="w-full max-w-md shadow-lg">
+                                       <CardContent className="p-6">
+                                         <div className="text-center">
+                                           <Info className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                                           <p className="text-sm text-muted-foreground">No tools available for the selected category</p>
+                                           <p className="text-xs text-muted-foreground mt-1">Try selecting a different category or "All Tools"</p>
+                                         </div>
+                                       </CardContent>
+                                     </Card>
+                                   </div>
+                                 )}
                                </div>
-                             )}
+                             </div>
                            </div>
                          ) : (
                            <div className="flex items-center justify-center h-64">
@@ -1693,6 +1882,84 @@ const FlowDesigner = () => {
                                </CardContent>
                              </Card>
                            </div>
+                         )}
+                       </div>
+                     ) : (
+                       /* Default State - Tutorial or Empty State */
+                       <div className="flex items-center justify-center h-full">
+                         {showTutorial ? (
+                           /* Tutorial Overlay */
+                           <div className="relative w-full max-w-md">
+                             {/* Tutorial Step 0: Goal Input */}
+                             {tutorialStep === 0 && (
+                               <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                                 <CardContent className="p-6">
+                                   <div className="text-center">
+                                     <p className="text-sm font-medium mb-2">Welcome to Flow Designer</p>
+                                     <p className="text-xs text-muted-foreground mb-4">Let's get you started with creating your first flow</p>
+                                     <Button onClick={handleTutorialNext} size="sm" className="mr-2">
+                                       Next
+                                     </Button>
+                                     <Button onClick={handleTutorialSkip} variant="outline" size="sm">
+                                       Skip Tutorial
+                                       </Button>
+                                   </div>
+                                 </CardContent>
+                               </Card>
+                             )}
+
+                             {/* Tutorial Step 1: Generate Steps Button */}
+                             {tutorialStep === 1 && (
+                               <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                                 <CardContent className="p-6">
+                                   <div className="text-center">
+                                     <Sparkles className="h-12 w-12 mx-auto mb-3 text-primary" />
+                                     <p className="text-sm font-medium mb-2">Great! You've entered a goal</p>
+                                     <p className="text-xs text-muted-foreground mb-4">Click the "Generate Steps" button to create your workflow</p>
+                                     <Button onClick={handleTutorialNext} size="sm" className="mr-2">
+                                       Next
+                                     </Button>
+                                     <Button onClick={handleTutorialSkip} variant="outline" size="sm">
+                                       Skip Tutorial
+                                       </Button>
+                                   </div>
+                                 </CardContent>
+                               </Card>
+                             )}
+
+                             {/* Tutorial Step 2: Flow Steps Section */}
+                             {tutorialStep === 2 && (
+                               <div className="relative">
+                                 <div className="absolute -top-16 -left-8 z-20">
+                                   <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
+                                     <ArrowDown className="h-4 w-4 mr-2" />
+                                     <span className="text-sm font-medium">Add steps to your flow</span>
+                                   </div>
+                                 </div>
+                                 <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                                   <CardContent className="p-6">
+                                     <div className="text-center">
+                                       <List className="h-12 w-12 mx-auto mb-3 text-primary" />
+                                       <p className="text-sm font-medium mb-2">Perfect! Steps generated</p>
+                                       <p className="text-xs text-muted-foreground mb-4">Click "Add Step" to add steps to your flow, then click on them to add tools</p>
+                                       <Button onClick={handleTutorialNext} size="sm">
+                                         Finish Tutorial
+                                       </Button>
+                                     </div>
+                                   </CardContent>
+                                 </Card>
+                               </div>
+                             )}
+                           </div>
+                         ) : (
+                           /* Empty State - No Tutorial */
+                           <Card className="w-full max-w-md shadow-lg">
+                             <CardContent className="p-6">
+                               <div className="text-center">
+                                 <p className="text-xs text-muted-foreground">Enter a goal and click "Generate Steps" to get started</p>
+                               </div>
+                             </CardContent>
+                           </Card>
                          )}
                        </div>
                      )}
