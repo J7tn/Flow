@@ -91,9 +91,9 @@ export function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -102,7 +102,7 @@ export function Pricing() {
                 alt="Flow Logo" 
                 className="w-8 h-8 rounded-lg"
               />
-              <span className="text-xl font-bold text-gray-900">Flow</span>
+              <span className="text-xl font-bold text-foreground">Flow</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/">
@@ -127,7 +127,7 @@ export function Pricing() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl font-bold text-gray-900 mb-6">
+              <h1 className="text-5xl font-bold text-foreground mb-6">
                 Simple, Transparent Pricing
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
@@ -136,7 +136,7 @@ export function Pricing() {
               
               {/* Billing Toggle */}
               <div className="flex items-center justify-center space-x-4 mb-8">
-                <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-gray-900' : 'text-gray-500'}`}>
+                <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-foreground' : 'text-muted-foreground'}`}>
                   Monthly
                 </span>
                 <button
@@ -151,7 +151,7 @@ export function Pricing() {
                     }`}
                   />
                 </button>
-                <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-gray-900' : 'text-gray-500'}`}>
+                <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-foreground' : 'text-muted-foreground'}`}>
                   Yearly
                 </span>
                 {billingPeriod === 'yearly' && (
@@ -190,8 +190,8 @@ export function Pricing() {
                     </div>
                     <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                     <div className="mt-4">
-                      <span className="text-4xl font-bold text-gray-900">{getCurrentPrice(plan)}</span>
-                      <span className="text-gray-600 ml-2">/{plan.period}</span>
+                      <span className="text-4xl font-bold text-foreground">{getCurrentPrice(plan)}</span>
+                                              <span className="text-muted-foreground ml-2">/{plan.period}</span>
                     </div>
                     {billingPeriod === 'yearly' && plan.name !== 'Free' && (
                       <div className="mt-2">
@@ -230,10 +230,10 @@ export function Pricing() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-card">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
               Frequently Asked Questions
             </h2>
           </div>
@@ -243,12 +243,12 @@ export function Pricing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="bg-gray-50 p-6 rounded-lg"
+              className="bg-muted/50 p-6 rounded-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 What's the difference between the plans?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Free is perfect for individuals with unlimited projects. Pro adds team collaboration for up to 20 members. Enterprise is designed for large organizations with unlimited team members, advanced security, and dedicated support.
               </p>
             </motion.div>
@@ -257,12 +257,12 @@ export function Pricing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-gray-50 p-6 rounded-lg"
+              className="bg-muted/50 p-6 rounded-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 Is there a discount for yearly billing?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Yes! Yearly plans save you up to 17% compared to monthly billing. You can switch between monthly and yearly billing at any time.
               </p>
             </motion.div>
@@ -271,12 +271,12 @@ export function Pricing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-gray-50 p-6 rounded-lg"
+              className="bg-muted/50 p-6 rounded-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 What's included in Enterprise?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Enterprise includes unlimited team members, advanced security features like SSO, custom integrations, dedicated account management, 24/7 support, compliance reporting, and custom training sessions.
               </p>
             </motion.div>
@@ -285,12 +285,12 @@ export function Pricing() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-gray-50 p-6 rounded-lg"
+              className="bg-muted/50 p-6 rounded-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 Can I upgrade or downgrade my plan?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Yes! You can upgrade or downgrade at any time. When upgrading, you'll be charged the prorated difference. When downgrading, changes take effect at the next billing cycle.
               </p>
             </motion.div>
@@ -314,13 +314,13 @@ export function Pricing() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/signup">
-                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8 py-3">
+                <Button size="lg" className="bg-background text-foreground hover:bg-muted text-lg px-8 py-3">
                   Start Free Trial
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/contact">
-                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-600 text-lg px-8 py-3">
+                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-foreground text-lg px-8 py-3 font-semibold">
                   Contact Sales
                 </Button>
               </Link>

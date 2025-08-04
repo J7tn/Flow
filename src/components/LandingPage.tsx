@@ -64,9 +64,9 @@ export function LandingPage() {
          ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -75,7 +75,7 @@ export function LandingPage() {
                 alt="Flow Logo" 
                 className="w-8 h-8 rounded-lg"
               />
-              <span className="text-xl font-bold text-gray-900">Flow</span>
+              <span className="text-xl font-bold text-foreground">Flow</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/login">
@@ -100,20 +100,20 @@ export function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-                                                 <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                                                 <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
                 Create your own personal
                 <span className="bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 bg-clip-text text-transparent">
                   {" "}flow
                 </span>
               </h1>
        
-                     <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                     <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
                        From creative projects to personal goals, Flow helps you plan, calculate costs,
                        optimize flows, and choose the right tools for any process or project.
                      </p>
                      
-                     <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 mb-8 max-w-4xl mx-auto border border-gray-200/50">
-                       <p className="text-lg text-gray-700 leading-relaxed">
+                     <div className="bg-card/60 backdrop-blur-sm rounded-2xl p-8 mb-8 max-w-4xl mx-auto border border-border/50">
+                       <p className="text-lg text-card-foreground leading-relaxed">
                          Sometimes when you want to build an idea, you don't know where to start. You have to do some research and there are so many options on what tools to use, so many different strategies that people employ, and you aren't sure which one is for you, or if they're even up to date. That's where we come in. Create a flow based on your goal. Optimize it. Calculate the cost. Weigh the pros and cons. All on one dashboard.
                        </p>
                      </div>
@@ -137,7 +137,7 @@ export function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -148,8 +148,8 @@ export function LandingPage() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="text-center"
               >
-                <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-                <div className="text-gray-600">{stat.label}</div>
+                <div className="text-3xl font-bold text-foreground mb-2">{stat.value}</div>
+                <div className="text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -157,13 +157,13 @@ export function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-muted/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-                               <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                               <h2 className="text-4xl font-bold text-foreground mb-4">
                      Everything You Need to Optimize Any Process
                    </h2>
-                   <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                   <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
                      Comprehensive tools and templates to streamline any project or flow
                    </p>
           </div>
@@ -194,13 +194,13 @@ export function LandingPage() {
       </section>
 
       {/* Template Categories */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-                               <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                               <h2 className="text-4xl font-bold text-foreground mb-4">
                      Templates for Every Project Type
                    </h2>
-                   <p className="text-xl text-gray-600">
+                   <p className="text-xl text-muted-foreground">
                      Ready-to-use templates covering creative, personal, educational, and professional projects
                    </p>
           </div>
@@ -215,7 +215,7 @@ export function LandingPage() {
               >
                 <Card className="text-center hover:shadow-md transition-shadow duration-300 cursor-pointer">
                   <CardContent className="pt-6">
-                    <div className="text-lg font-semibold text-gray-900">{category}</div>
+                    <div className="text-lg font-semibold text-foreground">{category}</div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -240,13 +240,13 @@ export function LandingPage() {
                    </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/signup">
-                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8 py-3">
+                <Button size="lg" className="bg-background text-foreground hover:bg-muted text-lg px-8 py-3">
                   Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/templates">
-                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-600 text-lg px-8 py-3 font-semibold">
+                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-foreground text-lg px-8 py-3 font-semibold">
                   Explore Templates
                 </Button>
               </Link>

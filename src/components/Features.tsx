@@ -74,9 +74,9 @@ export function Features() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -85,7 +85,7 @@ export function Features() {
                 alt="Flow Logo" 
                 className="w-8 h-8 rounded-lg"
               />
-              <span className="text-xl font-bold text-gray-900">Flow</span>
+              <span className="text-xl font-bold text-foreground">Flow</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/">
@@ -110,10 +110,10 @@ export function Features() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                How Flow Works
+              <h1 className="text-5xl font-bold text-foreground mb-6">
+                Powerful Features for Every Workflow
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
                 Transform chaos into clarity with our simple 5-step process. 
                 From template selection to execution, Flow guides you every step of the way.
               </p>
@@ -133,13 +133,13 @@ export function Features() {
                 }`}
               >
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg">
+                  <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center shadow-lg">
                     {step.icon}
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{step.title}</h3>
-                  <p className="text-lg text-gray-600">{step.description}</p>
+                  <h3 className="text-2xl font-bold text-foreground mb-3">{step.title}</h3>
+                                      <p className="text-lg text-muted-foreground">{step.description}</p>
                 </div>
                 {index < steps.length - 1 && (
                   <div className="hidden md:block">
@@ -153,10 +153,10 @@ export function Features() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
               Why Choose Flow?
             </h2>
             <p className="text-xl text-gray-600">
@@ -205,14 +205,14 @@ export function Features() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/signup">
-                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8 py-3">
-                  Start Free Trial
+                <Button size="lg" className="bg-background text-foreground hover:bg-muted text-lg px-8 py-3">
+                  Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/templates">
-                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-600 text-lg px-8 py-3">
-                  Browse Templates
+                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-foreground text-lg px-8 py-3 font-semibold">
+                  View Templates
                 </Button>
               </Link>
             </div>

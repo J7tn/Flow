@@ -63,9 +63,9 @@ export function About() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -74,7 +74,7 @@ export function About() {
                 alt="Flow Logo" 
                 className="w-8 h-8 rounded-lg"
               />
-              <span className="text-xl font-bold text-gray-900">Flow</span>
+              <span className="text-xl font-bold text-foreground">Flow</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/">
@@ -99,10 +99,10 @@ export function About() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                Why Flow Exists
+              <h1 className="text-5xl font-bold text-foreground mb-6">
+                About Flow
               </h1>
-              <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+                              <p className="text-xl text-muted-foreground max-w-4xl mx-auto">
                 Born from frustration with chaotic team processes, Flow transforms disorganized workflows 
                 into clear, actionable steps that everyone can follow.
               </p>
@@ -197,9 +197,9 @@ export function About() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.2 }}
-            className="bg-white rounded-2xl p-12 text-center shadow-xl"
+            className="bg-card rounded-2xl p-12 text-center shadow-xl"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl font-bold text-foreground mb-6">
               Our Mission
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
@@ -228,14 +228,14 @@ export function About() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/signup">
-                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8 py-3">
-                  Start Free Trial
+                <Button size="lg" className="bg-background text-foreground hover:bg-muted text-lg px-8 py-3">
+                  Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/templates">
-                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-600 text-lg px-8 py-3">
-                  Browse Templates
+                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-foreground text-lg px-8 py-3 font-semibold">
+                  Contact Us
                 </Button>
               </Link>
             </div>

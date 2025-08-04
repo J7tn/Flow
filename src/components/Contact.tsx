@@ -41,9 +41,9 @@ export function Contact() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -52,7 +52,7 @@ export function Contact() {
                 alt="Flow Logo" 
                 className="w-8 h-8 rounded-lg"
               />
-              <span className="text-xl font-bold text-gray-900">Flow</span>
+              <span className="text-xl font-bold text-foreground">Flow</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/">
@@ -77,12 +77,11 @@ export function Contact() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl font-bold text-gray-900 mb-6">
+              <h1 className="text-5xl font-bold text-foreground mb-6">
                 Get in Touch
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Have questions about Flow? Need help with your account? 
-                We're here to help you succeed.
+                              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Have a question or need help? We're here to assist you.
               </p>
             </motion.div>
           </div>
@@ -105,7 +104,7 @@ export function Contact() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-lg font-semibold text-gray-900 mb-4">
+                    <p className="text-lg font-semibold text-foreground mb-4">
                       {method.value}
                     </p>
                     {method.action && method.href && (
@@ -223,10 +222,10 @@ export function Contact() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-card">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
               Frequently Asked Questions
             </h2>
           </div>
@@ -236,12 +235,12 @@ export function Contact() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="bg-gray-50 p-6 rounded-lg"
+              className="bg-muted/50 p-6 rounded-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 How quickly do you respond to inquiries?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 We typically respond to all inquiries within 24 hours during business days.
               </p>
             </motion.div>
@@ -250,12 +249,12 @@ export function Contact() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-gray-50 p-6 rounded-lg"
+              className="bg-muted/50 p-6 rounded-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 Do you offer technical support?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Yes! We provide comprehensive technical support for all Flow users. Just send us an email.
               </p>
             </motion.div>
@@ -264,12 +263,12 @@ export function Contact() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-gray-50 p-6 rounded-lg"
+              className="bg-muted/50 p-6 rounded-lg"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 Can I request custom features?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Absolutely! We love hearing from our users about new features. Send us your ideas and we'll consider them for future updates.
               </p>
             </motion.div>
@@ -293,14 +292,14 @@ export function Contact() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/signup">
-                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8 py-3">
-                  Start Free Trial
+                <Button size="lg" className="bg-background text-foreground hover:bg-muted text-lg px-8 py-3">
+                  Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/templates">
-                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-600 text-lg px-8 py-3">
-                  Browse Templates
+                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-foreground text-lg px-8 py-3 font-semibold">
+                  Schedule Demo
                 </Button>
               </Link>
             </div>
