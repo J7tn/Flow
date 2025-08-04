@@ -24,12 +24,9 @@ import FlowDesigner from "./components/workflow/FlowDesigner";
 import SharedFlowViewer from "./components/workflow/SharedFlowViewer";
 import { TemplateTest } from "./components/TemplateTest";
 import { Toaster } from "./components/ui/toaster";
-import { useScrollToTop } from "./lib/hooks/useScrollToTop";
 
-function App() {
-  // Use custom hook for scroll restoration
-  useScrollToTop();
-
+// Wrapper component that uses the scroll hook
+function AppContent() {
   const appRoutes = [
     {
       path: "/",
@@ -166,9 +163,17 @@ function App() {
   const element = useRoutes(allRoutes);
 
   return (
+    <Suspense fallback={<p>Loading...</p>}>
+      {element}
+    </Suspense>
+  );
+}
+
+function App() {
+  return (
     <ThemeProvider>
       <AuthProvider>
-        <Suspense fallback={<p>Loading...</p>}>{element}</Suspense>
+        <AppContent />
         <Toaster />
       </AuthProvider>
     </ThemeProvider>
