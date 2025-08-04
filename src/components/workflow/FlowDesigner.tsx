@@ -87,6 +87,8 @@ import {
   ArrowDown,
   Building,
   Camera,
+  Star,
+  Check,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
@@ -414,7 +416,7 @@ Guidelines:
       const messages = [
         {
           role: 'system',
-          content: `You are an expert tool recommendation specialist. Based on the workflow step, suggest relevant tools, software, or resources that would help accomplish this step.
+          content: `You are an expert tool recommendation specialist with deep knowledge of game development, software development, and creative tools. Based on the workflow step, suggest relevant tools, software, or resources that would help accomplish this step.
 
 IMPORTANT: Return your response as a JSON array with exactly this structure:
 [
@@ -433,13 +435,20 @@ IMPORTANT: Return your response as a JSON array with exactly this structure:
   }
 ]
 
+SPECIAL INSTRUCTIONS FOR GAME DEVELOPMENT:
+- If the goal involves game development, ALWAYS include major game engines like Unity, Unreal Engine, Godot
+- For game development steps, suggest tools like: Unity, Unreal Engine, Godot, Blender, Maya, Photoshop, GIMP, Audacity, FMOD, Wwise
+- Include both free and paid options for game development tools
+- Consider the specific step context (planning, design, development, testing, publishing)
+
 Guidelines:
-- Suggest 3-6 relevant tools for the specific step
+- Suggest 4-8 relevant tools for the specific step
 - Include a mix of free and paid tools
 - Focus on tools that directly help with the step's objectives
 - Use realistic pricing and accurate descriptions
 - Choose appropriate categories and icons
-- Ensure tools are actually useful for the given step context`
+- Ensure tools are actually useful for the given step context
+- For game development, prioritize industry-standard tools`
         },
         {
           role: 'user',
@@ -454,7 +463,7 @@ Description: ${stepDescription}`
         model: 'gpt-3.5-turbo',
         messages,
         temperature: 0.7,
-        max_tokens: 800,
+        max_tokens: 1000,
       });
 
       console.log('📥 Received tool response from Chat2API:', response);
@@ -483,122 +492,128 @@ Description: ${stepDescription}`
         
         // Map icon names to actual icon components
         const iconMap: { [key: string]: any } = {
-          'Target': Target,
-          'Search': Search,
-          'Code': Code,
-          'Users': Users,
-          'Rocket': Rocket,
-          'TrendingUp': TrendingUp,
-          'Activity': Activity,
-          'Heart': Heart,
-          'Package': Package,
-          'Video': Video,
-          'Calendar': Calendar,
-          'FileText': FileText,
-          'Share2': Share2,
-          'Zap': Zap,
-          'BarChart3': BarChart3,
-          'UserPlus': UserPlus,
-          'Filter': Filter,
-          'Settings': Settings,
-          'Lightbulb': Lightbulb,
-          'MapPin': MapPin,
-          'Mic': Mic,
-          'Megaphone': Megaphone,
-          'MessageCircle': MessageCircle,
-          'MessageSquare': MessageSquare,
-          'Palette': Palette,
-          'PenTool': PenTool,
-          'Edit': Edit,
-          'Image': Image,
-          'CheckCircle': CheckCircle,
-          'Gamepad2': Gamepad2,
-          'BookOpen': BookOpen,
-          'Monitor': Monitor,
-          'GraduationCap': GraduationCap,
-          'Calculator': Calculator,
-          'RefreshCw': RefreshCw,
-          'HelpCircle': HelpCircle,
-          'Box': Box,
-          'Database': Database,
-          'Clipboard': Clipboard,
-          'Bug': Bug,
-          'Upload': Upload,
-          'Camera': Camera,
-          'Play': Play,
-          'Map': Map,
-          'CheckSquare': CheckSquare,
-          'Shield': Shield,
-          'AlertTriangle': AlertTriangle,
-          'Mail': Mail,
-          'Eye': Eye,
-          'Folder': Folder,
-          'Globe': Globe
+          'code': Code,
+          'gamepad': Gamepad2,
+          'book': BookOpen,
+          'monitor': Monitor,
+          'graduation': GraduationCap,
+          'calculator': Calculator,
+          'refresh': RefreshCw,
+          'help': HelpCircle,
+          'box': Box,
+          'database': Database,
+          'clipboard': Clipboard,
+          'bug': Bug,
+          'upload': Upload,
+          'camera': Camera,
+          'play': Play,
+          'map': Map,
+          'checksquare': CheckSquare,
+          'shield': Shield,
+          'alerttriangle': AlertTriangle,
+          'mail': Mail,
+          'eye': Eye,
+          'folder': Folder,
+          'globe': Globe,
+          'info': Info,
+          'filetext': FileText,
+          'messagesquare': MessageSquare,
+          'palette': Palette,
+          'pentool': PenTool,
+          'edit': Edit,
+          'image': Image,
+          'checkcircle': CheckCircle,
+          'zap': Zap,
+          'target': Target,
+          'trendingup': TrendingUp,
+          'search': Search,
+          'users': Users,
+          'rocket': Rocket,
+          'activity': Activity,
+          'heart': Heart,
+          'package': Package,
+          'award': Award,
+          'video': Video,
+          'list': List,
+          'building': Building,
+          'clock': Clock,
+          'dollarsign': DollarSign,
+          'trash2': Trash2,
+          'share2': Share2,
+          'barchart3': BarChart3,
+          'userplus': UserPlus,
+          'filter': Filter,
+          'settings': Settings,
+          'lightbulb': Lightbulb,
+          'mappin': MapPin,
+          'mic': Mic,
+          'megaphone': Megaphone,
+          'calendar': Calendar,
+          'messagecircle': MessageCircle,
+          'wrench': Wrench,
+          'star': Star,
+          'check': Check
         };
 
-        // Validate and transform the parsed tools
-        const validTools = parsedTools
-          .filter((tool: any) => 
-            tool.name && 
-            tool.description && 
-            tool.category && 
-            tool.pricing
-          )
+        // Validate and map tools
+        const validatedTools = parsedTools
+          .filter((tool: any) => tool.name && tool.description && tool.category)
           .map((tool: any) => ({
             name: tool.name,
             description: tool.description,
             category: tool.category,
-            icon: iconMap[tool.icon] || Target, // Default to Target if icon not found
-            link: tool.link || '#',
+            icon: iconMap[tool.icon?.toLowerCase()] || Code,
+            link: tool.link || undefined,
             pricing: {
-              model: tool.pricing.model || 'freemium',
-              startingPrice: tool.pricing.startingPrice || 0,
-              currency: tool.pricing.currency || 'USD',
-              notes: tool.pricing.notes || 'Pricing varies'
+              model: tool.pricing?.model || 'freemium',
+              startingPrice: tool.pricing?.startingPrice || 0,
+              currency: tool.pricing?.currency || 'USD',
+              notes: tool.pricing?.notes || 'Pricing varies'
             }
           }));
 
-        console.log('✅ Valid tools generated:', validTools);
-
-        if (validTools.length > 0) {
-          // Filter tools based on user type
-          const filterToolsByUserType = (toolList: Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }>) => {
-            return toolList.filter(tool => {
-              const userPricing = getUserSpecificPricing(tool);
-              // For solo users, prioritize free tools
-              if (userType === "solo" && userPricing.model !== "free") {
-                return false;
-              }
-              // For team users, include free and affordable tools
-              if (userType === "team" && userPricing.startingPrice && userPricing.startingPrice > 50) {
-                return false;
-              }
-              // For enterprise users, include all tools
-              return true;
-            });
-          };
-
-          const filteredTools = filterToolsByUserType(validTools);
-          console.log('🎉 Returning AI-generated tools!', filteredTools);
-          return filteredTools;
+        console.log('✅ Validated tools:', validatedTools);
+        
+        if (validatedTools.length === 0) {
+          console.log('⚠️ No valid tools found, using fallback');
+          throw new Error('No valid tools generated');
         }
-      } catch (parseError) {
-        console.warn('❌ Failed to parse AI tool response as JSON:', parseError);
-        console.warn('Raw tool response was:', aiResponse);
-      }
 
-      // Fallback to keyword-based generation if AI parsing fails
-      console.log('🔄 AI tool parsing failed, using fallback generation');
-      return getFallbackTools(stepTitle);
-      
+        return validatedTools;
+      } catch (parseError) {
+        console.error('❌ Failed to parse AI response as JSON:', parseError);
+        throw new Error('Failed to parse AI response');
+      }
     } catch (error) {
-      console.error('💥 AI tool generation failed:', error);
-      // Fallback to keyword-based generation
-      return getFallbackTools(stepTitle);
+      console.error('❌ Error in generateToolsWithAI:', error);
+      throw error;
     }
   };
 
   const getFallbackTools = (stepTitle: string): Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }> => {
+    // Check if this is a game development related step
+    const isGameDev = stepTitle.toLowerCase().includes('game') || 
+                     stepTitle.toLowerCase().includes('development') || 
+                     stepTitle.toLowerCase().includes('design') ||
+                     stepTitle.toLowerCase().includes('engine') ||
+                     stepTitle.toLowerCase().includes('unity') ||
+                     stepTitle.toLowerCase().includes('unreal') ||
+                     stepTitle.toLowerCase().includes('godot');
+
+    if (isGameDev) {
+      return [
+        { name: "Unity", description: "Popular game engine for 2D and 3D game development", category: "gaming", icon: Gamepad2, link: "https://unity.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free for personal use, paid plans from $25/month" } },
+        { name: "Unreal Engine", description: "Professional game engine for high-end 3D games", category: "gaming", icon: Gamepad2, link: "https://unrealengine.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free until $1M revenue, then 5% royalty" } },
+        { name: "Godot", description: "Free and open-source game engine", category: "gaming", icon: Gamepad2, link: "https://godotengine.org", pricing: { model: "free", currency: "USD", notes: "Completely free and open source" } },
+        { name: "Blender", description: "Free 3D modeling and animation software", category: "creative", icon: Palette, link: "https://blender.org", pricing: { model: "free", currency: "USD", notes: "Completely free and open source" } },
+        { name: "GIMP", description: "Free image editing software for game assets", category: "creative", icon: Image, link: "https://gimp.org", pricing: { model: "free", currency: "USD", notes: "Completely free and open source" } },
+        { name: "Audacity", description: "Free audio editing software for game sound effects", category: "creative", icon: Mic, link: "https://audacityteam.org", pricing: { model: "free", currency: "USD", notes: "Completely free and open source" } },
+        { name: "GitHub", description: "Version control and collaboration for game development", category: "productivity", icon: Code, link: "https://github.com", pricing: { model: "freemium", startingPrice: 0, currency: "USD", notes: "Free for public repos, paid for private" } },
+        { name: "Trello", description: "Project management for game development teams", category: "productivity", icon: CheckSquare, link: "https://trello.com", pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } }
+      ];
+    }
+
+    // Default fallback tools for other types of projects
     return [
       { name: "Notion", description: "Documentation and project management", category: "productivity", icon: FileText, pricing: { model: "freemium", startingPrice: 8, currency: "USD", notes: "Free plan available, paid from $8/month" } },
       { name: "Trello", description: "Task management and organization", category: "productivity", icon: CheckSquare, pricing: { model: "freemium", startingPrice: 5, currency: "USD", notes: "Free plan available, paid from $5/month" } },
