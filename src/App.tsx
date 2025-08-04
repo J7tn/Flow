@@ -170,8 +170,6 @@ function App() {
       <AuthProvider>
         <Suspense fallback={<p>Loading...</p>}>{element}</Suspense>
         <Toaster />
-        <ConfigDebugger isVisible={import.meta.env.DEV} />
-        <AuthDebugger isVisible={import.meta.env.DEV} />
       </AuthProvider>
     </ThemeProvider>
   );
