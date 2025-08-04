@@ -143,24 +143,24 @@ export const appDevelopmentTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 25000,
+    totalCost: 35000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Development Team',
-        description: 'Frontend and backend developers',
+        name: 'Development Team (3 developers)',
+        description: 'Frontend and backend developers at $120/hour average rate',
         type: 'labor',
-        amount: 15000,
+        amount: 24000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
       },
       {
         id: createId(),
-        name: 'Design Services',
-        description: 'UI/UX design and prototyping',
+        name: 'UI/UX Designer',
+        description: 'Professional designer at $80/hour for 50 hours',
         type: 'labor',
         amount: 4000,
         currency: 'USD',
@@ -169,28 +169,28 @@ export const appDevelopmentTemplate: FlowTemplate = {
       },
       {
         id: createId(),
-        name: 'Infrastructure & Hosting',
-        description: 'Cloud hosting and services',
+        name: 'AWS Cloud Infrastructure',
+        description: 'EC2, RDS, S3, CloudFront for first year (similar to Instagram\'s initial setup)',
         type: 'infrastructure',
-        amount: 1200,
+        amount: 2400,
         currency: 'USD',
         frequency: 'yearly',
         category: 'infrastructure'
       },
       {
         id: createId(),
-        name: 'Development Tools',
-        description: 'Software licenses and tools',
+        name: 'Development Tools & Licenses',
+        description: 'JetBrains IDEs, Sketch, Figma Pro, Postman Pro, GitHub Pro',
         type: 'licensing',
-        amount: 800,
+        amount: 1200,
         currency: 'USD',
-        frequency: 'one-time',
+        frequency: 'yearly',
         category: 'tools'
       },
       {
         id: createId(),
-        name: 'Testing & QA',
-        description: 'Testing services and tools',
+        name: 'Testing & QA Services',
+        description: 'Automated testing tools, device testing, security audit',
         type: 'labor',
         amount: 3000,
         currency: 'USD',
@@ -199,26 +199,27 @@ export const appDevelopmentTemplate: FlowTemplate = {
       },
       {
         id: createId(),
-        name: 'App Store Fees',
-        description: 'Apple Developer Program and Google Play fees',
+        name: 'App Store Developer Accounts',
+        description: 'Apple Developer Program ($99/year) + Google Play Console ($25 one-time)',
         type: 'subscription',
-        amount: 200,
+        amount: 124,
         currency: 'USD',
         frequency: 'yearly',
         category: 'platform'
       }
     ],
     assumptions: [
-      'Team of 3-4 developers',
-      '6-month development timeline',
-      'Standard app complexity',
-      'No custom hardware requirements'
+      'Team of 3 developers working 20 weeks',
+      'Professional UI/UX designer for 50 hours',
+      'Standard app complexity (similar to a food delivery app)',
+      'AWS infrastructure for scalability',
+      'Comprehensive testing and security measures'
     ],
     riskFactors: [
-      'Scope creep may increase costs',
-      'App store rejection delays',
-      'Technical debt accumulation',
-      'Market changes affecting requirements'
+      'Scope creep may increase costs by 20-30%',
+      'App store rejection delays (average 2-4 weeks)',
+      'Technical debt accumulation requiring refactoring',
+      'Market changes affecting requirements and timeline'
     ]
   },
 
@@ -469,46 +470,73 @@ export const gameDesignTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 45000,
+    totalCost: 85000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Development Team',
-        description: 'Programmers, artists, designers',
+        name: 'Development Team (5 people)',
+        description: '2 programmers ($100/hour), 2 artists ($80/hour), 1 designer ($90/hour) for 18 months',
         type: 'labor',
-        amount: 30000,
+        amount: 55000,
         currency: 'USD',
-        frequency: 'one-time'
+        frequency: 'one-time',
+        category: 'personnel'
       },
       {
         id: createId(),
-        name: 'Software Licenses',
-        description: 'Game engines, tools, and software',
+        name: 'Unity Pro Licenses',
+        description: 'Unity Pro ($180/month per seat) for 5 team members for 18 months',
         type: 'licensing',
-        amount: 3000,
+        amount: 16200,
         currency: 'USD',
-        frequency: 'one-time'
+        frequency: 'one-time',
+        category: 'software'
       },
       {
         id: createId(),
-        name: 'Marketing & PR',
-        description: 'Game marketing and promotion',
+        name: 'Marketing & Steam Page',
+        description: 'Steam page creation, press kit, influencer outreach, social media campaign',
         type: 'labor',
         amount: 8000,
         currency: 'USD',
-        frequency: 'one-time'
+        frequency: 'one-time',
+        category: 'marketing'
       },
       {
         id: createId(),
-        name: 'Asset Creation',
-        description: 'Graphics, sound, and animation assets',
+        name: 'Asset Store Purchases',
+        description: 'Unity Asset Store purchases for models, textures, sound effects, animations',
         type: 'materials',
-        amount: 4000,
+        amount: 3000,
         currency: 'USD',
-        frequency: 'one-time'
+        frequency: 'one-time',
+        category: 'assets'
+      },
+      {
+        id: createId(),
+        name: 'Testing & QA',
+        description: 'Beta testing, bug fixing, performance optimization, platform testing',
+        type: 'labor',
+        amount: 2800,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'quality'
       }
+    ],
+    assumptions: [
+      'Indie game development team of 5 people',
+      '18-month development cycle (typical for indie games)',
+      'Unity-based 3D game (similar to Among Us complexity)',
+      'Steam platform release with marketing',
+      'Asset store purchases to speed up development'
+    ],
+    riskFactors: [
+      'Development delays can increase costs by 30-50%',
+      'Steam algorithm changes affecting discoverability',
+      'Player feedback requiring major redesigns',
+      'Competition from similar games affecting sales'
     ]
   },
 
@@ -620,28 +648,83 @@ export const manufacturingTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 500000,
+    totalCost: 250000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Tooling & Setup',
-        description: 'Manufacturing tooling and equipment setup',
+        name: 'Injection Molding Tooling',
+        description: 'Custom injection molds for plastic parts (similar to iPhone case manufacturing)',
         type: 'one-time',
-        amount: 100000,
+        amount: 80000,
         currency: 'USD',
-        frequency: 'one-time'
+        frequency: 'one-time',
+        category: 'tooling'
       },
       {
         id: createId(),
-        name: 'Production Costs',
-        description: 'Per-unit manufacturing costs',
-        type: 'variable',
-        amount: 50000,
+        name: 'PCB Assembly Setup',
+        description: 'Circuit board assembly line setup, stencils, fixtures',
+        type: 'one-time',
+        amount: 45000,
         currency: 'USD',
-        frequency: 'monthly'
+        frequency: 'one-time',
+        category: 'equipment'
+      },
+      {
+        id: createId(),
+        name: 'First Production Run (1000 units)',
+        description: 'Materials, labor, and overhead for initial production batch',
+        type: 'variable',
+        amount: 75000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'production'
+      },
+      {
+        id: createId(),
+        name: 'Quality Control & Testing',
+        description: 'Testing equipment, certifications, quality assurance processes',
+        type: 'one-time',
+        amount: 25000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'quality'
+      },
+      {
+        id: createId(),
+        name: 'Packaging & Logistics',
+        description: 'Custom packaging design, shipping containers, logistics setup',
+        type: 'one-time',
+        amount: 15000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'logistics'
+      },
+      {
+        id: createId(),
+        name: 'Ongoing Production (Monthly)',
+        description: 'Materials, labor, overhead for 500 units/month production',
+        type: 'variable',
+        amount: 35000,
+        currency: 'USD',
+        frequency: 'monthly',
+        category: 'production'
       }
+    ],
+    assumptions: [
+      'Consumer electronics product (similar to smart home device)',
+      'Injection molded plastic housing with PCB assembly',
+      'Initial production run of 1000 units',
+      'Ongoing production of 500 units/month',
+      'Quality standards meeting FCC/CE certifications'
+    ],
+    riskFactors: [
+      'Supply chain disruptions can increase costs by 20-40%',
+      'Tooling modifications required after first production run',
+      'Quality issues requiring rework and delays',
+      'Material price fluctuations affecting ongoing costs'
     ]
   },
 
@@ -754,40 +837,108 @@ export const marketingCampaignTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 25000,
+    totalCost: 85000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Marketing Team',
-        description: 'Marketing specialists and content creators',
+        name: 'Marketing Team (4 people)',
+        description: 'Marketing director ($120/hour), content strategist ($80/hour), designer ($75/hour), social media manager ($65/hour) for 16 weeks',
         type: 'labor',
-        amount: 15000,
+        amount: 45000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
       },
       {
         id: createId(),
-        name: 'Advertising Budget',
-        description: 'Paid advertising and promotion',
+        name: 'Paid Advertising Budget',
+        description: 'Facebook/Instagram ads ($25,000), Google Search/Display ($15,000), TikTok ads ($10,000) - typical for mid-market D2C brand',
         type: 'variable',
-        amount: 8000,
+        amount: 50000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'advertising'
       },
       {
         id: createId(),
-        name: 'Tools & Software',
-        description: 'Marketing tools and analytics platforms',
-        type: 'licensing',
-        amount: 2000,
+        name: 'Influencer & Creator Partnerships',
+        description: 'Mix of nano (10-50k followers), micro (50k-500k), and macro (500k+) influencers across platforms',
+        type: 'variable',
+        amount: 15000,
         currency: 'USD',
         frequency: 'one-time',
+        category: 'influencer'
+      },
+      {
+        id: createId(),
+        name: 'Marketing Technology Stack',
+        description: 'HubSpot Marketing Hub ($800/month), Klaviyo ($200/month), Later Pro ($40/month), Canva Pro ($120/year), SEMrush ($119/month)',
+        type: 'subscription',
+        amount: 15000,
+        currency: 'USD',
+        frequency: 'yearly',
         category: 'tools'
+      },
+      {
+        id: createId(),
+        name: 'Professional Content Production',
+        description: 'Product photography ($5,000), lifestyle shoots ($8,000), video content ($12,000), graphic design assets ($5,000)',
+        type: 'labor',
+        amount: 30000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'content'
+      },
+      {
+        id: createId(),
+        name: 'PR & Media Relations',
+        description: 'Press release distribution ($2,000), media kit creation ($3,000), journalist outreach ($5,000), PR agency retainer ($10,000)',
+        type: 'labor',
+        amount: 20000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'pr'
+      },
+      {
+        id: createId(),
+        name: 'Analytics & Attribution',
+        description: 'Google Analytics 4 setup, conversion tracking, attribution modeling, A/B testing platform',
+        type: 'subscription',
+        amount: 5000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'analytics'
+      },
+      {
+        id: createId(),
+        name: 'Legal & Compliance',
+        description: 'Privacy policy updates, GDPR compliance, advertising compliance review, terms of service',
+        type: 'one-time',
+        amount: 8000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'legal'
       }
+    ],
+    assumptions: [
+      'Mid-market D2C e-commerce brand with $2-5M annual revenue',
+      '4-month comprehensive campaign duration',
+      'Target audience of 500,000+ potential customers across multiple platforms',
+      'Multi-channel approach (social, search, influencer, PR)',
+      'Professional content creation with agency-level quality',
+      'Full marketing technology stack implementation',
+      'Compliance with privacy regulations (GDPR, CCPA)'
+    ],
+    riskFactors: [
+      'Ad platform algorithm changes affecting performance and costs',
+      'Influencer partnerships not delivering expected ROI or brand alignment',
+      'Competitive advertising driving up costs and reducing visibility',
+      'Seasonal fluctuations affecting campaign timing and performance',
+      'Privacy regulation changes impacting targeting capabilities',
+      'Content creation delays affecting campaign timeline',
+      'Platform policy changes affecting advertising strategies'
     ]
   },
 
@@ -898,50 +1049,93 @@ export const ecommerceSetupTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 8000,
+    totalCost: 15000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Platform Fees',
-        description: 'Monthly platform subscription and transaction fees',
+        name: 'Shopify Plus Platform',
+        description: 'Shopify Plus ($2000/month) + transaction fees (2.9% + 30¢ per transaction)',
         type: 'subscription',
-        amount: 1500,
+        amount: 24000,
         currency: 'USD',
         frequency: 'yearly',
         category: 'platform'
       },
       {
         id: createId(),
-        name: 'Design & Development',
-        description: 'Store design and customization',
+        name: 'Custom Theme Development',
+        description: 'Professional Shopify theme development (similar to Allbirds or Warby Parker)',
         type: 'labor',
-        amount: 4000,
+        amount: 8000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'development'
       },
       {
         id: createId(),
-        name: 'Payment Processing',
-        description: 'Payment gateway setup and fees',
+        name: 'Payment Processing Setup',
+        description: 'Stripe integration, PayPal Business, Apple Pay, Google Pay setup',
         type: 'subscription',
-        amount: 1000,
+        amount: 1200,
         currency: 'USD',
         frequency: 'yearly',
         category: 'payments'
       },
       {
         id: createId(),
-        name: 'Marketing & SEO',
-        description: 'Initial marketing setup and SEO optimization',
+        name: 'Product Photography & Content',
+        description: 'Professional product photography, lifestyle shots, product descriptions',
         type: 'labor',
-        amount: 1500,
+        amount: 5000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'content'
+      },
+      {
+        id: createId(),
+        name: 'SEO & Marketing Setup',
+        description: 'SEO optimization, Google Shopping setup, Facebook Pixel, email marketing',
+        type: 'labor',
+        amount: 3000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'marketing'
+      },
+      {
+        id: createId(),
+        name: 'Apps & Integrations',
+        description: 'Klaviyo email marketing, Yotpo reviews, ReCharge subscriptions, ShipStation',
+        type: 'subscription',
+        amount: 2400,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'tools'
+      },
+      {
+        id: createId(),
+        name: 'Legal & Compliance',
+        description: 'Privacy policy, terms of service, GDPR compliance, SSL certificates',
+        type: 'one-time',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'legal'
       }
+    ],
+    assumptions: [
+      'Premium D2C brand with 100+ SKUs',
+      'Shopify Plus platform for scalability',
+      'Professional custom theme development',
+      'High-quality product photography',
+      'Comprehensive marketing and analytics setup'
+    ],
+    riskFactors: [
+      'Platform fee increases affecting profitability',
+      'Custom development delays extending timeline',
+      'Payment processing issues affecting sales',
+      'Competition driving up customer acquisition costs'
     ]
   },
 
@@ -1052,40 +1246,83 @@ export const contentCreationTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 3000,
+    totalCost: 8500,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Content Creation',
-        description: 'Writing, design, and production costs',
+        name: 'Content Creator (Freelance)',
+        description: 'Professional content creator at $75/hour for 40 hours (blog posts, social media, videos)',
         type: 'labor',
-        amount: 1800,
+        amount: 3000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'content'
       },
       {
         id: createId(),
-        name: 'Tools & Software',
-        description: 'Content creation and management tools',
+        name: 'Graphic Designer',
+        description: 'Professional designer for infographics, social media graphics, brand assets',
+        type: 'labor',
+        amount: 2000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'design'
+      },
+      {
+        id: createId(),
+        name: 'Video Production',
+        description: 'Professional video editing, motion graphics, YouTube optimization',
+        type: 'labor',
+        amount: 2500,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'video'
+      },
+      {
+        id: createId(),
+        name: 'Content Management Tools',
+        description: 'Notion Pro, Canva Pro, Adobe Creative Suite, Buffer, Hootsuite',
         type: 'licensing',
-        amount: 600,
+        amount: 1200,
         currency: 'USD',
         frequency: 'yearly',
         category: 'tools'
       },
       {
         id: createId(),
-        name: 'Promotion & Distribution',
-        description: 'Paid promotion and distribution costs',
+        name: 'Paid Promotion',
+        description: 'Facebook/Instagram ads, Pinterest promoted pins, YouTube ads',
         type: 'variable',
-        amount: 600,
+        amount: 1500,
         currency: 'USD',
         frequency: 'one-time',
         category: 'marketing'
+      },
+      {
+        id: createId(),
+        name: 'Analytics & SEO Tools',
+        description: 'SEMrush, Ahrefs, Google Analytics Premium, Hotjar',
+        type: 'licensing',
+        amount: 800,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'analytics'
       }
+    ],
+    assumptions: [
+      'Professional content marketing campaign for SaaS company',
+      'Multi-format content (blog, video, social media, infographics)',
+      '3-month content creation and distribution campaign',
+      'Target audience of 50,000+ potential customers',
+      'Professional tools and paid promotion'
+    ],
+    riskFactors: [
+      'Content performance below expectations affecting ROI',
+      'Platform algorithm changes reducing organic reach',
+      'Competition for audience attention increasing costs',
+      'Content creation delays affecting campaign timeline'
     ]
   },
 
@@ -1196,40 +1433,83 @@ export const customerSupportTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 5000,
+    totalCost: 12000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Support Platform',
-        description: 'Help desk software and tools',
+        name: 'Zendesk Support Suite',
+        description: 'Zendesk Support ($49/agent/month) for 3 agents + knowledge base + live chat',
         type: 'subscription',
-        amount: 1200,
+        amount: 1764,
         currency: 'USD',
         frequency: 'yearly',
         category: 'software'
       },
       {
         id: createId(),
-        name: 'Support Team',
-        description: 'Customer support staff training and setup',
+        name: 'Support Team Training',
+        description: '3 support agents training, onboarding, and process documentation',
         type: 'labor',
-        amount: 2500,
+        amount: 4500,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
       },
       {
         id: createId(),
-        name: 'Knowledge Base',
-        description: 'Documentation and self-service resources',
+        name: 'Knowledge Base Development',
+        description: 'Professional documentation, FAQs, video tutorials, troubleshooting guides',
         type: 'labor',
-        amount: 1300,
+        amount: 3000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'content'
+      },
+      {
+        id: createId(),
+        name: 'Chatbot Implementation',
+        description: 'Intercom chatbot setup, training, and integration with support system',
+        type: 'subscription',
+        amount: 1200,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'automation'
+      },
+      {
+        id: createId(),
+        name: 'Quality Monitoring Tools',
+        description: 'Call recording, quality assurance software, customer satisfaction surveys',
+        type: 'subscription',
+        amount: 800,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'analytics'
+      },
+      {
+        id: createId(),
+        name: 'Integration & Setup',
+        description: 'CRM integration, email setup, phone system configuration',
+        type: 'labor',
+        amount: 1500,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'integration'
       }
+    ],
+    assumptions: [
+      'SaaS company with 10,000+ customers',
+      '3 support agents handling 500+ tickets/month',
+      'Multi-channel support (email, chat, phone)',
+      'Professional knowledge base and automation',
+      'Quality monitoring and analytics'
+    ],
+    riskFactors: [
+      'High ticket volume overwhelming support team',
+      'Customer satisfaction scores below targets',
+      'Integration issues causing support delays',
+      'Staff turnover requiring retraining costs'
     ]
   },
 
@@ -1340,50 +1620,93 @@ export const hrRecruitmentTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 6000,
+    totalCost: 15000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Job Board Postings',
-        description: 'Paid job postings and recruitment advertising',
-        type: 'variable',
-        amount: 1200,
+        name: 'LinkedIn Recruiter',
+        description: 'LinkedIn Recruiter ($99/month) + job postings ($395 per posting)',
+        type: 'subscription',
+        amount: 1588,
         currency: 'USD',
-        frequency: 'one-time',
+        frequency: 'yearly',
         category: 'advertising'
       },
       {
         id: createId(),
-        name: 'Recruitment Software',
-        description: 'ATS and recruitment tools',
+        name: 'Greenhouse ATS',
+        description: 'Greenhouse ATS ($95/user/month) for 2 recruiters + job board integrations',
         type: 'subscription',
-        amount: 800,
+        amount: 2280,
         currency: 'USD',
         frequency: 'yearly',
         category: 'software'
       },
       {
         id: createId(),
-        name: 'HR Staff Time',
-        description: 'HR team time for recruitment process',
+        name: 'HR Team Time',
+        description: '2 recruiters ($75/hour) working 40 hours each on recruitment process',
         type: 'labor',
-        amount: 3000,
+        amount: 6000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
       },
       {
         id: createId(),
-        name: 'Background Checks',
-        description: 'Candidate background verification',
+        name: 'Background Checks & Assessments',
+        description: 'HireRight background checks ($50/candidate) + HackerRank assessments ($25/candidate)',
         type: 'one-time',
-        amount: 1000,
+        amount: 1500,
         currency: 'USD',
         frequency: 'one-time',
         category: 'verification'
+      },
+      {
+        id: createId(),
+        name: 'Recruitment Marketing',
+        description: 'Career page development, employer branding, social media recruitment',
+        type: 'labor',
+        amount: 2500,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'marketing'
+      },
+      {
+        id: createId(),
+        name: 'Interview Coordination',
+        description: 'Video interview platform (Zoom Pro), scheduling tools, candidate experience',
+        type: 'subscription',
+        amount: 600,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'tools'
+      },
+      {
+        id: createId(),
+        name: 'Onboarding Setup',
+        description: 'BambooHR onboarding ($6.19/employee/month) + welcome kit preparation',
+        type: 'subscription',
+        amount: 500,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'onboarding'
       }
+    ],
+    assumptions: [
+      'Tech company hiring 10-15 positions annually',
+      '2 full-time recruiters managing the process',
+      'Professional ATS and recruitment tools',
+      'Comprehensive background checks and assessments',
+      'Employer branding and candidate experience focus'
+    ],
+    riskFactors: [
+      'Talent shortage driving up recruitment costs',
+      'High candidate drop-off rates affecting efficiency',
+      'Competition for top talent increasing time-to-hire',
+      'Background check delays affecting start dates'
     ]
   },
 
@@ -1494,50 +1817,93 @@ export const financialPlanningTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 20000,
+    totalCost: 35000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Financial Advisor',
-        description: 'Professional financial planning services',
+        name: 'Certified Financial Planner',
+        description: 'CFP professional at $200/hour for comprehensive financial planning (40 hours)',
         type: 'labor',
-        amount: 12000,
+        amount: 8000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'professional'
       },
       {
         id: createId(),
-        name: 'Financial Software',
-        description: 'Planning and analysis tools',
+        name: 'Investment Management',
+        description: 'Vanguard Personal Advisor Services (0.30% AUM) for $500,000 portfolio',
         type: 'subscription',
-        amount: 2000,
+        amount: 1500,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'investment'
+      },
+      {
+        id: createId(),
+        name: 'Tax Planning & Preparation',
+        description: 'CPA services for tax planning, preparation, and optimization strategies',
+        type: 'labor',
+        amount: 5000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'professional'
+      },
+      {
+        id: createId(),
+        name: 'Estate Planning Attorney',
+        description: 'Estate planning, wills, trusts, and legal documentation',
+        type: 'labor',
+        amount: 8000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'legal'
+      },
+      {
+        id: createId(),
+        name: 'Insurance Policies',
+        description: 'Life insurance ($500,000 term policy), disability insurance, umbrella policy',
+        type: 'subscription',
+        amount: 3000,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'protection'
+      },
+      {
+        id: createId(),
+        name: 'Financial Planning Software',
+        description: 'eMoney Advisor, RightCapital, or similar comprehensive planning platform',
+        type: 'subscription',
+        amount: 1200,
         currency: 'USD',
         frequency: 'yearly',
         category: 'software'
       },
       {
         id: createId(),
-        name: 'Legal & Tax Services',
-        description: 'Legal and tax planning consultation',
+        name: 'Ongoing Advisory Services',
+        description: 'Quarterly reviews, portfolio rebalancing, strategy adjustments',
         type: 'labor',
         amount: 4000,
         currency: 'USD',
-        frequency: 'one-time',
-        category: 'professional'
-      },
-      {
-        id: createId(),
-        name: 'Insurance & Protection',
-        description: 'Insurance planning and implementation',
-        type: 'subscription',
-        amount: 2000,
-        currency: 'USD',
         frequency: 'yearly',
-        category: 'protection'
+        category: 'ongoing'
       }
+    ],
+    assumptions: [
+      'High-net-worth individual with $500,000+ investable assets',
+      'Comprehensive financial planning including retirement, estate, and tax',
+      'Professional CFP and CPA services',
+      'Diversified investment portfolio with professional management',
+      'Ongoing advisory relationship with quarterly reviews'
+    ],
+    riskFactors: [
+      'Market volatility affecting investment returns and planning',
+      'Tax law changes requiring strategy adjustments',
+      'Life events (marriage, children, career changes) affecting plans',
+      'Inflation and economic changes impacting long-term projections'
     ]
   },
 
@@ -1646,50 +2012,93 @@ export const researchProjectTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 15000,
+    totalCost: 45000,
     currency: 'USD',
     calculationDate: new Date(),
     breakdown: [
       {
         id: createId(),
-        name: 'Research Staff',
-        description: 'Researchers and assistants',
+        name: 'Principal Investigator',
+        description: 'PhD researcher at $150/hour for 100 hours (research design, analysis, writing)',
         type: 'labor',
-        amount: 8000,
+        amount: 15000,
         currency: 'USD',
         frequency: 'one-time',
         category: 'personnel'
       },
       {
         id: createId(),
-        name: 'Equipment & Software',
-        description: 'Research equipment and analysis software',
-        type: 'one-time',
-        amount: 3000,
+        name: 'Research Assistants',
+        description: '2 graduate students at $25/hour for 200 hours each (data collection, coding)',
+        type: 'labor',
+        amount: 10000,
         currency: 'USD',
         frequency: 'one-time',
-        category: 'equipment'
+        category: 'personnel'
       },
       {
         id: createId(),
-        name: 'Data Collection',
-        description: 'Survey costs, participant compensation, data access',
+        name: 'Statistical Software & Tools',
+        description: 'SPSS ($99/month), Qualtrics ($500/year), NVivo ($1,200/year)',
         type: 'subscription',
-        amount: 3000,
+        amount: 2400,
+        currency: 'USD',
+        frequency: 'yearly',
+        category: 'software'
+      },
+      {
+        id: createId(),
+        name: 'Participant Recruitment',
+        description: 'Amazon Mechanical Turk ($2/participant) for 500 participants + screening',
+        type: 'variable',
+        amount: 1500,
         currency: 'USD',
         frequency: 'one-time',
         category: 'data'
       },
       {
         id: createId(),
-        name: 'Publication & Dissemination',
-        description: 'Journal fees, conference attendance, publication costs',
+        name: 'Equipment & Materials',
+        description: 'Eye-tracking equipment, EEG system, or specialized research tools',
         type: 'one-time',
-        amount: 1000,
+        amount: 8000,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'equipment'
+      },
+      {
+        id: createId(),
+        name: 'Conference Presentations',
+        description: 'Conference registration ($500), travel ($1,000), accommodation ($800)',
+        type: 'one-time',
+        amount: 2300,
+        currency: 'USD',
+        frequency: 'one-time',
+        category: 'dissemination'
+      },
+      {
+        id: createId(),
+        name: 'Publication Costs',
+        description: 'Open access fees ($3,000), proofreading ($500), figure preparation ($200)',
+        type: 'one-time',
+        amount: 3700,
         currency: 'USD',
         frequency: 'one-time',
         category: 'publication'
       }
+    ],
+    assumptions: [
+      'Academic research project with 500+ participants',
+      'Mixed-methods study with quantitative and qualitative data',
+      'Professional statistical analysis and software',
+      'Conference presentation and journal publication',
+      'Specialized research equipment and tools'
+    ],
+    riskFactors: [
+      'Participant recruitment difficulties extending timeline',
+      'Data quality issues requiring additional collection',
+      'Journal rejection requiring resubmission to different outlets',
+      'Equipment malfunctions affecting data collection'
     ]
   },
 
@@ -1869,18 +2278,73 @@ export const gameBalanceTemplate: FlowTemplate = {
   ],
 
   costAnalysis: {
-    totalCost: 2400,
+    totalCost: 8500,
     breakdown: [
-      { id: createId(), name: 'Analytics Setup', description: 'Analytics setup and tools', type: 'one-time', amount: 750, currency: 'USD', frequency: 'one-time' },
-      { id: createId(), name: 'Data Collection', description: 'Data collection and processing', type: 'variable', amount: 450, currency: 'USD', frequency: 'one-time' },
-      { id: createId(), name: 'Analysis and Testing', description: 'Analysis and testing', type: 'one-time', amount: 600, currency: 'USD', frequency: 'one-time' },
-      { id: createId(), name: 'Documentation', description: 'Documentation and validation', type: 'one-time', amount: 300, currency: 'USD', frequency: 'one-time' },
-      { id: createId(), name: 'Ongoing Tools', description: 'Ongoing analytics tools', type: 'subscription', amount: 300, currency: 'USD', frequency: 'monthly' }
+      { 
+        id: createId(), 
+        name: 'Unity Analytics Pro', 
+        description: 'Unity Analytics Pro ($500/month) + Amplitude ($995/month) for advanced analytics', 
+        type: 'subscription', 
+        amount: 17940, 
+        currency: 'USD', 
+        frequency: 'yearly',
+        category: 'analytics'
+      },
+      { 
+        id: createId(), 
+        name: 'Data Scientist (Contract)', 
+        description: 'Contract data scientist at $120/hour for 20 hours (setup, analysis, reporting)', 
+        type: 'labor', 
+        amount: 2400, 
+        currency: 'USD', 
+        frequency: 'one-time',
+        category: 'personnel'
+      },
+      { 
+        id: createId(), 
+        name: 'A/B Testing Platform', 
+        description: 'Optimizely or similar A/B testing platform for game mechanics testing', 
+        type: 'subscription', 
+        amount: 2400, 
+        currency: 'USD', 
+        frequency: 'yearly',
+        category: 'testing'
+      },
+      { 
+        id: createId(), 
+        name: 'Heatmap & Session Recording', 
+        type: 'subscription', 
+        amount: 1200, 
+        currency: 'USD', 
+        frequency: 'yearly',
+        category: 'analytics'
+      },
+      { 
+        id: createId(), 
+        name: 'Ongoing Analysis & Reporting', 
+        description: 'Monthly analysis, reporting, and optimization recommendations', 
+        type: 'labor', 
+        amount: 6000, 
+        currency: 'USD', 
+        frequency: 'yearly',
+        category: 'ongoing'
+      }
     ],
     currency: 'USD',
     calculationDate: new Date(),
-    assumptions: ['Standard game analytics tools', 'Team of 3-5 people', '2-4 week timeline'],
-    riskFactors: ['Data quality issues', 'Player engagement changes', 'Technical implementation delays']
+    assumptions: [
+      'Mobile game with 100,000+ monthly active users',
+      'Professional analytics stack for data-driven decisions',
+      'Contract data scientist for setup and analysis',
+      'Comprehensive A/B testing and optimization',
+      'Ongoing analysis and reporting services'
+    ],
+    riskFactors: [
+      'Data privacy regulations affecting tracking capabilities',
+      'Player behavior changes requiring new analysis approaches',
+      'Analytics platform costs scaling with user growth',
+      'Technical implementation delays affecting data collection'
+    ]
   },
 
   recommendedTools: [
@@ -2855,4 +3319,4 @@ export const targetAudiences = [
   { value: 'individual', label: 'Individual' },
   { value: 'small-team', label: 'Small Team' },
   { value: 'enterprise', label: 'Enterprise' }
-]; 
+];

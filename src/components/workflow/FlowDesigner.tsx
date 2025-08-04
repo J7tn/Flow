@@ -154,7 +154,7 @@ const FlowDesigner = () => {
   const [activePanel, setActivePanel] = useState<"suggested-steps" | "tools" | null>(null);
   
   // Tutorial state
-  const [showTutorial, setShowTutorial] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false); // Start as false, will be set based on flow state
   const [tutorialStep, setTutorialStep] = useState(0);
 
   // Load auto-save settings from localStorage
@@ -338,6 +338,22 @@ const FlowDesigner = () => {
       }
     }
   }, [searchParams, toast]);
+
+  // Determine if tutorial should be shown based on flow state
+  useEffect(() => {
+    const savedFlowData = localStorage.getItem('flow-draft-data');
+    const templateId = searchParams.get('template');
+    
+    // Show tutorial only if:
+    // 1. No saved flow data exists, AND
+    // 2. No template is being loaded
+    const shouldShowTutorial = !savedFlowData && !templateId;
+    
+    setShowTutorial(shouldShowTutorial);
+    if (shouldShowTutorial) {
+      setTutorialStep(0);
+    }
+  }, [searchParams]);
 
   const generateAISteps = async (goal: string) => {
     if (!goal.trim()) return;
@@ -2040,9 +2056,8 @@ Description: ${stepDescription}`
                                </CardHeader>
                                <CardContent>
                                  <Tabs defaultValue="general" className="w-full">
-                                   <TabsList className="grid w-full grid-cols-2">
+                                   <TabsList className="grid w-full grid-cols-1">
                                      <TabsTrigger value="general">General</TabsTrigger>
-                                     <TabsTrigger value="advanced">Advanced</TabsTrigger>
                                    </TabsList>
                                    <TabsContent value="general" className="space-y-4">
                                      <div>
@@ -2089,46 +2104,6 @@ Description: ${stepDescription}`
                                            onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
                                            className="h-10"
                                          />
-                                       </div>
-                                     </div>
-                                   </TabsContent>
-                                   <TabsContent value="advanced" className="space-y-4">
-                                     <div>
-                                       <label className="text-sm font-medium">Status</label>
-                                       <select
-                                         value={steps.find(s => s.id === selectedStep)?.status || "pending"}
-                                         onChange={(e) => updateStep(selectedStep, { status: e.target.value as FlowStep["status"] })}
-                                         className="mt-1 w-full p-2 border rounded-md"
-                                       >
-                                         <option value="pending">Pending</option>
-                                         <option value="in-progress">In Progress</option>
-                                         <option value="completed">Completed</option>
-                                         <option value="blocked">Blocked</option>
-                                       </select>
-                                     </div>
-                                     <div>
-                                       <label className="text-sm font-medium">Dependencies</label>
-                                       <div className="mt-1 space-y-2">
-                                         {steps
-                                           .filter(s => s.id !== selectedStep && s.type !== "goal")
-                                           .map(step => (
-                                             <label key={step.id} className="flex items-center space-x-2">
-                                               <input
-                                                 type="checkbox"
-                                                 checked={steps.find(s => s.id === selectedStep)?.dependencies.includes(step.id) || false}
-                                                 onChange={(e) => {
-                                                   const currentStep = steps.find(s => s.id === selectedStep);
-                                                   if (currentStep) {
-                                                     const newDependencies = e.target.checked
-                                                       ? [...currentStep.dependencies, step.id]
-                                                       : currentStep.dependencies.filter(id => id !== step.id);
-                                                     updateStep(selectedStep, { dependencies: newDependencies });
-                                                   }
-                                                 }}
-                                               />
-                                               <span className="text-sm">{step.title}</span>
-                                             </label>
-                                           ))}
                                        </div>
                                      </div>
                                    </TabsContent>
