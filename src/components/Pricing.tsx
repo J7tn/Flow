@@ -5,8 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, ArrowRight, Star, Building2, Users, Shield, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useScrollToTop } from "@/lib/hooks/useScrollToTop";
 
 export function Pricing() {
+  // Scroll to top when component mounts
+  useScrollToTop();
+
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   const plans = [

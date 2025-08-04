@@ -16,8 +16,12 @@ import {
   Lightbulb
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useScrollToTop } from '@/lib/hooks/useScrollToTop';
 
 export function LandingPage() {
+  // Scroll to top when component mounts
+  useScrollToTop();
+
   const features = [
     {
       icon: <Zap className="h-8 w-8 text-orange-500" />,

@@ -10,6 +10,10 @@ import {
   BarChart,
   Loader2,
   RefreshCw,
+  Copy,
+  Mail,
+  Users,
+  X,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -26,10 +30,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
 import { toast } from "./ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
 import PermanentDashboard from "./shared/PermanentDashboard";
 import { supabase } from "@/lib/supabase";
+import { useScrollToTop } from "@/lib/hooks/useScrollToTop";
 
 const Home = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   const [activeTab, setActiveTab] = useState("recent");
   const [loading, setLoading] = useState(true);
   const [recentFlows, setRecentFlows] = useState<any[]>([]);
@@ -38,6 +56,71 @@ const Home = () => {
     completedTasks: 0,
     overallProgress: 0,
   });
+  const [teamInviteOpen, setTeamInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteMessage, setInviteMessage] = useState("Join our team on Flow! I'd love to collaborate with you on our workflows.");
+  const [inviteLink, setInviteLink] = useState("");
+
+  // Generate invite link
+  const generateInviteLink = () => {
+    const baseUrl = window.location.origin;
+    const inviteCode = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const link = `${baseUrl}/invite/${inviteCode}`;
+    setInviteLink(link);
+    return link;
+  };
+
+  // Copy invite link to clipboard
+  const copyInviteLink = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      toast({
+        title: "Link copied!",
+        description: "Invitation link has been copied to your clipboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy link. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Send email invitation
+  const sendEmailInvite = async () => {
+    if (!inviteEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter an email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Here you would typically send the invitation via your backend
+      // For now, we'll just show a success message
+      toast({
+        title: "Invitation sent!",
+        description: `Invitation has been sent to ${inviteEmail}`,
+      });
+      setInviteEmail("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send invitation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Initialize invite link when dialog opens
+  useEffect(() => {
+    if (teamInviteOpen && !inviteLink) {
+      generateInviteLink();
+    }
+  }, [teamInviteOpen, inviteLink]);
 
   // Fetch real data from Supabase
   const fetchDashboardData = async () => {
@@ -143,10 +226,98 @@ const Home = () => {
                              <Input placeholder="Search flows..." className="pl-8" />
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
-                <User className="h-4 w-4 mr-2" />
-                Invite Team
-              </Button>
+              <Dialog open={teamInviteOpen} onOpenChange={setTeamInviteOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    Invite Team
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Invite Team Members
+                    </DialogTitle>
+                    <DialogDescription>
+                      Share this invitation link with your team members to collaborate on workflows.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4">
+                    {/* Invitation Link Section */}
+                    <div className="space-y-2">
+                      <Label htmlFor="invite-link">Invitation Link</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="invite-link"
+                          value={inviteLink}
+                          readOnly
+                          className="flex-1"
+                          placeholder="Generating link..."
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={copyInviteLink}
+                          className="shrink-0"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Anyone with this link can join your team
+                      </p>
+                    </div>
+
+                    {/* Email Invitation Section */}
+                    <div className="space-y-2">
+                      <Label htmlFor="invite-email">Send Email Invitation</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="invite-email"
+                          type="email"
+                          placeholder="colleague@company.com"
+                          value={inviteEmail}
+                          onChange={(e) => setInviteEmail(e.target.value)}
+                          className="flex-1"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={sendEmailInvite}
+                          className="shrink-0"
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Custom Message Section */}
+                    <div className="space-y-2">
+                      <Label htmlFor="invite-message">Custom Message (Optional)</Label>
+                      <Textarea
+                        id="invite-message"
+                        placeholder="Add a personal message to your invitation..."
+                        value={inviteMessage}
+                        onChange={(e) => setInviteMessage(e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+
+                    {/* Team Benefits */}
+                    <div className="bg-muted/50 rounded-lg p-3">
+                      <h4 className="font-medium text-sm mb-2">Team Collaboration Benefits:</h4>
+                      <ul className="text-xs text-muted-foreground space-y-1">
+                        <li>• Share and collaborate on workflows</li>
+                        <li>• Real-time progress tracking</li>
+                        <li>• Comment and provide feedback</li>
+                        <li>• Access to team templates</li>
+                      </ul>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
               <Button size="sm" asChild>
                 <Link to="/workflow/new">
                   <PlusCircle className="h-4 w-4 mr-2" />

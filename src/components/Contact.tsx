@@ -8,11 +8,16 @@ import {
   Phone, 
   Clock, 
   ArrowRight,
-  Send
+  Send,
+  MapPin
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useScrollToTop } from '@/lib/hooks/useScrollToTop';
 
 export function Contact() {
+  // Scroll to top when component mounts
+  useScrollToTop();
+
   const contactMethods = [
     {
       icon: <Mail className="h-8 w-8 text-orange-500" />,

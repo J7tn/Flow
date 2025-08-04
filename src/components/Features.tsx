@@ -12,11 +12,18 @@ import {
   Zap,
   Target,
   Users,
-  Shield
+  Shield,
+  BarChart3,
+  Workflow,
+  Settings
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useScrollToTop } from "@/lib/hooks/useScrollToTop";
 
 export function Features() {
+  // Scroll to top when component mounts
+  useScrollToTop();
+
   const steps = [
     {
       icon: <Search className="h-8 w-8 text-orange-500" />,

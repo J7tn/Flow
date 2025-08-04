@@ -14,8 +14,12 @@ import {
   Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useScrollToTop } from '@/lib/hooks/useScrollToTop';
 
 export function About() {
+  // Scroll to top when component mounts
+  useScrollToTop();
+
   const problems = [
     {
       icon: <FileText className="h-8 w-8 text-red-500" />,
