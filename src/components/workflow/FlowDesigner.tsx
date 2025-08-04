@@ -1802,8 +1802,41 @@ Description: ${stepDescription}`
                                    ))}
                                  </div>
 
+                                 {/* Loading State */}
+                                 {isGeneratingTools && (
+                                   <div className="flex items-center justify-center py-6 mb-4">
+                                     <div className="flex items-center space-x-3">
+                                       <RefreshCw className="h-5 w-5 animate-spin text-primary" />
+                                       <span className="text-sm text-muted-foreground">AI is generating suggested tools...</span>
+                                     </div>
+                                   </div>
+                                 )}
+                                 
                                  {/* Tools Grid */}
-                                 {currentStepTools.length > 0 ? (
+                                 {isGeneratingTools ? (
+                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                     {/* Loading skeleton cards */}
+                                     {[1, 2, 3, 4].map((index) => (
+                                       <div key={index} className="border rounded-lg p-3 bg-card">
+                                         <div className="flex items-start space-x-3">
+                                           <Skeleton className="h-8 w-8 rounded-lg flex-shrink-0" />
+                                           <div className="flex-1 min-w-0">
+                                             <div className="flex items-center justify-between mb-1">
+                                               <Skeleton className="h-4 w-24" />
+                                               <Skeleton className="h-5 w-12" />
+                                             </div>
+                                             <Skeleton className="h-3 w-full mb-2" />
+                                             <Skeleton className="h-3 w-3/4 mb-2" />
+                                             <div className="flex gap-2">
+                                               <Skeleton className="h-6 w-16" />
+                                               <Skeleton className="h-6 w-16" />
+                                             </div>
+                                           </div>
+                                         </div>
+                                       </div>
+                                     ))}
+                                   </div>
+                                 ) : currentStepTools.length > 0 ? (
                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                      {currentStepTools.map((tool, index) => (
                                        <div key={index} className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card">
