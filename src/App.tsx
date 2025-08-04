@@ -25,6 +25,8 @@ import SharedFlowViewer from "./components/workflow/SharedFlowViewer";
 import { TemplateTest } from "./components/TemplateTest";
 import { Toaster } from "./components/ui/toaster";
 import { useScrollToTop } from "./lib/hooks/useScrollToTop";
+import ConfigDebugger from "./components/ConfigDebugger";
+import AuthDebugger from "./components/AuthDebugger";
 
 function App() {
   // Use custom hook for scroll restoration
@@ -170,6 +172,8 @@ function App() {
       <AuthProvider>
         <Suspense fallback={<p>Loading...</p>}>{element}</Suspense>
         <Toaster />
+        <ConfigDebugger isVisible={import.meta.env.DEV} />
+        <AuthDebugger isVisible={import.meta.env.DEV} />
       </AuthProvider>
     </ThemeProvider>
   );
