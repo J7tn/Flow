@@ -96,7 +96,7 @@ import { flowApi } from "@/lib/api";
 import { flowSchema, type FlowInput } from "@/lib/validation";
 import { allTemplates } from "@/data/templates";
 import type { FlowTemplate } from "@/types/templates";
-import { Chat2APIService } from '@/lib/chat2api';
+import { Chat2APIService, type ChatMessage } from '@/lib/chat2api';
 
 interface FlowStep {
   id: string;
@@ -156,6 +156,14 @@ const FlowDesigner = () => {
   // Tutorial state
   const [showTutorial, setShowTutorial] = useState(false); // Start as false, will be set based on flow state
   const [tutorialStep, setTutorialStep] = useState(0);
+
+  // Custom tool form state
+  const [showCustomToolForm, setShowCustomToolForm] = useState(false);
+  const [customToolName, setCustomToolName] = useState("");
+  const [customToolDescription, setCustomToolDescription] = useState("");
+  const [customToolCategory, setCustomToolCategory] = useState("other");
+  const [customToolLink, setCustomToolLink] = useState("");
+  const [customToolPricing, setCustomToolPricing] = useState("free");
 
   // Load auto-save settings from localStorage
   useEffect(() => {
@@ -394,9 +402,9 @@ const FlowDesigner = () => {
     console.log('🔍 Starting AI step generation for goal:', goal);
     try {
       // Use Chat2API to generate custom steps based on the goal
-      const messages = [
+      const messages: ChatMessage[] = [
         {
-          role: 'system',
+          role: 'system' as const,
           content: `You are an expert workflow designer. Create a step-by-step workflow for achieving the given goal. 
 
 IMPORTANT: Return your response as a JSON array with exactly this structure:
@@ -419,7 +427,7 @@ Guidelines:
 - Ensure steps are in logical order and build upon each other`
         },
         {
-          role: 'user',
+          role: 'user' as const,
           content: `Create a workflow for this goal: ${goal}`
         }
       ];
@@ -580,9 +588,9 @@ Guidelines:
     console.log('🔍 Starting AI tool generation for step:', stepTitle);
     try {
       // Use Chat2API to generate custom tools based on the step
-      const messages = [
+      const messages: ChatMessage[] = [
         {
-          role: 'system',
+          role: 'system' as const,
           content: `You are an expert tool recommendation specialist with deep knowledge of game development, software development, and creative tools. Based on the workflow step, suggest relevant tools, software, or resources that would help accomplish this step.
 
 IMPORTANT: Return your response as a JSON array with exactly this structure:
@@ -618,7 +626,7 @@ Guidelines:
 - For game development, prioritize industry-standard tools`
         },
         {
-          role: 'user',
+          role: 'user' as const,
           content: `Suggest tools for this workflow step:
 Title: ${stepTitle}
 Description: ${stepDescription}`
@@ -939,6 +947,76 @@ Description: ${stepDescription}`
     toast({
       title: "Tool Added",
       description: `${tool.name} has been added to the step`,
+    });
+  };
+
+  const removeToolFromStep = (stepId: string, toolName: string) => {
+    setSteps(steps.map(step => {
+      if (step.id === stepId) {
+        const existingTools = step.addedTools || [];
+        const updatedTools = existingTools.filter(tool => tool.name !== toolName);
+        
+        return {
+          ...step,
+          addedTools: updatedTools
+        };
+      }
+      return step;
+    }));
+    
+    toast({
+      title: "Tool Removed",
+      description: `${toolName} has been removed from the step`,
+    });
+  };
+
+  const addCustomToolToStep = (stepId: string) => {
+    if (!customToolName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a tool name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!customToolDescription.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a tool description",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const customTool = {
+      name: customToolName.trim(),
+      description: customToolDescription.trim(),
+      category: customToolCategory,
+      icon: Wrench, // Default icon for custom tools
+      link: customToolLink.trim() || undefined,
+      pricing: {
+        model: customToolPricing,
+        startingPrice: customToolPricing === "free" ? 0 : undefined,
+        currency: "USD",
+        notes: customToolPricing === "free" ? "Free tool" : "Custom pricing"
+      }
+    };
+
+    // Add the custom tool to the step
+    addToolToStep(stepId, customTool);
+
+    // Reset form
+    setCustomToolName("");
+    setCustomToolDescription("");
+    setCustomToolCategory("other");
+    setCustomToolLink("");
+    setCustomToolPricing("free");
+    setShowCustomToolForm(false);
+
+    toast({
+      title: "Custom Tool Added",
+      description: `${customTool.name} has been added to the step`,
     });
   };
 
@@ -1715,656 +1793,664 @@ Description: ${stepDescription}`
         </div>
 
                  {/* Main Content */}
-         <div className="flex-1 flex overflow-hidden">
-           {/* Center - Flow Canvas */}
-           <div className="flex-1 bg-background relative overflow-auto">
-             <div className="p-6 min-h-full">
-                              <div className="canvas-container w-full h-full min-h-[600px] bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/20 p-6">
-                 {/* Roadmap Layout - Goal Block at the very left */}
-                                     <div className="flex flex-col lg:flex-row gap-8 mb-8">
-                      {/* Goal Input Block - Left Side */}
-                      <div className="lg:w-1/3 relative">
-                        {/* Tutorial Hint - Outside tutorial block */}
-                        {showTutorial && tutorialStep === 0 && (
-                          <div className="absolute top-1/3 -right-4 z-20 transform -translate-y-1/2">
-                            <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
-                              <ArrowLeft className="h-4 w-4 mr-2" />
-                              <span className="text-sm font-medium">First, type in a goal</span>
+          <div className="flex-1 flex overflow-hidden">
+            {/* Center - Flow Canvas */}
+            <div className="flex-1 bg-background relative overflow-auto">
+              <div className="p-6 min-h-full">
+                               <div className="canvas-container w-full h-full min-h-[600px] bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/20 p-6">
+                {/* Roadmap Layout - Goal Block at the very left */}
+                                    <div className="flex flex-col lg:flex-row gap-8 mb-8">
+                     {/* Goal Input Block - Left Side */}
+                     <div className="lg:w-1/3 relative">
+                       {/* Tutorial Hint - Outside tutorial block */}
+                       {showTutorial && tutorialStep === 0 && (
+                         <div className="absolute top-1/3 -right-4 z-20 transform -translate-y-1/2">
+                           <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
+                             <ArrowLeft className="h-4 w-4 mr-2" />
+                             <span className="text-sm font-medium">First, type in a goal</span>
+                           </div>
+                         </div>
+                       )}
+                    <Card 
+                      className={`w-full max-w-md mx-auto shadow-lg border-2 cursor-pointer hover:shadow-xl transition-shadow ${
+                        showTutorial && tutorialStep === 0 
+                          ? 'border-primary ring-4 ring-primary/30 bg-gradient-to-br from-primary/10 to-primary/5' 
+                          : 'border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10'
+                      }`}
+                      onClick={() => {
+                        if (suggestedSteps.length > 0) {
+                          setActivePanel("suggested-steps");
+                        }
+                        setSelectedStep(null);
+                        setCurrentStepTools([]);
+                      }}
+                    >
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center space-x-2 mb-3">
+                          <div className="w-4 h-4 rounded-full bg-gradient-to-r from-primary to-primary/80" />
+                          <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+                            Goal
+                          </Badge>
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <label htmlFor="workflow-goal" className="text-sm font-medium text-foreground mb-2 block">
+                              What is the goal of this flow?
+                            </label>
+                            <div className="relative">
+                              <Textarea
+                                id="workflow-goal"
+                                value={workflowGoal}
+                                onChange={(e) => updateGoal(e.target.value)}
+                                placeholder="e.g., Launch a new product, Optimize customer onboarding, Create a marketing campaign..."
+                                className="w-full"
+                                rows={3}
+                              />
                             </div>
                           </div>
+                          <div>
+                            <label className="text-sm font-medium text-foreground mb-2 block">
+                              Who is this flow for?
+                            </label>
+                            <div className="flex gap-2">
+                              <Button
+                                variant={userType === "solo" ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setUserType("solo")}
+                                className="flex-1"
+                              >
+                                <UserPlus className="h-4 w-4 mr-2" />
+                                Solo
+                              </Button>
+                              <Button
+                                variant={userType === "team" ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setUserType("team")}
+                                className="flex-1"
+                              >
+                                <Users className="h-4 w-4 mr-2" />
+                                Team
+                              </Button>
+                              <Button
+                                variant={userType === "enterprise" ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setUserType("enterprise")}
+                                className="flex-1"
+                              >
+                                <Building className="h-4 w-4 mr-2" />
+                                Enterprise
+                              </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              This helps AI select better tools based on your needs
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs text-muted-foreground">
+                              Define a clear, measurable goal
+                            </div>
+                            <Button
+                              onClick={handleGenerateStepsClick}
+                              disabled={!workflowGoal.trim() || isGeneratingSteps}
+                              size="sm"
+                              className={`${
+                                showTutorial && tutorialStep === 1 
+                                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground ring-4 ring-primary/30' 
+                                  : 'bg-accent hover:bg-accent/90 text-accent-foreground'
+                              }`}
+                            >
+                              {isGeneratingSteps ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                  AI is thinking...
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="h-4 w-4 mr-2" />
+                                  Generate Steps
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                    </Card>
+
+                    {/* Tutorial Hint - Outside goal block, below Generate Steps button */}
+                    {showTutorial && tutorialStep === 1 && (
+                      <div className="mt-3 flex justify-end">
+                        <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
+                          <ArrowUp className="h-4 w-4 mr-2" />
+                          <span className="text-sm font-medium">Now, generate steps</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Miniaturized Step Blocks - Directly below Goal Block */}
+                    {steps.length > 0 && (
+                      <div className={`mt-3 ${
+                        showTutorial && tutorialStep === 2 
+                          ? 'ring-4 ring-primary/30 rounded-lg p-2 bg-primary/5' 
+                          : ''
+                      }`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-semibold text-lg">Flow Steps</h3>
+                          <Badge variant="secondary">{steps.length} steps added</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          {steps.map((step, index) => (
+                            <div key={step.id} className="relative z-10">
+                              <Card 
+                                className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-card dark:bg-card cursor-pointer ${
+                                selectedStep === step.id ? 'ring-2 ring-accent' : ''
+                              }`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log('Added step clicked:', step.id, step.title);
+                                  setSelectedStep(step.id);
+                                  setActivePanel("tools");
+                                  // Generate tools for this added step
+                                  generateToolsForStep(step.title, step.description);
+                                }}
+                              >
+                                <CardHeader className="pb-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <div className={`w-3 h-3 rounded-full ${getStepColor(step)}`} />
+                                      <Badge variant="outline" className="text-xs">
+                                        {index + 1}
+                                      </Badge>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteStep(step.id);
+                                      }}
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                  <CardTitle className="text-base break-words">{step.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-0 space-y-4">
+                                  <CardDescription className="text-sm break-words overflow-hidden leading-relaxed">
+                                    {step.description || "No description"}
+                                  </CardDescription>
+                                  
+                                  <div className="space-y-1 text-xs text-muted-foreground pt-2 border-t">
+                                    {step.estimatedTime && (
+                                      <div className="flex items-center">
+                                        <Clock className="h-3 w-3 mr-1" />
+                                        {step.estimatedTime}h
+                                      </div>
+                                    )}
+                                    {step.cost && (
+                                      <div className="flex items-center">
+                                        <DollarSign className="h-3 w-3 mr-1" />
+                                        ${step.cost}
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Added Tools Display */}
+                                  {step.addedTools && step.addedTools.length > 0 && (
+                                    <div className="space-y-2 pt-2 border-t">
+                                      <div className="text-xs font-medium text-muted-foreground">Added Tools:</div>
+                                      <div className="flex flex-wrap gap-1">
+                                        {step.addedTools.map((tool, toolIndex) => (
+                                          <Badge 
+                                            key={toolIndex} 
+                                            variant="secondary" 
+                                            className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              removeToolFromStep(step.id, tool.name);
+                                            }}
+                                          >
+                                            {tool.name}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </CardContent>
+                              </Card>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Dynamic Panel Area - Right Side */}
+                  <div className="lg:w-2/3">
+                    {activePanel === "suggested-steps" && suggestedSteps.length > 0 ? (
+                      /* Suggested Steps Panel */
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-semibold text-lg">Suggested Steps</h3>
+                          <Badge variant="secondary">{suggestedSteps.length} steps</Badge>
+                        </div>
+
+                        {/* Loading State */}
+                        {isGeneratingSteps && (
+                          <div className="flex items-center justify-center h-64">
+                            <Card className="w-full max-w-md shadow-lg">
+                              <CardContent className="p-6">
+                                <div className="text-center">
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+                                  <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
                         )}
-                     <Card 
-                       className={`w-full max-w-md mx-auto shadow-lg border-2 cursor-pointer hover:shadow-xl transition-shadow ${
-                         showTutorial && tutorialStep === 0 
-                           ? 'border-primary ring-4 ring-primary/30 bg-gradient-to-br from-primary/10 to-primary/5' 
-                           : 'border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10'
-                       }`}
-                       onClick={() => {
-                         if (suggestedSteps.length > 0) {
-                           setActivePanel("suggested-steps");
-                         }
-                         setSelectedStep(null);
-                         setCurrentStepTools([]);
-                       }}
-                     >
-                       <CardHeader className="pb-4">
-                         <div className="flex items-center space-x-2 mb-3">
-                           <div className="w-4 h-4 rounded-full bg-gradient-to-r from-primary to-primary/80" />
-                           <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
-                             Goal
-                           </Badge>
-                         </div>
-                         <div className="space-y-3">
-                           <div>
-                             <label htmlFor="workflow-goal" className="text-sm font-medium text-foreground mb-2 block">
-                               What is the goal of this flow?
-                             </label>
-                             <div className="relative">
-                               <Textarea
-                                 id="workflow-goal"
-                                 value={workflowGoal}
-                                 onChange={(e) => updateGoal(e.target.value)}
-                                 placeholder="e.g., Launch a new product, Optimize customer onboarding, Create a marketing campaign..."
-                                 className="w-full"
-                                 rows={3}
-                               />
-                             </div>
-                           </div>
-                           <div>
-                             <label className="text-sm font-medium text-foreground mb-2 block">
-                               Who is this flow for?
-                             </label>
-                             <div className="flex gap-2">
-                               <Button
-                                 variant={userType === "solo" ? "default" : "outline"}
-                                 size="sm"
-                                 onClick={() => setUserType("solo")}
-                                 className="flex-1"
-                               >
-                                 <UserPlus className="h-4 w-4 mr-2" />
-                                 Solo
-                               </Button>
-                               <Button
-                                 variant={userType === "team" ? "default" : "outline"}
-                                 size="sm"
-                                 onClick={() => setUserType("team")}
-                                 className="flex-1"
-                               >
-                                 <Users className="h-4 w-4 mr-2" />
-                                 Team
-                               </Button>
-                               <Button
-                                 variant={userType === "enterprise" ? "default" : "outline"}
-                                 size="sm"
-                                 onClick={() => setUserType("enterprise")}
-                                 className="flex-1"
-                               >
-                                 <Building className="h-4 w-4 mr-2" />
-                                 Enterprise
-                               </Button>
-                             </div>
-                             <p className="text-xs text-muted-foreground mt-1">
-                               This helps AI select better tools based on your needs
-                             </p>
-                           </div>
-                           <div className="flex items-center justify-between">
-                             <div className="text-xs text-muted-foreground">
-                               Define a clear, measurable goal
-                             </div>
-                             <Button
-                               onClick={handleGenerateStepsClick}
-                               disabled={!workflowGoal.trim() || isGeneratingSteps}
-                               size="sm"
-                               className={`${
-                                 showTutorial && tutorialStep === 1 
-                                   ? 'bg-primary hover:bg-primary/90 text-primary-foreground ring-4 ring-primary/30' 
-                                   : 'bg-accent hover:bg-accent/90 text-accent-foreground'
-                               }`}
-                             >
-                               {isGeneratingSteps ? (
-                                 <>
-                                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                   AI is thinking...
-                                 </>
-                               ) : (
-                                 <>
-                                   <Sparkles className="h-4 w-4 mr-2" />
-                                   Generate Steps
-                                 </>
-                               )}
-                             </Button>
-                           </div>
-                         </div>
-                       </CardHeader>
-                     </Card>
 
-                     {/* Tutorial Hint - Outside goal block, below Generate Steps button */}
-                     {showTutorial && tutorialStep === 1 && (
-                       <div className="mt-3 flex justify-end">
-                         <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
-                           <ArrowUp className="h-4 w-4 mr-2" />
-                           <span className="text-sm font-medium">Now, generate steps</span>
-                         </div>
-                       </div>
-                     )}
+                        {/* Suggested Steps Grid */}
+                        {suggestedSteps.length > 0 && !isGeneratingSteps && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {suggestedSteps.map((step, index) => (
+                              <div
+                                key={index}
+                                className={`transition-all duration-300 ${
+                                  selectedRoadmapStep === `suggested-${index}` ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-80'
+                                }`}
+                              >
+                                <Card 
+                                  className={`shadow-lg hover:shadow-xl transition-all cursor-pointer border-2 ${
+                                    selectedRoadmapStep === `suggested-${index}` 
+                                      ? 'border-primary ring-2 ring-primary/20' 
+                                      : 'border-muted hover:border-primary/50'
+                                  }`}
+                                  onClick={() => {
+                                    setSelectedRoadmapStep(`suggested-${index}`);
+                                  }}
+                                >
+                                  <CardHeader className="pb-3">
+                                    <div className="flex items-center space-x-2">
+                                      <div className={`p-2 rounded-lg ${step.color} bg-opacity-10`}>
+                                        {step.icon && React.createElement(step.icon, {
+                                          className: `h-5 w-5 ${step.color.replace('bg-', 'text-')}`
+                                        })}
+                                      </div>
+                                      <Badge variant="outline" className="text-xs">
+                                        Step {index + 1}
+                                      </Badge>
+                                    </div>
+                                    <CardTitle className="text-sm font-medium">{step.title}</CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="pt-0">
+                                    <p className="text-xs text-muted-foreground mb-3">{step.description}</p>
+                                    <Button 
+                                      size="sm" 
+                                      className="w-full text-xs"
+                                      variant={selectedRoadmapStep === `suggested-${index}` ? "default" : "outline"}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (selectedRoadmapStep === `suggested-${index}`) {
+                                          addStep(step);
+                                          setSelectedRoadmapStep(null);
+                                        }
+                                      }}
+                                    >
+                                      {selectedRoadmapStep === `suggested-${index}` ? "Add to Flow" : "Choose This Step"}
+                                    </Button>
+                                  </CardContent>
+                                </Card>
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
-                     {/* Miniaturized Step Blocks - Directly below Goal Block */}
-                     {steps.length > 0 && (
-                       <div className={`mt-3 ${
-                         showTutorial && tutorialStep === 2 
-                           ? 'ring-4 ring-primary/30 rounded-lg p-2 bg-primary/5' 
-                           : ''
-                       }`}>
-                         <div className="flex items-center justify-between mb-3">
-                           <h3 className="font-semibold text-lg">Flow Steps</h3>
-                           <Badge variant="secondary">{steps.length} steps added</Badge>
-                         </div>
-                         <div className="space-y-2">
-                           {steps.map((step, index) => (
-                             <div key={step.id} className="relative z-10">
-                               <Card 
-                                 className={`shadow-lg hover:shadow-xl transition-shadow min-h-[200px] border-2 border-primary/20 bg-card dark:bg-card cursor-pointer ${
-                                 selectedStep === step.id ? 'ring-2 ring-accent' : ''
-                               }`}
-                                 onClick={(e) => {
-                                   e.preventDefault();
-                                   e.stopPropagation();
-                                   console.log('Added step clicked:', step.id, step.title);
-                                   setSelectedStep(step.id);
-                                   setActivePanel("tools");
-                                   // Generate tools for this added step
-                                   generateToolsForStep(step.title, step.description);
-                                 }}
-                               >
-                                 <CardHeader className="pb-4">
-                                   <div className="flex items-center justify-between">
-                                     <div className="flex items-center space-x-2">
-                                       <div className={`w-3 h-3 rounded-full ${getStepColor(step)}`} />
-                                       <Badge variant="outline" className="text-xs">
-                                         {index + 1}
-                                       </Badge>
-                                     </div>
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={(e) => {
-                                         e.stopPropagation();
-                                         deleteStep(step.id);
-                                       }}
-                                     >
-                                       <Trash2 className="h-3 w-3" />
-                                     </Button>
-                                   </div>
-                                   <CardTitle className="text-base break-words">{step.title}</CardTitle>
-                                 </CardHeader>
-                                 <CardContent className="pt-0 space-y-4">
-                                   <CardDescription className="text-sm break-words overflow-hidden leading-relaxed">
-                                     {step.description || "No description"}
-                                   </CardDescription>
-                                   
-                                   <div className="space-y-1 text-xs text-muted-foreground pt-2 border-t">
-                                     {step.estimatedTime && (
-                                       <div className="flex items-center">
-                                         <Clock className="h-3 w-3 mr-1" />
-                                         {step.estimatedTime}h
-                                       </div>
-                                     )}
-                                     {step.cost && (
-                                       <div className="flex items-center">
-                                         <DollarSign className="h-3 w-3 mr-1" />
-                                         ${step.cost}
-                                       </div>
-                                     )}
-                                   </div>
-                                   
-                                   {/* Added Tools Display */}
-                                   {step.addedTools && step.addedTools.length > 0 && (
-                                     <div className="space-y-2 pt-2 border-t">
-                                       <div className="text-xs font-medium text-muted-foreground">Added Tools:</div>
-                                       <div className="flex flex-wrap gap-1">
-                                         {step.addedTools.map((tool, toolIndex) => (
-                                           <Badge key={toolIndex} variant="secondary" className="text-xs">
-                                             {tool.name}
-                                           </Badge>
-                                         ))}
-                                       </div>
-                                     </div>
-                                   )}
-                                 </CardContent>
-                               </Card>
-                             </div>
-                           ))}
-                         </div>
-                       </div>
-                     )}
-                   </div>
+                        {/* Empty state when no suggested steps */}
+                        {suggestedSteps.length === 0 && !isGeneratingSteps && (
+                          <div className="flex items-center justify-center h-64">
+                            <Card className="w-full max-w-md shadow-lg">
+                              <CardContent className="p-6">
+                                <div className="text-center">
+                                  <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                                  <p className="text-sm text-muted-foreground">Enter a goal and click "Generate Steps" to get started</p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        )}
+                      </div>
+                    ) : activePanel === "tools" ? (
+                      /* Tools for Selected Step Panel */
+                      <div>
+                        {selectedStep ? (
+                          <div>
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="font-semibold text-lg">Tools for Selected Step</h3>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedStep(null)}
+                              >
+                                ×
+                              </Button>
+                            </div>
+                            
+                            {/* Step Properties */}
+                            <Card className="mb-6">
+                              <CardHeader>
+                                <CardTitle className="text-base">Step Properties</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <Tabs defaultValue="general" className="w-full">
+                                  <TabsList className="grid w-full grid-cols-1">
+                                    <TabsTrigger value="general">General</TabsTrigger>
+                                  </TabsList>
+                                  <TabsContent value="general" className="space-y-4">
+                                    <div>
+                                      <label className="text-sm font-medium">Title</label>
+                                      <Input
+                                        value={steps.find(s => s.id === selectedStep)?.title || ""}
+                                        onChange={(e) => updateStep(selectedStep, { title: e.target.value })}
+                                        className="mt-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium">Description</label>
+                                      <Textarea
+                                        value={steps.find(s => s.id === selectedStep)?.description || ""}
+                                        onChange={(e) => updateStep(selectedStep, { description: e.target.value })}
+                                        className="mt-1"
+                                        rows={3}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-sm font-medium">Assignee</label>
+                                      <Input
+                                        value={steps.find(s => s.id === selectedStep)?.assignee || ""}
+                                        onChange={(e) => updateStep(selectedStep, { assignee: e.target.value })}
+                                        className="mt-1"
+                                        placeholder="Enter assignee name"
+                                      />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4 items-start">
+                                      <div className="flex flex-col">
+                                        <label className="text-sm font-medium mb-1 whitespace-nowrap">Estimated Time (hours)</label>
+                                        <Input
+                                          type="number"
+                                          value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
+                                          onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
+                                          className="h-10"
+                                        />
+                                      </div>
+                                      <div className="flex flex-col">
+                                        <label className="text-sm font-medium mb-1 whitespace-nowrap">Cost ($)</label>
+                                        <Input
+                                          type="number"
+                                          value={steps.find(s => s.id === selectedStep)?.cost || ""}
+                                          onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
+                                          className="h-10"
+                                        />
+                                      </div>
+                                    </div>
+                                  </TabsContent>
+                                </Tabs>
+                              </CardContent>
+                            </Card>
 
-                   {/* Dynamic Panel Area - Right Side */}
-                   <div className="lg:w-2/3">
-                     {activePanel === "suggested-steps" && suggestedSteps.length > 0 ? (
-                       /* Suggested Steps Panel */
-                       <div>
-                         <div className="flex items-center justify-between mb-4">
-                           <h3 className="font-semibold text-lg">Suggested Steps</h3>
-                           <Badge variant="secondary">{suggestedSteps.length} steps</Badge>
-                         </div>
+                            {/* Tools for Selected Step */}
+                            <div>
+                              <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-semibold text-lg">Available Tools</h3>
+                              </div>
+                              
+                              <div className="space-y-4">
+                                {/* Category Filter Buttons */}
+                                <div className="flex flex-wrap gap-2">
+                                  {getRelevantCategories(workflowGoal).map((category) => (
+                                    <Button
+                                      key={category}
+                                      variant={selectedCategory === category ? "default" : "outline"}
+                                      size="sm"
+                                      className="text-xs capitalize"
+                                      onClick={() => handleCategorySelect(category, selectedStep)}
+                                    >
+                                      {category === "all" ? "All Tools" : category}
+                                    </Button>
+                                  ))}
+                                </div>
 
-                         {/* Loading State */}
-                         {isGeneratingSteps && (
-                           <div className="flex items-center justify-center h-64">
-                             <Card className="w-full max-w-md shadow-lg">
-                               <CardContent className="p-6">
-                                 <div className="text-center">
-                                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
-                                   <p className="text-sm text-muted-foreground">AI is analyzing your goal and generating intelligent steps...</p>
-                                 </div>
-                               </CardContent>
-                             </Card>
-                           </div>
-                         )}
+                                {/* Custom Tool Form */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="text-sm font-medium">Add Custom Tool</h4>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => setShowCustomToolForm(!showCustomToolForm)}
+                                      className="text-xs"
+                                    >
+                                      {showCustomToolForm ? "Cancel" : "Add Custom Tool"}
+                                    </Button>
+                                  </div>
+                                  
+                                  {showCustomToolForm && (
+                                    <Card className="p-4 space-y-3">
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                          <label className="text-xs font-medium">Tool Name *</label>
+                                          <Input
+                                            value={customToolName}
+                                            onChange={(e) => setCustomToolName(e.target.value)}
+                                            placeholder="e.g., Copilot, Figma, etc."
+                                            className="mt-1 text-sm"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-xs font-medium">Category</label>
+                                          <select
+                                            value={customToolCategory}
+                                            onChange={(e) => setCustomToolCategory(e.target.value)}
+                                            className="mt-1 w-full px-3 py-2 border border-input bg-background text-sm rounded-md"
+                                          >
+                                            <option value="other">Other</option>
+                                            <option value="productivity">Productivity</option>
+                                            <option value="communication">Communication</option>
+                                            <option value="management">Management</option>
+                                            <option value="storage">Storage</option>
+                                            <option value="creative">Creative</option>
+                                            <option value="development">Development</option>
+                                            <option value="marketing">Marketing</option>
+                                            <option value="analytics">Analytics</option>
+                                          </select>
+                                        </div>
+                                      </div>
+                                      
+                                      <div>
+                                        <label className="text-xs font-medium">Description *</label>
+                                        <Textarea
+                                          value={customToolDescription}
+                                          onChange={(e) => setCustomToolDescription(e.target.value)}
+                                          placeholder="Brief description of what this tool does..."
+                                          className="mt-1 text-sm"
+                                          rows={2}
+                                        />
+                                      </div>
+                                      
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                          <label className="text-xs font-medium">Website Link (Optional)</label>
+                                          <Input
+                                            value={customToolLink}
+                                            onChange={(e) => setCustomToolLink(e.target.value)}
+                                            placeholder="https://..."
+                                            className="mt-1 text-sm"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-xs font-medium">Pricing</label>
+                                          <select
+                                            value={customToolPricing}
+                                            onChange={(e) => setCustomToolPricing(e.target.value)}
+                                            className="mt-1 w-full px-3 py-2 border border-input bg-background text-sm rounded-md"
+                                          >
+                                            <option value="free">Free</option>
+                                            <option value="paid">Paid</option>
+                                            <option value="freemium">Freemium</option>
+                                          </select>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex justify-end space-x-2 pt-2">
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => setShowCustomToolForm(false)}
+                                        >
+                                          Cancel
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          onClick={() => selectedStep && addCustomToolToStep(selectedStep)}
+                                        >
+                                          Add Tool
+                                        </Button>
+                                      </div>
+                                    </Card>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center h-64">
+                            <Card className="w-full max-w-md shadow-lg">
+                              <CardContent className="p-6">
+                                <div className="text-center">
+                                  <Info className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                                  <p className="text-sm text-muted-foreground">Select an added step to view its tools</p>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      /* Default State - Tutorial or Empty State */
+                      <div className="flex items-center justify-center h-full">
+                        {showTutorial ? (
+                          /* Tutorial Overlay */
+                          <div className="relative w-full max-w-md">
+                            {/* Tutorial Step 0: Goal Input */}
+                            {tutorialStep === 0 && (
+                              <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                                <CardContent className="p-6">
+                                  <div className="text-center">
+                                    <p className="text-sm font-medium mb-2">Welcome to Flow Designer</p>
+                                    <p className="text-xs text-muted-foreground mb-4">Let's get you started with creating your first flow</p>
+                                    <Button onClick={handleTutorialNext} size="sm" className="mr-2">
+                                      Next
+                                    </Button>
+                                    <Button onClick={handleTutorialSkip} variant="outline" size="sm">
+                                      Skip Tutorial
+                                      </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )}
 
-                         {/* Suggested Steps Grid */}
-                         {suggestedSteps.length > 0 && !isGeneratingSteps && (
-                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             {suggestedSteps.map((step, index) => (
-                               <div
-                                 key={index}
-                                 className={`transition-all duration-300 ${
-                                   selectedRoadmapStep === `suggested-${index}` ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-80'
-                                 }`}
-                               >
-                                 <Card 
-                                   className={`shadow-lg hover:shadow-xl transition-all cursor-pointer border-2 ${
-                                     selectedRoadmapStep === `suggested-${index}` 
-                                       ? 'border-primary ring-2 ring-primary/20' 
-                                       : 'border-muted hover:border-primary/50'
-                                   }`}
-                                   onClick={() => {
-                                     setSelectedRoadmapStep(`suggested-${index}`);
-                                   }}
-                                 >
-                                   <CardHeader className="pb-3">
-                                     <div className="flex items-center space-x-2">
-                                       <div className={`p-2 rounded-lg ${step.color} bg-opacity-10`}>
-                                         {step.icon && React.createElement(step.icon, {
-                                           className: `h-5 w-5 ${step.color.replace('bg-', 'text-')}`
-                                         })}
-                                       </div>
-                                       <Badge variant="outline" className="text-xs">
-                                         Step {index + 1}
-                                       </Badge>
-                                     </div>
-                                     <CardTitle className="text-sm font-medium">{step.title}</CardTitle>
-                                   </CardHeader>
-                                   <CardContent className="pt-0">
-                                     <p className="text-xs text-muted-foreground mb-3">{step.description}</p>
-                                     <Button 
-                                       size="sm" 
-                                       className="w-full text-xs"
-                                       variant={selectedRoadmapStep === `suggested-${index}` ? "default" : "outline"}
-                                       onClick={(e) => {
-                                         e.stopPropagation();
-                                         if (selectedRoadmapStep === `suggested-${index}`) {
-                                           addStep(step);
-                                           setSelectedRoadmapStep(null);
-                                         }
-                                       }}
-                                     >
-                                       {selectedRoadmapStep === `suggested-${index}` ? "Add to Flow" : "Choose This Step"}
-                                     </Button>
-                                   </CardContent>
-                                 </Card>
-                               </div>
-                             ))}
-                           </div>
-                         )}
+                            {/* Tutorial Step 1: Generate Steps Button */}
+                            {tutorialStep === 1 && (
+                              <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                                <CardContent className="p-6">
+                                  <div className="text-center">
+                                    <Sparkles className="h-12 w-12 mx-auto mb-3 text-primary" />
+                                    <p className="text-sm font-medium mb-2">Great! You've entered a goal</p>
+                                    <p className="text-xs text-muted-foreground mb-4">Click the "Generate Steps" button to create your workflow</p>
+                                    <Button onClick={handleTutorialNext} size="sm" className="mr-2">
+                                      Next
+                                    </Button>
+                                    <Button onClick={handleTutorialSkip} variant="outline" size="sm">
+                                      Skip Tutorial
+                                      </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )}
 
-                         {/* Empty state when no suggested steps */}
-                         {suggestedSteps.length === 0 && !isGeneratingSteps && (
-                           <div className="flex items-center justify-center h-64">
-                             <Card className="w-full max-w-md shadow-lg">
-                               <CardContent className="p-6">
-                                 <div className="text-center">
-                                   <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
-                                   <p className="text-sm text-muted-foreground">Enter a goal and click "Generate Steps" to get started</p>
-                                 </div>
-                               </CardContent>
-                             </Card>
-                           </div>
-                         )}
-                       </div>
-                     ) : activePanel === "tools" ? (
-                       /* Tools for Selected Step Panel */
-                       <div>
-                         {selectedStep ? (
-                           <div>
-                             <div className="flex items-center justify-between mb-4">
-                               <h3 className="font-semibold text-lg">Tools for Selected Step</h3>
-                               <Button
-                                 variant="ghost"
-                                 size="sm"
-                                 onClick={() => setSelectedStep(null)}
-                               >
-                                 ×
-                               </Button>
-                             </div>
-                             
-                             {/* Step Properties */}
-                             <Card className="mb-6">
-                               <CardHeader>
-                                 <CardTitle className="text-base">Step Properties</CardTitle>
-                               </CardHeader>
-                               <CardContent>
-                                 <Tabs defaultValue="general" className="w-full">
-                                   <TabsList className="grid w-full grid-cols-1">
-                                     <TabsTrigger value="general">General</TabsTrigger>
-                                   </TabsList>
-                                   <TabsContent value="general" className="space-y-4">
-                                     <div>
-                                       <label className="text-sm font-medium">Title</label>
-                                       <Input
-                                         value={steps.find(s => s.id === selectedStep)?.title || ""}
-                                         onChange={(e) => updateStep(selectedStep, { title: e.target.value })}
-                                         className="mt-1"
-                                       />
-                                     </div>
-                                     <div>
-                                       <label className="text-sm font-medium">Description</label>
-                                       <Textarea
-                                         value={steps.find(s => s.id === selectedStep)?.description || ""}
-                                         onChange={(e) => updateStep(selectedStep, { description: e.target.value })}
-                                         className="mt-1"
-                                         rows={3}
-                                       />
-                                     </div>
-                                     <div>
-                                       <label className="text-sm font-medium">Assignee</label>
-                                       <Input
-                                         value={steps.find(s => s.id === selectedStep)?.assignee || ""}
-                                         onChange={(e) => updateStep(selectedStep, { assignee: e.target.value })}
-                                         className="mt-1"
-                                         placeholder="Enter assignee name"
-                                       />
-                                     </div>
-                                     <div className="grid grid-cols-2 gap-4 items-start">
-                                       <div className="flex flex-col">
-                                         <label className="text-sm font-medium mb-1 whitespace-nowrap">Estimated Time (hours)</label>
-                                         <Input
-                                           type="number"
-                                           value={steps.find(s => s.id === selectedStep)?.estimatedTime || ""}
-                                           onChange={(e) => updateStep(selectedStep, { estimatedTime: parseInt(e.target.value) || 0 })}
-                                           className="h-10"
-                                         />
-                                       </div>
-                                       <div className="flex flex-col">
-                                         <label className="text-sm font-medium mb-1 whitespace-nowrap">Cost ($)</label>
-                                         <Input
-                                           type="number"
-                                           value={steps.find(s => s.id === selectedStep)?.cost || ""}
-                                           onChange={(e) => updateStep(selectedStep, { cost: parseInt(e.target.value) || 0 })}
-                                           className="h-10"
-                                         />
-                                       </div>
-                                     </div>
-                                   </TabsContent>
-                                 </Tabs>
-                               </CardContent>
-                             </Card>
+                            {/* Tutorial Step 2: Flow Steps Section */}
+                            {tutorialStep === 2 && (
+                              <div className="relative">
+                                <div className="absolute -top-16 -left-8 z-20">
+                                  <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
+                                    <ArrowDown className="h-4 w-4 mr-2" />
+                                    <span className="text-sm font-medium">Add steps to your flow</span>
+                                  </div>
+                                </div>
+                                <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                                  <CardContent className="p-6">
+                                    <div className="text-center">
+                                      <List className="h-12 w-12 mx-auto mb-3 text-primary" />
+                                      <p className="text-sm font-medium mb-2">Perfect! Steps generated</p>
+                                      <p className="text-xs text-muted-foreground mb-4">Click "Add Step" to add steps to your flow, then click on them to add tools</p>
+                                      <Button onClick={handleTutorialNext} size="sm">
+                                        Finish Tutorial
+                                      </Button>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          /* Empty State - No Tutorial */
+                          <Card className="w-full max-w-md shadow-lg">
+                            <CardContent className="p-6">
+                              <div className="text-center">
+                                <p className="text-xs text-muted-foreground">Enter a goal and click "Generate Steps" to get started</p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                             {/* Tools for Selected Step */}
-                             <div>
-                               <div className="flex items-center justify-between mb-4">
-                                 <h3 className="font-semibold text-lg">Available Tools</h3>
-                               </div>
-                               
-                               <div className="space-y-4">
-                                 {/* Category Filter Buttons */}
-                                 <div className="flex flex-wrap gap-2">
-                                   {getRelevantCategories(workflowGoal).map((category) => (
-                                     <Button
-                                       key={category}
-                                       variant={selectedCategory === category ? "default" : "outline"}
-                                       size="sm"
-                                       className="text-xs capitalize"
-                                       onClick={() => handleCategorySelect(category, selectedStep)}
-                                     >
-                                       {category === "all" ? "All Tools" : category}
-                                     </Button>
-                                   ))}
-                                 </div>
+              </div>
+            </div>
+          </div>
 
-                                 {/* Loading State */}
-                                 {isGeneratingTools && (
-                                   <div className="flex items-center justify-center py-6 mb-4">
-                                     <div className="flex items-center space-x-3">
-                                       <RefreshCw className="h-5 w-5 animate-spin text-primary" />
-                                       <span className="text-sm text-muted-foreground">AI is generating suggested tools...</span>
-                                     </div>
-                                   </div>
-                                 )}
-                                 
-                                 {/* Tools Grid */}
-                                 {isGeneratingTools ? (
-                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                     {/* Loading skeleton cards */}
-                                     {[1, 2, 3, 4].map((index) => (
-                                       <div key={index} className="border rounded-lg p-3 bg-card">
-                                         <div className="flex items-start space-x-3">
-                                           <Skeleton className="h-8 w-8 rounded-lg flex-shrink-0" />
-                                           <div className="flex-1 min-w-0">
-                                             <div className="flex items-center justify-between mb-1">
-                                               <Skeleton className="h-4 w-24" />
-                                               <Skeleton className="h-5 w-12" />
-                                             </div>
-                                             <Skeleton className="h-3 w-full mb-2" />
-                                             <Skeleton className="h-3 w-3/4 mb-2" />
-                                             <div className="flex gap-2">
-                                               <Skeleton className="h-6 w-16" />
-                                               <Skeleton className="h-6 w-16" />
-                                             </div>
-                                           </div>
-                                         </div>
-                                       </div>
-                                     ))}
-                                   </div>
-                                 ) : currentStepTools.length > 0 ? (
-                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                     {currentStepTools.map((tool, index) => (
-                                       <div key={index} className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card">
-                                         <div className="flex items-start space-x-3">
-                                           <div className="p-2 rounded-lg bg-muted flex-shrink-0">
-                                             {tool.icon && React.createElement(tool.icon, {
-                                               className: "h-4 w-4 text-muted-foreground"
-                                             })}
-                                           </div>
-                                           <div className="flex-1 min-w-0">
-                                             <div className="flex items-center justify-between mb-1">
-                                               <h5 className="font-medium text-sm truncate">{tool.name}</h5>
-                                               <Badge 
-                                                 variant={getUserSpecificPricing(tool).model === 'free' ? 'secondary' : 'default'}
-                                                 className="text-xs"
-                                               >
-                                                 {getUserSpecificPricing(tool).model === 'free' ? 'FREE' : getUserSpecificPricing(tool).startingPrice ? `$${getUserSpecificPricing(tool).startingPrice}` : 'PAID'}
-                                               </Badge>
-                                             </div>
-                                             <p className="text-xs text-muted-foreground mb-2">{tool.description}</p>
-                                             <div className="flex gap-2">
-                                               {tool.link && (
-                                                 <Button
-                                                   variant="ghost"
-                                                   size="sm"
-                                                   className="h-6 px-2 text-xs"
-                                                   onClick={() => window.open(tool.link, '_blank')}
-                                                 >
-                                                   Visit Tool
-                                                   <ChevronRight className="h-3 w-3 ml-1" />
-                                                 </Button>
-                                               )}
-                                               <Button
-                                                 variant="outline"
-                                                 size="sm"
-                                                 className="h-6 px-2 text-xs"
-                                                 onClick={(e) => {
-                                                   e.stopPropagation();
-                                                   if (selectedStep) {
-                                                     addToolToStep(selectedStep, tool);
-                                                   }
-                                                 }}
-                                               >
-                                                 Add Tool
-                                               </Button>
-                                             </div>
-                                           </div>
-                                         </div>
-                                       </div>
-                                     ))}
-                                   </div>
-                                 ) : (
-                                   <div className="flex items-center justify-center h-32">
-                                     <Card className="w-full max-w-md shadow-lg">
-                                       <CardContent className="p-6">
-                                         <div className="text-center">
-                                           <Info className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                                           <p className="text-sm text-muted-foreground">No tools available for the selected category</p>
-                                           <p className="text-xs text-muted-foreground mt-1">Try selecting a different category or "All Tools"</p>
-                                         </div>
-                                       </CardContent>
-                                     </Card>
-                                   </div>
-                                 )}
-                               </div>
-                             </div>
-                           </div>
-                         ) : (
-                           <div className="flex items-center justify-center h-64">
-                             <Card className="w-full max-w-md shadow-lg">
-                               <CardContent className="p-6">
-                                 <div className="text-center">
-                                   <Info className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
-                                   <p className="text-sm text-muted-foreground">Select an added step to view its tools</p>
-                                 </div>
-                               </CardContent>
-                             </Card>
-                           </div>
-                         )}
-                       </div>
-                     ) : (
-                       /* Default State - Tutorial or Empty State */
-                       <div className="flex items-center justify-center h-full">
-                         {showTutorial ? (
-                           /* Tutorial Overlay */
-                           <div className="relative w-full max-w-md">
-                             {/* Tutorial Step 0: Goal Input */}
-                             {tutorialStep === 0 && (
-                               <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
-                                 <CardContent className="p-6">
-                                   <div className="text-center">
-                                     <p className="text-sm font-medium mb-2">Welcome to Flow Designer</p>
-                                     <p className="text-xs text-muted-foreground mb-4">Let's get you started with creating your first flow</p>
-                                     <Button onClick={handleTutorialNext} size="sm" className="mr-2">
-                                       Next
-                                     </Button>
-                                     <Button onClick={handleTutorialSkip} variant="outline" size="sm">
-                                       Skip Tutorial
-                                       </Button>
-                                   </div>
-                                 </CardContent>
-                               </Card>
-                             )}
-
-                             {/* Tutorial Step 1: Generate Steps Button */}
-                             {tutorialStep === 1 && (
-                               <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
-                                 <CardContent className="p-6">
-                                   <div className="text-center">
-                                     <Sparkles className="h-12 w-12 mx-auto mb-3 text-primary" />
-                                     <p className="text-sm font-medium mb-2">Great! You've entered a goal</p>
-                                     <p className="text-xs text-muted-foreground mb-4">Click the "Generate Steps" button to create your workflow</p>
-                                     <Button onClick={handleTutorialNext} size="sm" className="mr-2">
-                                       Next
-                                     </Button>
-                                     <Button onClick={handleTutorialSkip} variant="outline" size="sm">
-                                       Skip Tutorial
-                                       </Button>
-                                   </div>
-                                 </CardContent>
-                               </Card>
-                             )}
-
-                             {/* Tutorial Step 2: Flow Steps Section */}
-                             {tutorialStep === 2 && (
-                               <div className="relative">
-                                 <div className="absolute -top-16 -left-8 z-20">
-                                   <div className="flex items-center bg-primary text-primary-foreground px-3 py-2 rounded-lg shadow-lg">
-                                     <ArrowDown className="h-4 w-4 mr-2" />
-                                     <span className="text-sm font-medium">Add steps to your flow</span>
-                                   </div>
-                                 </div>
-                                 <Card className="w-full shadow-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
-                                   <CardContent className="p-6">
-                                     <div className="text-center">
-                                       <List className="h-12 w-12 mx-auto mb-3 text-primary" />
-                                       <p className="text-sm font-medium mb-2">Perfect! Steps generated</p>
-                                       <p className="text-xs text-muted-foreground mb-4">Click "Add Step" to add steps to your flow, then click on them to add tools</p>
-                                       <Button onClick={handleTutorialNext} size="sm">
-                                         Finish Tutorial
-                                       </Button>
-                                     </div>
-                                   </CardContent>
-                                 </Card>
-                               </div>
-                             )}
-                           </div>
-                         ) : (
-                           /* Empty State - No Tutorial */
-                           <Card className="w-full max-w-md shadow-lg">
-                             <CardContent className="p-6">
-                               <div className="text-center">
-                                 <p className="text-xs text-muted-foreground">Enter a goal and click "Generate Steps" to get started</p>
-                               </div>
-                             </CardContent>
-                           </Card>
-                         )}
-                       </div>
-                     )}
-                   </div>
-                 </div>
-
-               </div>
-             </div>
-           </div>
-
-                      {/* Right Sidebar - Flow Statistics */}
-           <div className="w-80 border-l bg-muted/30 p-4 overflow-y-auto">
-             {/* Flow Statistics */}
-             <div className="mb-6">
-               <h3 className="font-semibold mb-3">Flow Statistics</h3>
-               <div className="space-y-3">
-                 <div className="flex items-center justify-between">
-                   <span className="text-sm text-muted-foreground">Goal Set</span>
-                   <Badge variant={workflowGoal ? "default" : "secondary"}>
-                     {workflowGoal ? "✓ Set" : "Not Set"}
-                   </Badge>
-                 </div>
-                 <div className="flex items-center justify-between">
-                   <span className="text-sm text-muted-foreground">Total Steps</span>
-                   <Badge variant="secondary">{steps.filter(step => step.type !== "goal").length}</Badge>
-                 </div>
-                 <div className="flex items-center justify-between">
-                   <span className="text-sm text-muted-foreground">Estimated Time</span>
-                   <Badge variant="secondary">{calculateTotalTime()}h</Badge>
-                 </div>
-                 <div className="flex items-center justify-between">
-                   <span className="text-sm text-muted-foreground">Total Cost</span>
-                   <Badge variant="secondary">${calculateTotalCost().toLocaleString()}</Badge>
-                 </div>
-               </div>
-             </div>
-           </div>
-        </div>
-      </div>
-    </PermanentDashboard>
-  );
+                     {/* Right Sidebar - Flow Statistics */}
+          <div className="w-80 border-l bg-muted/30 p-4 overflow-y-auto">
+            {/* Flow Statistics */}
+            <div className="mb-6">
+              <h3 className="font-semibold mb-3">Flow Statistics</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Goal Set</span>
+                  <Badge variant={workflowGoal ? "default" : "secondary"}>
+                    {workflowGoal ? "✓ Set" : "Not Set"}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Total Steps</span>
+                  <Badge variant="secondary">{steps.filter(step => step.type !== "goal").length}</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Estimated Time</span>
+                  <Badge variant="secondary">{calculateTotalTime()}h</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Total Cost</span>
+                  <Badge variant="secondary">${calculateTotalCost().toLocaleString()}</Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+       </div>
+     </div>
+   </PermanentDashboard>
+ );
 };
 
 export default FlowDesigner; 
