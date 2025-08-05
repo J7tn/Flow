@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Login } from "./components/auth/Login";
 import { Signup } from "./components/auth/Signup";
 import { EmailConfirmation } from "./components/auth/EmailConfirmation";
+import { BypassLogin } from "./components/auth/BypassLogin";
 import { LandingPage } from "./components/LandingPage";
 import { Features } from "./components/Features";
 import { Pricing } from "./components/Pricing";
@@ -71,6 +72,10 @@ function AppContent() {
           <EmailConfirmation />
         </ProtectedRoute>
       ),
+    },
+    {
+      path: "/friend",
+      element: <BypassLogin />,
     },
     {
       path: "/dashboard",

@@ -6,10 +6,13 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  bypassMode: boolean;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
+  enableBypass: () => void;
+  disableBypass: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [bypassMode, setBypassMode] = useState(false);
 
   useEffect(() => {
     console.log('AuthProvider: Initializing authentication...');
@@ -166,14 +170,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const enableBypass = () => {
+    console.log('AuthProvider: Enabling bypass mode');
+    setBypassMode(true);
+    // Create a mock user for bypass mode
+    const mockUser = {
+      id: 'bypass-user',
+      email: 'friend@flow.app',
+      user_metadata: { full_name: 'Friend User' },
+      app_metadata: {},
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
+    } as User;
+    setUser(mockUser);
+    setSession({ user: mockUser, access_token: 'bypass-token', refresh_token: 'bypass-refresh', expires_at: Date.now() + 86400000 } as Session);
+  };
+
+  const disableBypass = () => {
+    console.log('AuthProvider: Disabling bypass mode');
+    setBypassMode(false);
+    setUser(null);
+    setSession(null);
+  };
+
   const value = {
     user,
     session,
     loading,
+    bypassMode,
     signIn,
     signUp,
     signOut,
     resetPassword,
+    enableBypass,
+    disableBypass,
   };
 
   return (

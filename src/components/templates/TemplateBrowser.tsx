@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, Star, Clock, DollarSign, Users, TrendingUp, Zap, Loader2 } from 'lucide-react';
+import { Search, Star, Clock, DollarSign, Users, TrendingUp, Zap, Loader2, Upload, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import {
   allTemplates, 
   templateCategories
 } from '@/data/templates';
+import { TemplateUploadForm } from './TemplateUploadForm';
 import type { FlowTemplate } from '@/types/templates';
 
 interface TemplateBrowserProps {
@@ -28,6 +29,7 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
   const [sortBy, setSortBy] = useState<'popularity' | 'rating' | 'duration' | 'cost'>('popularity');
   const [visibleCount, setVisibleCount] = useState(15);
   const [isLoading, setIsLoading] = useState(false);
+  const [showUploadForm, setShowUploadForm] = useState(false);
 
   // Filter and sort templates
   const filteredTemplates = useMemo(() => {
@@ -159,15 +161,29 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
     return `${cost} ${currency}`;
   };
 
+  const handleUploadSuccess = (templateId: string) => {
+    setShowUploadForm(false);
+    // Optionally refresh the template list or navigate to the new template
+    navigate(`/templates/${templateId}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-4">
-        <div>
-          <h1 className="text-3xl font-bold">Flow Templates</h1>
-          <p className="text-muted-foreground">
-            Browse and select from hundreds of industry-proven flow templates
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Flow Templates</h1>
+            <p className="text-muted-foreground">
+              Browse and select from hundreds of industry-proven flow templates
+            </p>
+          </div>
+          {user && (
+            <Button onClick={() => setShowUploadForm(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Share Template
+            </Button>
+          )}
         </div>
 
         {/* Search and Filters */}
@@ -276,7 +292,7 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
           {visibleTemplates.map((template) => (
             <Card 
               key={template.id} 
-              className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-[450px]"
+              className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-[480px]"
               onClick={() => handleTemplateSelect(template)}
             >
               <CardHeader className="pb-3">
@@ -311,6 +327,16 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
                     </Badge>
                   )}
                 </div>
+
+                {/* Author Information */}
+                {template.isUserGenerated && template.authorName && (
+                  <div className="flex items-center space-x-2 pt-2 border-t">
+                    <User className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      By {template.authorName}
+                    </span>
+                  </div>
+                )}
               </CardHeader>
 
               <CardContent className="space-y-4 flex-1 flex flex-col overflow-hidden">
@@ -461,6 +487,20 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
           </div>
         )}
       </div>
+
+      {/* Upload Form Modal */}
+      {showUploadForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-background border rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <TemplateUploadForm
+                onSuccess={handleUploadSuccess}
+                onCancel={() => setShowUploadForm(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }; 

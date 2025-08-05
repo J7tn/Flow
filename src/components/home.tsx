@@ -14,6 +14,7 @@ import {
   Mail,
   Users,
   X,
+  Shield,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -43,6 +44,7 @@ import { Textarea } from "./ui/textarea";
 import PermanentDashboard from "./shared/PermanentDashboard";
 import { supabase } from "@/lib/supabase";
 import { useScrollToTop } from "@/lib/hooks/useScrollToTop";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
   // Scroll to top immediately before any rendering
@@ -53,6 +55,7 @@ const Home = () => {
   // Scroll to top when component mounts
   useScrollToTop();
   
+  const { bypassMode, disableBypass } = useAuth();
   const [activeTab, setActiveTab] = useState("recent");
   const [loading, setLoading] = useState(true);
   const [recentFlows, setRecentFlows] = useState<any[]>([]);
@@ -231,6 +234,20 @@ const Home = () => {
                              <Input placeholder="Search flows..." className="pl-8" />
             </div>
             <div className="flex items-center space-x-4">
+              {bypassMode && (
+                <div className="flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/20 px-3 py-1 rounded-full">
+                  <Shield className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                  <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Friend Mode</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={disableBypass}
+                    className="h-6 w-6 p-0 hover:bg-yellow-200 dark:hover:bg-yellow-800"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
               <Dialog open={teamInviteOpen} onOpenChange={setTeamInviteOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">

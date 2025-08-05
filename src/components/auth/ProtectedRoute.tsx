@@ -14,7 +14,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   redirectTo = '/login',
 }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, bypassMode } = useAuth();
   const location = useLocation();
 
   console.log('ProtectedRoute:', {
@@ -37,8 +37,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  if (requireAuth && !user) {
-    console.log('ProtectedRoute: Requiring auth but no user, redirecting to:', redirectTo);
+  if (requireAuth && !user && !bypassMode) {
+    console.log('ProtectedRoute: Requiring auth but no user and not in bypass mode, redirecting to:', redirectTo);
     // Redirect to login page with return URL
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }

@@ -1,65 +1,268 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  ArrowLeft, 
   Star, 
   Clock, 
   DollarSign, 
   Users, 
   TrendingUp, 
   Zap, 
-  CheckCircle, 
-  AlertTriangle,
+  Loader2,
+  ArrowLeft,
+  User,
+  Calendar,
+  CheckCircle,
+  AlertCircle,
   ExternalLink,
-  Play,
+  Copy,
   Share2,
-  Bookmark,
-  MessageCircle
+  Heart,
+  MessageSquare
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  allTemplates, 
-  templateCategories
-} from '@/data/templates';
-import { getTemplateReviews, getUserReview } from '@/lib/api';
-import { ReviewSubmissionForm } from './ReviewSubmissionForm';
-import { ReviewDisplay } from './ReviewDisplay';
-import type { FlowTemplate, TemplateReview } from '@/types/templates';
+import { supabase } from '@/lib/supabase';
+import { TemplateReviews } from './TemplateReviews';
+import { TemplateReviewForm } from './TemplateReviewForm';
+import { allTemplates, templateCategories } from '@/data/templates';
+import type { FlowTemplate } from '@/types/templates';
 
 export const TemplateDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [reviews, setReviews] = useState<TemplateReview[]>([]);
-  const [userReview, setUserReview] = useState<TemplateReview | null>(null);
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
   const { user } = useAuth();
+  const { toast } = useToast();
+  
+  const [template, setTemplate] = useState<FlowTemplate | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
-  // Find the template by ID
-  const template = allTemplates.find(t => t.id === id);
+  // Load template data
+  useEffect(() => {
+    loadTemplate();
+  }, [id]);
 
-  if (!template) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">Template not found</h2>
-        <p className="text-muted-foreground mb-6">
-          The template you're looking for doesn't exist or has been removed.
-        </p>
-        <Button onClick={() => navigate('/templates')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Templates
-        </Button>
-      </div>
-    );
-  }
+  const loadTemplate = async () => {
+    try {
+      setIsLoading(true);
+      console.log('🔍 Loading template with ID:', id);
+      console.log('🔍 Available local template IDs:', allTemplates.map(t => t.id));
+      console.log('🔍 Total templates available:', allTemplates.length);
+      
+      // First try to get from local templates
+      let templateData = allTemplates.find(t => t.id === id);
+      console.log('🔍 Found in local templates:', !!templateData);
+      if (templateData) {
+        console.log('🔍 Local template found:', templateData.name);
+        console.log('🔍 Template data:', {
+          id: templateData.id,
+          name: templateData.name,
+          category: templateData.category,
+          hasThumbnail: !!templateData.thumbnail,
+          hasAuthorName: !!templateData.authorName,
+          hasCreatedAt: !!templateData.createdAt,
+          hasIsUserGenerated: templateData.isUserGenerated !== undefined,
+          hasStatus: !!templateData.status
+        });
+      }
+      
+      if (!templateData) {
+        console.log('🔍 Not found locally, checking database...');
+        console.log('🔍 Searching for exact ID match:', id);
+        console.log('🔍 Available IDs for comparison:', allTemplates.map(t => ({ id: t.id, name: t.name })));
+        
+        // If not found locally, try to get from database
+        const supabaseClient = supabase();
+        if (!supabaseClient) {
+          throw new Error('Supabase client not available');
+        }
+        
+        console.log('🔍 Querying database for template ID:', id);
+        const { data, error } = await supabaseClient
+          .from('workflow_templates')
+          .select('*')
+          .eq('id', id)
+          .eq('is_public', true)
+          .single();
 
-  const category = templateCategories.find(c => c.id === template.category);
+        if (error) {
+          console.error('🔍 Database error:', error);
+          throw error;
+        }
+        
+        if (!data) {
+          console.log('🔍 Template not found in database either');
+          console.log('🔍 Final result: Template not found in any source');
+          throw new Error('Template not found');
+        }
+        
+        console.log('🔍 Found in database:', data.name);
+        
+        // Transform database data to match FlowTemplate interface
+        templateData = {
+          id: data.id,
+          name: data.name,
+          description: data.description,
+          category: data.category,
+          difficulty: data.difficulty,
+          targetAudience: data.target_audience,
+          estimatedDuration: {
+            min: data.estimated_duration_min,
+            max: data.estimated_duration_max,
+            unit: data.duration_unit
+          },
+          tags: data.tags || [],
+          thumbnail: data.thumbnail_url, // Map thumbnailUrl to thumbnail
+          version: '1.0.0', // Default version
+          author: data.author_name || 'Unknown',
+          authorName: data.author_name || 'Unknown', // Add authorName field
+          lastUpdated: new Date(data.updated_at || data.created_at),
+          createdAt: new Date(data.created_at), // Add createdAt field
+          isPublic: data.is_public,
+          rating: data.rating,
+          usageCount: data.usage_count || 0,
+          steps: data.steps || [],
+          costAnalysis: data.cost_analysis || {
+            totalCost: 0,
+            currency: 'USD',
+            breakdown: [],
+            calculationDate: new Date()
+          },
+          recommendedTools: data.recommended_tools || [],
+          optimizationSuggestions: data.optimization_suggestions || [],
+          industryContext: data.industry_context || {},
+          successMetrics: data.success_metrics || [],
+          risks: data.risks || [],
+          customizationOptions: data.customization_options || [],
+          isUserGenerated: data.is_user_generated,
+          status: data.status || 'approved',
+          moderationNotes: data.moderation_notes,
+          moderatedBy: data.moderated_by,
+          moderatedAt: data.moderated_at ? new Date(data.moderated_at) : undefined,
+          rejectionReason: data.rejection_reason
+        };
+      }
 
+      console.log('✅ Setting template:', templateData.name);
+      setTemplate(templateData);
+
+      // Check if user has favorited this template
+      if (user) {
+        const supabaseClient = supabase();
+        if (supabaseClient) {
+          const { data: favoriteData } = await supabaseClient
+            .from('user_favorites')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('template_id', id)
+            .single();
+
+          setIsFavorite(!!favoriteData);
+        }
+      }
+
+    } catch (error) {
+      console.error('❌ Error loading template:', error);
+      toast({
+        title: "Template Not Found",
+        description: "The template you're looking for doesn't exist or is not available.",
+        variant: "destructive"
+      });
+      navigate('/templates');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Toggle favorite
+  const toggleFavorite = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to save favorites",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const supabaseClient = supabase();
+      if (!supabaseClient) {
+        throw new Error('Supabase client not available');
+      }
+
+      if (isFavorite) {
+        await supabaseClient
+          .from('user_favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('template_id', template!.id);
+      } else {
+        await supabaseClient
+          .from('user_favorites')
+          .insert({
+            user_id: user.id,
+            template_id: template!.id
+          });
+      }
+
+      setIsFavorite(!isFavorite);
+      toast({
+        title: isFavorite ? "Removed from Favorites" : "Added to Favorites",
+        description: isFavorite 
+          ? "Template removed from your favorites" 
+          : "Template added to your favorites",
+      });
+
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favorites. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Copy template link
+  const copyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast({
+      title: "Link Copied",
+      description: "Template link copied to clipboard",
+    });
+  };
+
+  // Share template
+  const shareTemplate = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: template?.name || 'Flow Template',
+        text: template?.description || 'Check out this workflow template',
+        url: window.location.href,
+      });
+    } else {
+      copyLink();
+    }
+  };
+
+  // Use template
+  const useTemplate = () => {
+    if (user) {
+      navigate(`/workflow/new?template=${template!.id}`);
+    } else {
+      navigate('/signup', { state: { from: `/templates/${template!.id}` } });
+    }
+  };
+
+  // Format functions
   const formatDuration = (min: number, max: number, unit: string) => {
     if (min === max) {
       return `${min} ${unit}${min > 1 ? 's' : ''}`;
@@ -77,69 +280,45 @@ export const TemplateDetail: React.FC = () => {
     return `${cost} ${currency}`;
   };
 
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'low': return 'text-green-600 bg-green-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
-      case 'critical': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
-  const handleUseTemplate = () => {
-    if (user) {
-      navigate(`/workflow/new?template=${template.id}`);
-    } else {
-      navigate('/signup', { state: { from: `/templates/${template.id}` } });
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="text-muted-foreground">Loading template...</span>
+        </div>
+      </div>
+    );
+  }
 
-  // Load reviews
-  useEffect(() => {
-    if (id) {
-      loadReviews();
-    }
-  }, [id]);
-
-  const loadReviews = async () => {
-    if (!id) return;
-    
-    setIsLoadingReviews(true);
-    try {
-      const [reviewsResult, userReviewResult] = await Promise.all([
-        getTemplateReviews(id),
-        user ? getUserReview(id) : Promise.resolve({ data: null, error: null })
-      ]);
-
-      if (reviewsResult.data) {
-        setReviews(reviewsResult.data);
-      }
-
-      if (userReviewResult.data) {
-        setUserReview(userReviewResult.data);
-      }
-    } catch (error) {
-      console.error('Error loading reviews:', error);
-    } finally {
-      setIsLoadingReviews(false);
-    }
-  };
-
-  const handleReviewSuccess = (review: TemplateReview) => {
-    setUserReview(review);
-    setShowReviewForm(false);
-    loadReviews(); // Reload all reviews to update the list
-  };
-
-  const handleReviewCancel = () => {
-    setShowReviewForm(false);
-  };
+  if (!template) {
+    return (
+      <div className="text-center py-12">
+        <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+        <h3 className="text-lg font-medium mb-2">Template Not Found</h3>
+        <p className="text-muted-foreground mb-4">
+          The template you're looking for doesn't exist or is not available.
+        </p>
+        <Button onClick={() => navigate('/templates')}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Templates
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="sm" onClick={() => navigate('/templates')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -147,310 +326,218 @@ export const TemplateDetail: React.FC = () => {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">{template.name}</h1>
-            <p className="text-muted-foreground">{template.description}</p>
+            <p className="text-muted-foreground mt-1">{template.description}</p>
           </div>
         </div>
+        
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm">
-            <Bookmark className="h-4 w-4 mr-2" />
-            Save
-          </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={shareTemplate}>
             <Share2 className="h-4 w-4 mr-2" />
             Share
           </Button>
-          <Button onClick={handleUseTemplate}>
-            <Play className="h-4 w-4 mr-2" />
-            Use Template
+          <Button variant="outline" size="sm" onClick={copyLink}>
+            <Copy className="h-4 w-4 mr-2" />
+            Copy Link
+          </Button>
+          <Button 
+            variant={isFavorite ? "default" : "outline"} 
+            size="sm" 
+            onClick={toggleFavorite}
+          >
+            <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
+            {isFavorite ? 'Favorited' : 'Favorite'}
+          </Button>
+          <Button onClick={useTemplate}>
+            <Zap className="h-4 w-4 mr-2" />
+            {user ? 'Use Template' : 'Sign Up to Use'}
           </Button>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Template Info Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Star className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium">{template.rating?.toFixed(1) || 'N/A'}</span>
+              <div>
+                <p className="text-sm text-muted-foreground">Rating</p>
+                <p className="font-semibold">{template.rating?.toFixed(1) || 'N/A'}</p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">Rating</p>
           </CardContent>
         </Card>
+        
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Clock className="h-4 w-4 text-blue-500" />
-              <span className="text-sm font-medium">
-                {formatDuration(
-                  template.estimatedDuration.min,
-                  template.estimatedDuration.max,
-                  template.estimatedDuration.unit
-                )}
-              </span>
+              <div>
+                <p className="text-sm text-muted-foreground">Duration</p>
+                <p className="font-semibold">
+                  {formatDuration(
+                    template.estimatedDuration.min,
+                    template.estimatedDuration.max,
+                    template.estimatedDuration.unit
+                  )}
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">Duration</p>
           </CardContent>
         </Card>
+        
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <DollarSign className="h-4 w-4 text-green-500" />
-              <span className="text-sm font-medium">
-                {formatCost(template.costAnalysis.totalCost, template.costAnalysis.currency)}
-              </span>
+              <div>
+                <p className="text-sm text-muted-foreground">Cost</p>
+                <p className="font-semibold">
+                  {formatCost(template.costAnalysis.totalCost, template.costAnalysis.currency)}
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">Total Cost</p>
           </CardContent>
         </Card>
+        
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Users className="h-4 w-4 text-purple-500" />
-              <span className="text-sm font-medium">{template.usageCount.toLocaleString()}</span>
+              <div>
+                <p className="text-sm text-muted-foreground">Usage</p>
+                <p className="font-semibold">{template.usageCount.toLocaleString()}</p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">Users</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Content */}
+      {/* Tags and Categories */}
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="secondary">
+          {templateCategories.find(c => c.id === template.category)?.icon} 
+          {templateCategories.find(c => c.id === template.category)?.name}
+        </Badge>
+        <Badge variant="outline" className="capitalize">
+          {template.difficulty}
+        </Badge>
+        <Badge variant="outline" className="capitalize">
+          {template.targetAudience === 'individual' ? 'Individual' : 
+           template.targetAudience === 'small-team' ? 'Small Team' : 'Enterprise'}
+        </Badge>
+        {template.isUserGenerated && (
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            Community Template
+          </Badge>
+        )}
+        {template.tags.map(tag => (
+          <Badge key={tag} variant="outline">
+            {tag}
+          </Badge>
+        ))}
+      </div>
+
+      {/* Author Information */}
+      {template.isUserGenerated && template.authorName && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <User className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium">Created by {template.authorName}</p>
+                <p className="text-sm text-muted-foreground">
+                  Published {formatDate(template.createdAt?.toISOString() || '')}
+                </p>
+              </div>
+              <Badge variant="outline" className="ml-auto">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Community Contributor
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="steps">Steps</TabsTrigger>
-          <TabsTrigger value="costs">Costs</TabsTrigger>
-          <TabsTrigger value="tools">Tools</TabsTrigger>
-          <TabsTrigger value="optimization">Optimization</TabsTrigger>
-          <TabsTrigger value="reviews">
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Reviews ({reviews.length})
-          </TabsTrigger>
+          <TabsTrigger value="tools">Tools & Costs</TabsTrigger>
+          <TabsTrigger value="reviews">Reviews</TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Info */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>About This Template</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">
-                      {category?.icon} {category?.name}
-                    </Badge>
-                    <Badge variant="outline" className="capitalize">
-                      {template.difficulty}
-                    </Badge>
-                    <Badge variant="outline">
-                      v{template.version}
-                    </Badge>
-                  </div>
-                  <p className="text-muted-foreground">{template.description}</p>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Tags</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {template.tags.map((tag) => (
-                        <Badge key={tag} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Industry Context */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Industry Context</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {template.industryContext.marketSize && (
-                    <div>
-                      <h4 className="font-medium">Market Size</h4>
-                      <p className="text-sm text-muted-foreground">{template.industryContext.marketSize}</p>
-                    </div>
-                  )}
-                  {template.industryContext.competition && (
-                    <div>
-                      <h4 className="font-medium">Competition</h4>
-                      <p className="text-sm text-muted-foreground">{template.industryContext.competition}</p>
-                    </div>
-                  )}
-                  {template.industryContext.trends && template.industryContext.trends.length > 0 && (
-                    <div>
-                      <h4 className="font-medium">Current Trends</h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        {template.industryContext.trends.map((trend, index) => (
-                          <li key={index}>• {trend}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Success Metrics */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Success Metrics</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {template.successMetrics.map((metric) => (
-                    <div key={metric.name} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium">{metric.name}</span>
-                        <span className="text-muted-foreground">{metric.target}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{metric.description}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Risks */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Risk Assessment</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {template.risks.map((risk) => (
-                    <div key={risk.description} className="space-y-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">{risk.category}</span>
-                        <Badge 
-                          variant="outline" 
-                          className={`text-xs ${getRiskColor(risk.impact)}`}
-                        >
-                          {risk.impact}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{risk.description}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </TabsContent>
-
-        {/* Steps Tab */}
-        <TabsContent value="steps" className="space-y-6">
+        <TabsContent value="overview" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Process Steps</CardTitle>
+              <CardTitle>Template Overview</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">Description</h4>
+                <p className="text-muted-foreground">{template.description}</p>
+              </div>
+              
+              {template.successMetrics.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Success Metrics</h4>
+                  <ul className="space-y-1">
+                    {template.successMetrics.map((metric, index) => (
+                      <li key={index} className="flex items-center space-x-2">
+                        <div className="w-1 h-1 bg-green-500 rounded-full" />
+                        <span className="text-sm">{metric.name}: {metric.target}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {template.risks.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Potential Risks</h4>
+                  <ul className="space-y-1">
+                    {template.risks.map((risk, index) => (
+                      <li key={index} className="flex items-center space-x-2">
+                        <div className="w-1 h-1 bg-red-500 rounded-full" />
+                        <span className="text-sm">{risk.title}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="steps" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Workflow Steps</CardTitle>
               <CardDescription>
-                {template.steps.length} steps • {template.steps.length} dependencies
+                {template.steps.length} steps to complete this workflow
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {template.steps.map((step, index) => (
-                  <div key={step.id} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <h3 className="font-medium">{step.title}</h3>
-                          <p className="text-sm text-muted-foreground">{step.description}</p>
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="capitalize">
-                        {step.type}
-                      </Badge>
+                  <div key={step.id} className="flex items-start space-x-4 p-4 border rounded-lg">
+                    <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
+                      {index + 1}
                     </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Duration:</span>
-                        <div className="font-medium">
-                          {formatDuration(
-                            step.estimatedDuration.min,
-                            step.estimatedDuration.max,
-                            step.estimatedDuration.unit
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Cost:</span>
-                        <div className="font-medium">
-                          {formatCost(step.costEstimate.min, step.costEstimate.currency)} - 
-                          {formatCost(step.costEstimate.max, step.costEstimate.currency)}
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Risk:</span>
-                        <Badge 
-                          variant="outline" 
-                          className={`text-xs ${getRiskColor(step.riskLevel)}`}
-                        >
-                          {step.riskLevel}
-                        </Badge>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Automation:</span>
-                        <div className="font-medium">{step.automationPotential || 0}%</div>
-                      </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{step.title}</h4>
+                      {step.description && (
+                        <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                      )}
+                      {step.estimatedDuration && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Estimated: {step.estimatedDuration.min}-{step.estimatedDuration.max} {step.estimatedDuration.unit}
+                        </p>
+                      )}
                     </div>
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Required Skills:</span>
-                        <div className="flex flex-wrap gap-1">
-                          {step.requiredSkills.map((skill) => (
-                            <Badge key={skill} variant="outline" className="text-xs">
-                              {skill}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Required Tools:</span>
-                        <div className="flex flex-wrap gap-1">
-                          {step.requiredTools.map((tool) => (
-                            <Badge key={tool} variant="outline" className="text-xs">
-                              {tool}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Deliverables:</h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        {step.deliverables.map((deliverable) => (
-                          <li key={deliverable} className="flex items-center space-x-2">
-                            <CheckCircle className="h-3 w-3 text-green-500" />
-                            <span>{deliverable}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {step.optimizationTips && step.optimizationTips.length > 0 && (
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Optimization Tips:</h4>
-                        <ul className="text-sm text-muted-foreground space-y-1">
-                          {step.optimizationTips.map((tip) => (
-                            <li key={tip} className="flex items-center space-x-2">
-                              <Zap className="h-3 w-3 text-yellow-500" />
-                              <span>{tip}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
@@ -458,333 +545,107 @@ export const TemplateDetail: React.FC = () => {
           </Card>
         </TabsContent>
 
-        {/* Costs Tab */}
-        <TabsContent value="costs" className="space-y-6">
+        <TabsContent value="tools" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Cost Summary */}
+            {/* Recommended Tools */}
             <Card>
               <CardHeader>
-                <CardTitle>Cost Summary</CardTitle>
+                <CardTitle>Recommended Tools</CardTitle>
                 <CardDescription>
-                  Total estimated cost: {formatCost(template.costAnalysis.totalCost, template.costAnalysis.currency)}
+                  Tools and software recommended for this workflow
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Total Cost</span>
-                    <span className="font-bold text-lg">
-                      {formatCost(template.costAnalysis.totalCost, template.costAnalysis.currency)}
-                    </span>
-                  </div>
-                </div>
-
+              <CardContent>
                 <div className="space-y-3">
-                  {template.costAnalysis.breakdown.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center">
-                      <div className="space-y-1">
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-sm text-muted-foreground">{item.description}</div>
+                  {template.recommendedTools.map((tool) => (
+                    <div key={tool.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <h4 className="font-medium">{tool.name}</h4>
+                        <p className="text-sm text-muted-foreground">{tool.category}</p>
                       </div>
-                      <div className="text-right">
-                        <div className="font-medium">
-                          {formatCost(item.amount, item.currency)}
-                        </div>
-                        <div className="text-xs text-muted-foreground capitalize">
-                          {item.frequency}
-                        </div>
-                      </div>
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Learn More
+                      </Button>
                     </div>
                   ))}
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-medium">Assumptions</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    {template.costAnalysis.assumptions?.map((assumption, index) => (
-                      <li key={index}>• {assumption}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-medium">Risk Factors</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    {template.costAnalysis.riskFactors?.map((risk, index) => (
-                      <li key={index} className="flex items-center space-x-2">
-                        <AlertTriangle className="h-3 w-3 text-orange-500" />
-                        <span>{risk}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Cost by Step */}
+            {/* Cost Analysis */}
             <Card>
               <CardHeader>
-                <CardTitle>Cost by Step</CardTitle>
-                <CardDescription>Cost breakdown for each process step</CardDescription>
+                <CardTitle>Cost Breakdown</CardTitle>
+                <CardDescription>
+                  Detailed cost analysis for this workflow
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {template.steps.map((step, index) => (
-                    <div key={step.id} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">
-                          {index + 1}. {step.title}
-                        </span>
-                        <span className="text-sm">
-                          {formatCost(step.costEstimate.min, step.costEstimate.currency)} - 
-                          {formatCost(step.costEstimate.max, step.costEstimate.currency)}
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Total Cost</span>
+                    <span className="text-lg font-bold">
+                      {formatCost(template.costAnalysis.totalCost, template.costAnalysis.currency)}
+                    </span>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="space-y-2">
+                    {template.costAnalysis.breakdown.map((item) => (
+                      <div key={item.id} className="flex justify-between items-center">
+                        <div>
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-muted-foreground">{item.description}</p>
+                        </div>
+                        <span className="font-medium">
+                          {formatCost(item.amount, item.currency)}
                         </span>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
-        {/* Tools Tab */}
-        <TabsContent value="tools" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recommended Tools & Technologies</CardTitle>
-              <CardDescription>
-                {template.recommendedTools.length} tools recommended for this workflow
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {template.recommendedTools.map((tool) => (
-                  <Card key={tool.id} className="p-4 h-full flex flex-col">
-                    <div className="space-y-3 flex-1 flex flex-col h-full">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h3 className="font-medium">{tool.name}</h3>
-                          <div className="mt-1">
-                            <Badge variant="outline" className="capitalize text-xs">
-                              {tool.category}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-2 line-clamp-2 min-h-[2.5rem]">{tool.description}</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Pricing:</span>
-                          <span className="font-medium">
-                            {tool.pricing.model === 'free' ? 'Free' : 
-                             tool.pricing.startingPrice ? 
-                             `${tool.pricing.startingPrice} ${tool.pricing.currency}` : 
-                             'Contact for pricing'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Learning Curve:</span>
-                          <Badge variant="outline" className="capitalize">
-                            {tool.learningCurve}
-                          </Badge>
-                        </div>
-                        {tool.popularity && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Popularity:</span>
-                            <div className="flex items-center space-x-1">
-                              {[...Array(10)].map((_, i) => (
-                                <div
-                                  key={i}
-                                  className={`w-2 h-2 rounded-full ${
-                                    i < tool.popularity! ? 'bg-yellow-400' : 'bg-gray-200'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Features:</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {tool.features.slice(0, 3).map((feature) => (
-                            <Badge key={feature} variant="outline" className="text-xs">
-                              {feature}
-                            </Badge>
-                          ))}
-                          {tool.features.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{tool.features.length - 3} more
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <h4 className="font-medium text-green-600">Pros:</h4>
-                          <ul className="text-muted-foreground space-y-1">
-                            {tool.pros.slice(0, 2).map((pro) => (
-                              <li key={pro}>• {pro}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-red-600">Cons:</h4>
-                          <ul className="text-muted-foreground space-y-1">
-                            {tool.cons.slice(0, 2).map((con) => (
-                              <li key={con}>• {con}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-
-                      {tool.website && (
-                        <Button variant="outline" size="sm" className="w-full mt-auto">
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Visit Website
-                        </Button>
-                      )}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Optimization Tab */}
-        <TabsContent value="optimization" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Optimization Suggestions</CardTitle>
-              <CardDescription>
-                AI-powered recommendations to improve efficiency, reduce costs, and enhance quality
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {template.optimizationSuggestions.map((suggestion, index) => (
-                  <div key={index} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium">{suggestion.title}</h3>
-                        <p className="text-sm text-muted-foreground">{suggestion.description}</p>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Badge 
-                          variant="outline" 
-                          className={suggestion.impact === 'high' ? 'text-green-600 bg-green-50' : 
-                                   suggestion.impact === 'medium' ? 'text-yellow-600 bg-yellow-50' : 
-                                   'text-blue-600 bg-blue-50'}
-                        >
-                          {suggestion.impact} impact
-                        </Badge>
-                        <Badge 
-                          variant="outline" 
-                          className={suggestion.effort === 'low' ? 'text-green-600 bg-green-50' : 
-                                   suggestion.effort === 'medium' ? 'text-yellow-600 bg-yellow-50' : 
-                                   'text-red-600 bg-red-50'}
-                        >
-                          {suggestion.effort} effort
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Implementation:</h4>
-                      <p className="text-sm text-muted-foreground">{suggestion.implementation}</p>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">
-                        Category: {suggestion.category}
-                      </span>
-                      <Button variant="outline" size="sm">
-                        <Zap className="h-4 w-4 mr-2" />
-                        Apply Suggestion
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Reviews Tab */}
-        <TabsContent value="reviews" className="space-y-6">
+        <TabsContent value="reviews" className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold">Reviews</h2>
+              <h3 className="text-lg font-semibold">Reviews & Ratings</h3>
               <p className="text-muted-foreground">
                 See what others think about this template
               </p>
             </div>
-            {user && !userReview && (
-              <Button onClick={() => setShowReviewForm(true)}>
-                <Star className="h-4 w-4 mr-2" />
-                Write a Review
-              </Button>
-            )}
+            <Button onClick={() => setShowReviewForm(true)}>
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Write a Review
+            </Button>
           </div>
-
-          {/* Review Form */}
-          {showReviewForm && (
-            <ReviewSubmissionForm
-              templateId={template.id}
-              existingReview={userReview}
-              onSuccess={handleReviewSuccess}
-              onCancel={handleReviewCancel}
-            />
-          )}
-
-          {/* User's Review */}
-          {userReview && !showReviewForm && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Your Review</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowReviewForm(true)}
-                  >
-                    Edit Review
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ReviewDisplay
-                  reviews={[userReview]}
-                  onReviewUpdate={loadReviews}
-                />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* All Reviews */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">
-              Community Reviews ({reviews.length})
-            </h3>
-            {isLoadingReviews ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                <p className="text-muted-foreground mt-2">Loading reviews...</p>
-              </div>
-            ) : (
-              <ReviewDisplay
-                reviews={userReview ? reviews.filter(r => r.id !== userReview.id) : reviews}
-                onReviewUpdate={loadReviews}
-              />
-            )}
-          </div>
+          
+          {template && <TemplateReviews template={template} />}
         </TabsContent>
       </Tabs>
+
+      {/* Review Form Modal */}
+      {showReviewForm && template && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <TemplateReviewForm
+                template={template}
+                onSuccess={() => {
+                  setShowReviewForm(false);
+                  // Optionally refresh reviews
+                }}
+                onCancel={() => setShowReviewForm(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }; 

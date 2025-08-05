@@ -43,7 +43,7 @@ export const costTypeSchema = z.enum([
 
 // Cost calculation types
 export const costItemSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(), // Allow any string ID, not just UUIDs
   name: z.string().min(1, 'Cost item name is required'),
   description: z.string().optional(),
   type: costTypeSchema,
@@ -89,7 +89,7 @@ export const toolCategorySchema = z.enum([
 ]);
 
 export const toolSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(), // Allow any string ID, not just UUIDs
   name: z.string().min(1, 'Tool name is required'),
   category: toolCategorySchema,
   description: z.string(),
@@ -202,9 +202,9 @@ export const templateUploadSchema = z.object({
   is_latest_version: z.boolean().default(true),
 });
 
-// Enhanced flow template schema with user-generated fields
+  // Enhanced flow template schema with user-generated fields
 export const flowTemplateSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(), // Allow any string ID, not just UUIDs
   name: z.string().min(1, 'Template name is required'),
   description: z.string(),
   category: templateCategorySchema,
@@ -219,7 +219,9 @@ export const flowTemplateSchema = z.object({
   thumbnail: z.string().url().optional(),
   version: z.string().default('1.0.0'),
   author: z.string(),
+  authorName: z.string().optional(), // For displaying author's name
   lastUpdated: z.date(),
+  createdAt: z.date().optional(), // For showing creation date
   isPublic: z.boolean().default(true),
   rating: z.number().min(0).max(5).optional(),
   usageCount: z.number().int().min(0).default(0),

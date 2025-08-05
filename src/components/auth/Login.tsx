@@ -137,7 +137,7 @@ export const Login: React.FC = () => {
             </Button>
           </form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-2">
             <Button
               variant="link"
               onClick={() => navigate('/signup')}
@@ -145,6 +145,17 @@ export const Login: React.FC = () => {
             >
               Don't have an account? Sign up
             </Button>
+            <div className="text-sm text-muted-foreground">
+              or{' '}
+              <Button
+                variant="link"
+                onClick={() => navigate('/friend')}
+                disabled={isLoading}
+                className="p-0 h-auto text-sm"
+              >
+                continue as friend
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

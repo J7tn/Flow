@@ -87,14 +87,20 @@ export function LandingPage() {
               <span className="text-xl font-bold text-foreground">Flow</span>
             </div>
             <div className="flex items-center space-x-4">
+              <Link to="/friend">
+                <Button variant="outline" size="sm">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Try as Friend
+                </Button>
+              </Link>
               <Link to="/login">
                 <Button variant="ghost">Sign In</Button>
               </Link>
-                             <Link to="/signup">
-                 <Button className="bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 hover:from-orange-600 hover:via-purple-700 hover:to-blue-700">
-                   Get Started
-                 </Button>
-               </Link>
+              <Link to="/signup">
+                <Button className="bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 hover:from-orange-600 hover:via-purple-700 hover:to-blue-700">
+                  Get Started
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
