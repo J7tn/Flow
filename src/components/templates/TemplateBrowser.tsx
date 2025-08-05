@@ -393,16 +393,16 @@ export const TemplateBrowser: React.FC<TemplateBrowserProps> = ({ onTemplateSele
 
                   {/* Top Tools */}
                   <div className="space-y-2">
-                    <div className="text-sm font-medium">Top Tools</div>
+                    <div className="text-sm font-medium">Recommended Tools ({template.recommendedTools.length})</div>
                     <div className="flex flex-wrap gap-1">
-                      {template.recommendedTools.slice(0, 3).map((tool) => (
+                      {template.recommendedTools.slice(0, 6).map((tool) => (
                         <Badge key={tool.id} variant="outline" className="text-xs">
                           {tool.name}
                         </Badge>
                       ))}
-                      {template.recommendedTools.length > 3 && (
+                      {template.recommendedTools.length > 6 && (
                         <Badge variant="outline" className="text-xs">
-                          +{template.recommendedTools.length - 3} more
+                          +{template.recommendedTools.length - 6} more
                         </Badge>
                       )}
                     </div>

@@ -556,17 +556,125 @@ export const TemplateDetail: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {template.recommendedTools.map((tool) => (
-                    <div key={tool.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">{tool.name}</h4>
-                        <p className="text-sm text-muted-foreground">{tool.category}</p>
+                    <div key={tool.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-semibold text-lg">{tool.name}</h4>
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {tool.category}
+                            </Badge>
+                            {tool.popularity && (
+                              <div className="flex items-center gap-1">
+                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                <span className="text-xs text-muted-foreground">{tool.popularity}/10</span>
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{tool.description}</p>
+                          
+                          {/* Pricing Information */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge 
+                              variant={tool.pricing.model === 'free' ? 'default' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {tool.pricing.model === 'free' && 'Free'}
+                              {tool.pricing.model === 'freemium' && 'Freemium'}
+                              {tool.pricing.model === 'subscription' && 'Subscription'}
+                              {tool.pricing.model === 'one-time' && 'One-time'}
+                              {tool.pricing.model === 'transaction' && 'Transaction'}
+                              {tool.pricing.model === 'pay-per-click' && 'Pay-per-click'}
+                            </Badge>
+                            {tool.pricing.startingPrice !== undefined && tool.pricing.startingPrice > 0 && (
+                              <span className="text-sm font-medium">
+                                ${tool.pricing.startingPrice}
+                                {tool.pricing.model === 'subscription' && '/month'}
+                                {tool.pricing.model === 'transaction' && '%'}
+                                {tool.pricing.notes && (
+                                  <span className="text-xs text-muted-foreground ml-1">
+                                    {tool.pricing.notes}
+                                  </span>
+                                )}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Features */}
+                          {tool.features && tool.features.length > 0 && (
+                            <div className="mb-2">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">Key Features:</p>
+                              <div className="flex flex-wrap gap-1">
+                                {tool.features.slice(0, 4).map((feature, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {feature}
+                                  </Badge>
+                                ))}
+                                {tool.features.length > 4 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{tool.features.length - 4} more
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Pros and Cons */}
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                              <p className="font-medium text-green-600 mb-1">Pros:</p>
+                              <ul className="space-y-1">
+                                {tool.pros.slice(0, 3).map((pro, index) => (
+                                  <li key={index} className="flex items-start gap-1">
+                                    <div className="w-1 h-1 bg-green-500 rounded-full mt-1.5 flex-shrink-0" />
+                                    <span>{pro}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div>
+                              <p className="font-medium text-red-600 mb-1">Cons:</p>
+                              <ul className="space-y-1">
+                                {tool.cons.slice(0, 3).map((con, index) => (
+                                  <li key={index} className="flex items-start gap-1">
+                                    <div className="w-1 h-1 bg-red-500 rounded-full mt-1.5 flex-shrink-0" />
+                                    <span>{con}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+
+                          {/* Learning Curve */}
+                          {tool.learningCurve && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">Learning Curve:</span>
+                              <Badge 
+                                variant={
+                                  tool.learningCurve === 'beginner' ? 'default' :
+                                  tool.learningCurve === 'intermediate' ? 'secondary' : 'destructive'
+                                }
+                                className="text-xs capitalize"
+                              >
+                                {tool.learningCurve}
+                              </Badge>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-col gap-2 ml-4">
+                          {tool.website && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={tool.website} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-3 w-3 mr-1" />
+                                Visit Site
+                              </a>
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      <Button variant="outline" size="sm">
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Learn More
-                      </Button>
                     </div>
                   ))}
                 </div>

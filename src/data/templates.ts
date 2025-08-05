@@ -245,6 +245,22 @@ export const appDevelopmentTemplate: FlowTemplate = {
       popularity: 9
     },
     {
+      id: createId('flutter', 1),
+      name: 'Flutter',
+      category: 'frontend',
+      description: 'Google\'s UI toolkit for building natively compiled applications',
+      website: 'https://flutter.dev',
+      pricing: {
+        model: 'free',
+        notes: 'Open source framework'
+      },
+      features: ['Single codebase', 'Hot reload', 'Rich widget library', 'Native performance'],
+      pros: ['Excellent performance', 'Beautiful UI', 'Single codebase', 'Google backing'],
+      cons: ['Smaller ecosystem', 'Dart language learning', 'Limited third-party libraries'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
       id: createId('figma', 1),
       name: 'Figma',
       category: 'design',
@@ -263,6 +279,42 @@ export const appDevelopmentTemplate: FlowTemplate = {
       popularity: 10
     },
     {
+      id: createId('sketch', 1),
+      name: 'Sketch',
+      category: 'design',
+      description: 'Professional design tool for macOS',
+      website: 'https://sketch.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 9,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Vector graphics', 'Symbols and styles', 'Prototyping', 'Developer handoff'],
+      pros: ['Industry standard', 'Excellent for UI design', 'Great plugins', 'Symbol system'],
+      cons: ['Mac only', 'No free tier', 'Learning curve', 'Subscription model'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('invision', 1),
+      name: 'InVision',
+      category: 'design',
+      description: 'Digital product design platform',
+      website: 'https://invisionapp.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 4,
+        currency: 'USD',
+        notes: 'Per user per month'
+      },
+      features: ['Prototyping', 'Design handoff', 'User testing', 'Design systems'],
+      pros: ['Great prototyping', 'User testing features', 'Design handoff', 'Collaboration'],
+      cons: ['Can be expensive', 'Internet dependent', 'Learning curve', 'Limited free tier'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
       id: createId('aws', 1),
       name: 'AWS',
       category: 'cloud-services',
@@ -279,6 +331,258 @@ export const appDevelopmentTemplate: FlowTemplate = {
       cons: ['Complex pricing', 'Steep learning curve', 'Vendor lock-in', 'Cost management'],
       learningCurve: 'advanced',
       popularity: 10
+    },
+    {
+      id: createId('firebase', 1),
+      name: 'Firebase',
+      category: 'backend',
+      description: 'Google\'s mobile and web app development platform',
+      website: 'https://firebase.google.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier with usage limits'
+      },
+      features: ['Authentication', 'Real-time database', 'Cloud functions', 'Hosting'],
+      pros: ['Easy to use', 'Great free tier', 'Google integration', 'Real-time features'],
+      cons: ['Vendor lock-in', 'Limited customization', 'Scaling costs', 'Google dependency'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('node-js', 1),
+      name: 'Node.js',
+      category: 'backend',
+      description: 'JavaScript runtime for server-side development',
+      website: 'https://nodejs.org',
+      pricing: {
+        model: 'free',
+        notes: 'Open source'
+      },
+      features: ['JavaScript runtime', 'NPM ecosystem', 'Event-driven', 'Cross-platform'],
+      pros: ['JavaScript everywhere', 'Large ecosystem', 'Fast development', 'Great community'],
+      cons: ['Single-threaded', 'Callback hell', 'Memory leaks', 'Security concerns'],
+      learningCurve: 'intermediate',
+      popularity: 10
+    },
+    {
+      id: createId('express', 1),
+      name: 'Express.js',
+      category: 'backend',
+      description: 'Fast, unopinionated web framework for Node.js',
+      website: 'https://expressjs.com',
+      pricing: {
+        model: 'free',
+        notes: 'Open source'
+      },
+      features: ['Minimal framework', 'Middleware support', 'Routing', 'Template engines'],
+      pros: ['Lightweight', 'Flexible', 'Large ecosystem', 'Easy to learn'],
+      cons: ['Unopinionated', 'Security concerns', 'No built-in features', 'Requires setup'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('postgresql', 1),
+      name: 'PostgreSQL',
+      category: 'database',
+      description: 'Advanced open-source relational database',
+      website: 'https://postgresql.org',
+      pricing: {
+        model: 'free',
+        notes: 'Open source'
+      },
+      features: ['ACID compliance', 'JSON support', 'Extensible', 'Advanced features'],
+      pros: ['Reliable', 'Feature-rich', 'Free', 'Great performance'],
+      cons: ['Complex setup', 'Resource intensive', 'Learning curve', 'Limited cloud options'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('mongodb', 1),
+      name: 'MongoDB',
+      category: 'database',
+      description: 'NoSQL document database',
+      website: 'https://mongodb.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Document storage', 'Scalable', 'Flexible schema', 'JSON-like documents'],
+      pros: ['Flexible schema', 'Easy to scale', 'JSON-like data', 'Great for prototyping'],
+      cons: ['No ACID compliance', 'Memory usage', 'Complex queries', 'Data consistency'],
+      learningCurve: 'beginner',
+      popularity: 8
+    },
+    {
+      id: createId('jest', 1),
+      name: 'Jest',
+      category: 'testing',
+      description: 'JavaScript testing framework',
+      website: 'https://jestjs.io',
+      pricing: {
+        model: 'free',
+        notes: 'Open source'
+      },
+      features: ['Unit testing', 'Snapshot testing', 'Mocking', 'Code coverage'],
+      pros: ['Easy setup', 'Great documentation', 'Built-in mocking', 'Fast execution'],
+      cons: ['Large bundle size', 'Complex configuration', 'Memory leaks', 'Slow startup'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('cypress', 1),
+      name: 'Cypress',
+      category: 'testing',
+      description: 'End-to-end testing framework',
+      website: 'https://cypress.io',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free for open source'
+      },
+      features: ['E2E testing', 'Visual testing', 'API testing', 'Real-time reload'],
+      pros: ['Great developer experience', 'Real-time feedback', 'Easy debugging', 'Visual testing'],
+      cons: ['Slow execution', 'Limited browser support', 'Complex setup', 'Resource intensive'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('appium', 1),
+      name: 'Appium',
+      category: 'testing',
+      description: 'Mobile app automation testing',
+      website: 'https://appium.io',
+      pricing: {
+        model: 'free',
+        notes: 'Open source'
+      },
+      features: ['Cross-platform', 'Multiple languages', 'Real devices', 'Cloud testing'],
+      pros: ['Cross-platform', 'Free', 'Large community', 'Real device testing'],
+      cons: ['Slow execution', 'Complex setup', 'Flaky tests', 'Limited debugging'],
+      learningCurve: 'advanced',
+      popularity: 7
+    },
+    {
+      id: createId('github-actions', 1),
+      name: 'GitHub Actions',
+      category: 'devops',
+      description: 'CI/CD platform integrated with GitHub',
+      website: 'https://github.com/features/actions',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free for public repos'
+      },
+      features: ['CI/CD', 'GitHub integration', 'Multiple runners', 'Workflow automation'],
+      pros: ['GitHub integration', 'Free for public repos', 'Easy setup', 'Great documentation'],
+      cons: ['Limited free minutes', 'GitHub dependency', 'Complex workflows', 'Learning curve'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('jenkins', 1),
+      name: 'Jenkins',
+      category: 'devops',
+      description: 'Open-source automation server',
+      website: 'https://jenkins.io',
+      pricing: {
+        model: 'free',
+        notes: 'Open source'
+      },
+      features: ['CI/CD', 'Plugin ecosystem', 'Distributed builds', 'Pipeline support'],
+      pros: ['Free', 'Highly customizable', 'Large plugin ecosystem', 'Mature platform'],
+      cons: ['Complex setup', 'Resource intensive', 'Security concerns', 'Maintenance overhead'],
+      learningCurve: 'advanced',
+      popularity: 8
+    },
+    {
+      id: createId('docker', 1),
+      name: 'Docker',
+      category: 'devops',
+      description: 'Containerization platform',
+      website: 'https://docker.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free for personal use'
+      },
+      features: ['Containerization', 'Image management', 'Orchestration', 'Multi-platform'],
+      pros: ['Consistent environments', 'Easy deployment', 'Resource efficient', 'Great ecosystem'],
+      cons: ['Learning curve', 'Security concerns', 'Resource overhead', 'Complex networking'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('postman', 1),
+      name: 'Postman',
+      category: 'development',
+      description: 'API development and testing platform',
+      website: 'https://postman.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['API testing', 'Request builder', 'Collections', 'Team collaboration'],
+      pros: ['Easy to use', 'Great for testing', 'Team features', 'Documentation'],
+      cons: ['Limited free tier', 'Internet required', 'Learning curve', 'Resource usage'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('visual-studio-code', 1),
+      name: 'Visual Studio Code',
+      category: 'development',
+      description: 'Free source code editor',
+      website: 'https://code.visualstudio.com',
+      pricing: {
+        model: 'free',
+        notes: 'Free and open source'
+      },
+      features: ['IntelliSense', 'Debugging', 'Git integration', 'Extensions'],
+      pros: ['Free', 'Lightweight', 'Great extensions', 'Cross-platform'],
+      cons: ['Limited features', 'Extension dependency', 'Performance issues', 'Memory usage'],
+      learningCurve: 'beginner',
+      popularity: 10
+    },
+    {
+      id: createId('xcode', 1),
+      name: 'Xcode',
+      category: 'development',
+      description: 'Apple\'s IDE for iOS development',
+      website: 'https://developer.apple.com/xcode',
+      pricing: {
+        model: 'free',
+        notes: 'Free with macOS'
+      },
+      features: ['iOS development', 'Interface Builder', 'Simulator', 'Debugging tools'],
+      pros: ['Official Apple tool', 'Great simulator', 'Interface Builder', 'Integrated tools'],
+      cons: ['Mac only', 'Large download', 'Complex interface', 'Resource intensive'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('android-studio', 1),
+      name: 'Android Studio',
+      category: 'development',
+      description: 'Official IDE for Android development',
+      website: 'https://developer.android.com/studio',
+      pricing: {
+        model: 'free',
+        notes: 'Free and open source'
+      },
+      features: ['Android development', 'Layout editor', 'Emulator', 'Gradle build system'],
+      pros: ['Official Google tool', 'Great emulator', 'Layout editor', 'Integrated tools'],
+      cons: ['Resource intensive', 'Slow startup', 'Complex setup', 'Large download'],
+      learningCurve: 'intermediate',
+      popularity: 9
     }
   ],
 
@@ -567,6 +871,358 @@ export const gameDesignTemplate: FlowTemplate = {
       cons: ['Performance limitations', 'Subscription model', 'Platform fees'],
       learningCurve: 'beginner',
       popularity: 9
+    },
+    {
+      id: createId('unreal-engine', 1),
+      name: 'Unreal Engine',
+      category: 'development',
+      description: 'Advanced 3D game engine',
+      website: 'https://unrealengine.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free until $1M revenue'
+      },
+      features: ['Advanced graphics', 'Blueprints', 'C++ support', 'Marketplace'],
+      pros: ['Industry standard', 'Amazing graphics', 'Free for indie', 'Great marketplace'],
+      cons: ['Steep learning curve', 'Resource intensive', 'Complex setup', 'Overkill for 2D'],
+      learningCurve: 'advanced',
+      popularity: 9
+    },
+    {
+      id: createId('godot', 1),
+      name: 'Godot',
+      category: 'development',
+      description: 'Free and open-source game engine',
+      website: 'https://godotengine.org',
+      pricing: {
+        model: 'free',
+        notes: 'Completely free and open source'
+      },
+      features: ['2D/3D support', 'GDScript', 'Visual scripting', 'Cross-platform'],
+      pros: ['Completely free', 'No royalties', 'Active community', 'Lightweight'],
+      cons: ['Smaller ecosystem', 'Limited documentation', 'Fewer assets', 'Less mature'],
+      learningCurve: 'intermediate',
+      popularity: 7
+    },
+    {
+      id: createId('blender', 1),
+      name: 'Blender',
+      category: '3d-modeling',
+      description: 'Free 3D modeling and animation software',
+      website: 'https://blender.org',
+      pricing: {
+        model: 'free',
+        notes: 'Free and open source'
+      },
+      features: ['3D modeling', 'Animation', 'Rendering', 'Video editing'],
+      pros: ['Completely free', 'Professional features', 'Large community', 'Regular updates'],
+      cons: ['Steep learning curve', 'Complex interface', 'Resource intensive', 'Limited support'],
+      learningCurve: 'advanced',
+      popularity: 8
+    },
+    {
+      id: createId('maya', 1),
+      name: 'Autodesk Maya',
+      category: '3d-modeling',
+      description: 'Professional 3D animation and modeling software',
+      website: 'https://autodesk.com/maya',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 225,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['3D modeling', 'Animation', 'Rendering', 'Simulation'],
+      pros: ['Industry standard', 'Professional features', 'Great documentation', 'Plugin ecosystem'],
+      cons: ['Very expensive', 'Steep learning curve', 'Resource intensive', 'Complex interface'],
+      learningCurve: 'advanced',
+      popularity: 9
+    },
+    {
+      id: createId('3ds-max', 1),
+      name: '3ds Max',
+      category: '3d-modeling',
+      description: 'Professional 3D modeling and rendering software',
+      website: 'https://autodesk.com/3ds-max',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 225,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['3D modeling', 'Rendering', 'Animation', 'Architecture tools'],
+      pros: ['Industry standard', 'Great for modeling', 'Professional features', 'Plugin ecosystem'],
+      cons: ['Very expensive', 'Windows only', 'Steep learning curve', 'Resource intensive'],
+      learningCurve: 'advanced',
+      popularity: 8
+    },
+    {
+      id: createId('zbrush', 1),
+      name: 'ZBrush',
+      category: '3d-modeling',
+      description: 'Digital sculpting and painting software',
+      website: 'https://pixologic.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 39.95,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Digital sculpting', 'Texturing', '3D painting', 'High-resolution modeling'],
+      pros: ['Industry standard', 'Amazing sculpting', 'High-resolution support', 'Great for characters'],
+      cons: ['Expensive', 'Steep learning curve', 'Unique interface', 'Resource intensive'],
+      learningCurve: 'advanced',
+      popularity: 8
+    },
+    {
+      id: createId('substance-painter', 1),
+      name: 'Substance Painter',
+      category: 'texturing',
+      description: '3D texturing and material authoring software',
+      website: 'https://adobe.com/substance',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 19.99,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['3D texturing', 'Material authoring', 'Smart materials', 'PBR workflow'],
+      pros: ['Industry standard', 'Amazing texturing', 'Smart materials', 'PBR workflow'],
+      cons: ['Expensive', 'Steep learning curve', 'Resource intensive', 'Subscription model'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('photoshop', 1),
+      name: 'Adobe Photoshop',
+      category: 'graphics',
+      description: 'Professional image editing software',
+      website: 'https://adobe.com/photoshop',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 20.99,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Image editing', 'Digital painting', 'Photo manipulation', 'Layer system'],
+      pros: ['Industry standard', 'Comprehensive features', 'Great plugins', 'Professional tools'],
+      cons: ['Expensive', 'Steep learning curve', 'Resource intensive', 'Subscription model'],
+      learningCurve: 'intermediate',
+      popularity: 10
+    },
+    {
+      id: createId('illustrator', 1),
+      name: 'Adobe Illustrator',
+      category: 'graphics',
+      description: 'Vector graphics editor',
+      website: 'https://adobe.com/illustrator',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 20.99,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Vector graphics', 'Logo design', 'Illustration', 'Typography'],
+      pros: ['Industry standard', 'Great for logos', 'Vector precision', 'Professional tools'],
+      cons: ['Expensive', 'Steep learning curve', 'Raster limitations', 'Subscription model'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('audacity', 1),
+      name: 'Audacity',
+      category: 'audio',
+      description: 'Free audio editing software',
+      website: 'https://audacityteam.org',
+      pricing: {
+        model: 'free',
+        notes: 'Free and open source'
+      },
+      features: ['Audio editing', 'Recording', 'Effects', 'Multi-track'],
+      pros: ['Completely free', 'Easy to use', 'Good features', 'Cross-platform'],
+      cons: ['Basic interface', 'Limited effects', 'No professional features', 'Outdated UI'],
+      learningCurve: 'beginner',
+      popularity: 7
+    },
+    {
+      id: createId('reaper', 1),
+      name: 'REAPER',
+      category: 'audio',
+      description: 'Professional digital audio workstation',
+      website: 'https://reaper.fm',
+      pricing: {
+        model: 'one-time',
+        startingPrice: 60,
+        currency: 'USD',
+        notes: 'One-time purchase'
+      },
+      features: ['Multi-track recording', 'MIDI support', 'Effects', 'Plugin support'],
+      pros: ['Affordable', 'Professional features', 'Great performance', 'Customizable'],
+      cons: ['Steep learning curve', 'Complex interface', 'Limited free trial', 'Smaller community'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('pro-tools', 1),
+      name: 'Pro Tools',
+      category: 'audio',
+      description: 'Industry-standard digital audio workstation',
+      website: 'https://avid.com/pro-tools',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 29.99,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Professional recording', 'Mixing', 'Mastering', 'Plugin ecosystem'],
+      pros: ['Industry standard', 'Professional features', 'Great plugins', 'Studio compatibility'],
+      cons: ['Very expensive', 'Steep learning curve', 'Hardware requirements', 'Complex setup'],
+      learningCurve: 'advanced',
+      popularity: 9
+    },
+    {
+      id: createId('fmod', 1),
+      name: 'FMOD',
+      category: 'audio',
+      description: 'Audio middleware for game development',
+      website: 'https://fmod.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free for indie developers'
+      },
+      features: ['Audio middleware', 'Real-time mixing', 'Dynamic music', '3D audio'],
+      pros: ['Industry standard', 'Great features', 'Free for indie', 'Professional tools'],
+      cons: ['Steep learning curve', 'Complex setup', 'Limited free tier', 'Resource intensive'],
+      learningCurve: 'advanced',
+      popularity: 8
+    },
+    {
+      id: createId('wwise', 1),
+      name: 'Wwise',
+      category: 'audio',
+      description: 'Interactive audio middleware',
+      website: 'https://audiokinetic.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free for indie developers'
+      },
+      features: ['Interactive audio', 'Real-time mixing', 'Dynamic music', '3D audio'],
+      pros: ['Industry standard', 'Great features', 'Free for indie', 'Professional tools'],
+      cons: ['Steep learning curve', 'Complex setup', 'Limited free tier', 'Resource intensive'],
+      learningCurve: 'advanced',
+      popularity: 8
+    },
+    {
+      id: createId('git', 1),
+      name: 'Git',
+      category: 'version-control',
+      description: 'Distributed version control system',
+      website: 'https://git-scm.com',
+      pricing: {
+        model: 'free',
+        notes: 'Free and open source'
+      },
+      features: ['Version control', 'Branching', 'Merging', 'Collaboration'],
+      pros: ['Free', 'Industry standard', 'Great features', 'Large community'],
+      cons: ['Steep learning curve', 'Complex commands', 'Merge conflicts', 'Setup required'],
+      learningCurve: 'intermediate',
+      popularity: 10
+    },
+    {
+      id: createId('perforce', 1),
+      name: 'Perforce',
+      category: 'version-control',
+      description: 'Enterprise version control system',
+      website: 'https://perforce.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 25,
+        currency: 'USD',
+        notes: 'Per user per month'
+      },
+      features: ['Version control', 'Large file support', 'Enterprise features', 'Security'],
+      pros: ['Great for large files', 'Enterprise features', 'Security', 'Performance'],
+      cons: ['Expensive', 'Complex setup', 'Steep learning curve', 'Limited free tier'],
+      learningCurve: 'advanced',
+      popularity: 7
+    },
+    {
+      id: createId('jira', 1),
+      name: 'Jira',
+      category: 'project-management',
+      description: 'Project management and issue tracking',
+      website: 'https://atlassian.com/jira',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 7.50,
+        currency: 'USD',
+        notes: 'Per user per month'
+      },
+      features: ['Issue tracking', 'Project management', 'Agile tools', 'Reporting'],
+      pros: ['Industry standard', 'Comprehensive features', 'Great integrations', 'Scalable'],
+      cons: ['Expensive', 'Complex setup', 'Steep learning curve', 'Overkill for small teams'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('trello', 1),
+      name: 'Trello',
+      category: 'project-management',
+      description: 'Visual project management tool',
+      website: 'https://trello.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Kanban boards', 'Task management', 'Collaboration', 'Integrations'],
+      pros: ['Easy to use', 'Visual interface', 'Free tier', 'Great for small teams'],
+      cons: ['Limited features', 'Not scalable', 'Basic reporting', 'Limited automation'],
+      learningCurve: 'beginner',
+      popularity: 8
+    },
+    {
+      id: createId('slack', 1),
+      name: 'Slack',
+      category: 'communication',
+      description: 'Team communication platform',
+      website: 'https://slack.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Team chat', 'File sharing', 'Integrations', 'Video calls'],
+      pros: ['Easy to use', 'Great integrations', 'Free tier', 'Mobile app'],
+      cons: ['Can be distracting', 'Limited free tier', 'Expensive for large teams', 'Information overload'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('discord', 1),
+      name: 'Discord',
+      category: 'communication',
+      description: 'Voice and text communication platform',
+      website: 'https://discord.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Voice chat', 'Text chat', 'Screen sharing', 'Server organization'],
+      pros: ['Free', 'Great for gaming', 'Voice quality', 'Easy to use'],
+      cons: ['Limited business features', 'Privacy concerns', 'Not professional', 'Limited integrations'],
+      learningCurve: 'beginner',
+      popularity: 8
     }
   ],
 
@@ -1116,6 +1772,380 @@ export const marketingCampaignTemplate: FlowTemplate = {
       cons: ['Can be expensive', 'Complex for beginners', 'Limited customization'],
       learningCurve: 'intermediate',
       popularity: 9
+    },
+    {
+      id: createId('mailchimp', 1),
+      name: 'Mailchimp',
+      category: 'email-marketing',
+      description: 'Email marketing and automation platform',
+      website: 'https://mailchimp.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Email campaigns', 'Automation', 'Templates', 'Analytics'],
+      pros: ['Easy to use', 'Great templates', 'Free tier', 'Good analytics'],
+      cons: ['Limited free tier', 'Can be expensive', 'Limited customization', 'Basic CRM'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('klaviyo', 1),
+      name: 'Klaviyo',
+      category: 'email-marketing',
+      description: 'E-commerce focused email marketing platform',
+      website: 'https://klaviyo.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 20,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Email marketing', 'SMS marketing', 'Segmentation', 'E-commerce integration'],
+      pros: ['Great for e-commerce', 'Advanced segmentation', 'SMS marketing', 'Good analytics'],
+      cons: ['Expensive', 'Complex setup', 'Limited free tier', 'E-commerce focused'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('convertkit', 1),
+      name: 'ConvertKit',
+      category: 'email-marketing',
+      description: 'Email marketing for creators and bloggers',
+      website: 'https://convertkit.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Email marketing', 'Automation', 'Landing pages', 'Creator tools'],
+      pros: ['Great for creators', 'Easy to use', 'Free tier', 'Good automation'],
+      cons: ['Limited features', 'Expensive scaling', 'Basic templates', 'Limited integrations'],
+      learningCurve: 'beginner',
+      popularity: 7
+    },
+    {
+      id: createId('facebook-ads', 1),
+      name: 'Facebook Ads',
+      category: 'social-media',
+      description: 'Facebook and Instagram advertising platform',
+      website: 'https://facebook.com/business/ads',
+      pricing: {
+        model: 'pay-per-click',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Pay for clicks/impressions'
+      },
+      features: ['Targeted advertising', 'Multiple formats', 'Analytics', 'Retargeting'],
+      pros: ['Huge audience', 'Great targeting', 'Multiple formats', 'Good analytics'],
+      cons: ['Algorithm changes', 'Privacy concerns', 'Ad fatigue', 'Complex optimization'],
+      learningCurve: 'intermediate',
+      popularity: 10
+    },
+    {
+      id: createId('google-ads', 1),
+      name: 'Google Ads',
+      category: 'search-marketing',
+      description: 'Google\'s advertising platform',
+      website: 'https://ads.google.com',
+      pricing: {
+        model: 'pay-per-click',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Pay for clicks'
+      },
+      features: ['Search ads', 'Display ads', 'Shopping ads', 'Video ads'],
+      pros: ['High intent traffic', 'Great targeting', 'Multiple formats', 'Good analytics'],
+      cons: ['Expensive clicks', 'Complex setup', 'Steep learning curve', 'Competition'],
+      learningCurve: 'advanced',
+      popularity: 10
+    },
+    {
+      id: createId('linkedin-ads', 1),
+      name: 'LinkedIn Ads',
+      category: 'social-media',
+      description: 'LinkedIn advertising platform',
+      website: 'https://linkedin.com/advertising',
+      pricing: {
+        model: 'pay-per-click',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Pay for clicks/impressions'
+      },
+      features: ['B2B targeting', 'Professional audience', 'Multiple formats', 'Lead generation'],
+      pros: ['Great B2B targeting', 'Professional audience', 'Lead generation', 'Good targeting'],
+      cons: ['Expensive', 'Limited audience', 'Complex setup', 'Lower volume'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('tiktok-ads', 1),
+      name: 'TikTok Ads',
+      category: 'social-media',
+      description: 'TikTok advertising platform',
+      website: 'https://ads.tiktok.com',
+      pricing: {
+        model: 'pay-per-click',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Pay for clicks/impressions'
+      },
+      features: ['Video ads', 'Young audience', 'Creative tools', 'Viral potential'],
+      pros: ['Young audience', 'Viral potential', 'Creative tools', 'Growing platform'],
+      cons: ['Limited targeting', 'Young audience only', 'Unpredictable', 'New platform'],
+      learningCurve: 'intermediate',
+      popularity: 7
+    },
+    {
+      id: createId('canva', 1),
+      name: 'Canva',
+      category: 'design',
+      description: 'Graphic design platform',
+      website: 'https://canva.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Templates', 'Design tools', 'Collaboration', 'Brand kit'],
+      pros: ['Easy to use', 'Free tier', 'Great templates', 'Collaboration'],
+      cons: ['Limited advanced features', 'Internet required', 'Template dependency'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('figma', 1),
+      name: 'Figma',
+      category: 'design',
+      description: 'Collaborative design and prototyping tool',
+      website: 'https://figma.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Real-time collaboration', 'Prototyping', 'Design systems', 'Developer handoff'],
+      pros: ['Excellent collaboration', 'Web-based', 'Free tier', 'Great prototyping'],
+      cons: ['Internet required', 'Limited offline features', 'Performance with large files'],
+      learningCurve: 'beginner',
+      popularity: 10
+    },
+    {
+      id: createId('adobe-creative-suite', 1),
+      name: 'Adobe Creative Suite',
+      category: 'design',
+      description: 'Professional design software suite',
+      website: 'https://adobe.com/creativecloud',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 52.99,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Photoshop', 'Illustrator', 'InDesign', 'Premiere Pro'],
+      pros: ['Industry standard', 'Professional features', 'Great integration', 'Comprehensive'],
+      cons: ['Very expensive', 'Steep learning curve', 'Resource intensive', 'Subscription model'],
+      learningCurve: 'advanced',
+      popularity: 9
+    },
+    {
+      id: createId('capcut', 1),
+      name: 'CapCut',
+      category: 'video-editing',
+      description: 'Free video editing app',
+      website: 'https://capcut.com',
+      pricing: {
+        model: 'free',
+        notes: 'Free to use'
+      },
+      features: ['Video editing', 'Effects', 'Templates', 'Music library'],
+      pros: ['Completely free', 'Easy to use', 'Great effects', 'Mobile app'],
+      cons: ['Limited features', 'Watermarks', 'Basic editing', 'Mobile focused'],
+      learningCurve: 'beginner',
+      popularity: 8
+    },
+    {
+      id: createId('premiere-pro', 1),
+      name: 'Adobe Premiere Pro',
+      category: 'video-editing',
+      description: 'Professional video editing software',
+      website: 'https://adobe.com/premiere-pro',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 20.99,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Professional editing', 'Effects', 'Color grading', 'Audio editing'],
+      pros: ['Industry standard', 'Professional features', 'Great integration', 'Comprehensive'],
+      cons: ['Expensive', 'Steep learning curve', 'Resource intensive', 'Complex interface'],
+      learningCurve: 'advanced',
+      popularity: 9
+    },
+    {
+      id: createId('google-analytics', 1),
+      name: 'Google Analytics',
+      category: 'analytics',
+      description: 'Web analytics platform',
+      website: 'https://analytics.google.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Website analytics', 'Conversion tracking', 'Audience insights', 'Reporting'],
+      pros: ['Free', 'Comprehensive', 'Industry standard', 'Great integration'],
+      cons: ['Complex setup', 'Privacy concerns', 'Data sampling', 'Learning curve'],
+      learningCurve: 'intermediate',
+      popularity: 10
+    },
+    {
+      id: createId('semrush', 1),
+      name: 'SEMrush',
+      category: 'seo',
+      description: 'SEO and competitive research platform',
+      website: 'https://semrush.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 119.95,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['SEO tools', 'Competitive research', 'Keyword research', 'Backlink analysis'],
+      pros: ['Comprehensive SEO', 'Great competitive research', 'Good data', 'Multiple tools'],
+      cons: ['Expensive', 'Complex interface', 'Data accuracy', 'Steep learning curve'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('ahrefs', 1),
+      name: 'Ahrefs',
+      category: 'seo',
+      description: 'SEO and backlink analysis tool',
+      website: 'https://ahrefs.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 99,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Backlink analysis', 'Keyword research', 'Site audit', 'Rank tracking'],
+      pros: ['Great backlink data', 'Comprehensive SEO', 'Good accuracy', 'Multiple tools'],
+      cons: ['Expensive', 'Complex interface', 'Limited features', 'Steep learning curve'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('buffer', 1),
+      name: 'Buffer',
+      category: 'social-media',
+      description: 'Social media management platform',
+      website: 'https://buffer.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Social scheduling', 'Analytics', 'Team collaboration', 'Content calendar'],
+      pros: ['Easy to use', 'Free tier', 'Good analytics', 'Team features'],
+      cons: ['Limited free tier', 'Basic features', 'Expensive scaling', 'Limited platforms'],
+      learningCurve: 'beginner',
+      popularity: 8
+    },
+    {
+      id: createId('hootsuite', 1),
+      name: 'Hootsuite',
+      category: 'social-media',
+      description: 'Social media management platform',
+      website: 'https://hootsuite.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 29,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Social scheduling', 'Analytics', 'Team collaboration', 'Content calendar'],
+      pros: ['Comprehensive features', 'Team collaboration', 'Good analytics', 'Multiple platforms'],
+      cons: ['Expensive', 'Complex interface', 'Limited free tier', 'Steep learning curve'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('later', 1),
+      name: 'Later',
+      category: 'social-media',
+      description: 'Instagram-focused social media scheduler',
+      website: 'https://later.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Instagram scheduling', 'Visual planner', 'Analytics', 'Content calendar'],
+      pros: ['Great for Instagram', 'Visual planner', 'Free tier', 'Easy to use'],
+      cons: ['Instagram focused', 'Limited platforms', 'Basic features', 'Expensive scaling'],
+      learningCurve: 'beginner',
+      popularity: 7
+    },
+    {
+      id: createId('hotjar', 1),
+      name: 'Hotjar',
+      category: 'analytics',
+      description: 'User behavior analytics platform',
+      website: 'https://hotjar.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Heatmaps', 'Session recordings', 'Feedback tools', 'Conversion funnels'],
+      pros: ['Great user insights', 'Easy to use', 'Free tier', 'Visual data'],
+      cons: ['Limited free tier', 'Privacy concerns', 'Data accuracy', 'Resource intensive'],
+      learningCurve: 'beginner',
+      popularity: 8
+    },
+    {
+      id: createId('optimizely', 1),
+      name: 'Optimizely',
+      category: 'testing',
+      description: 'A/B testing and experimentation platform',
+      website: 'https://optimizely.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Contact for pricing'
+      },
+      features: ['A/B testing', 'Multivariate testing', 'Personalization', 'Analytics'],
+      pros: ['Industry standard', 'Comprehensive testing', 'Good analytics', 'Professional features'],
+      cons: ['Expensive', 'Complex setup', 'Steep learning curve', 'Limited free tier'],
+      learningCurve: 'advanced',
+      popularity: 8
+    },
+    {
+      id: createId('google-optimize', 1),
+      name: 'Google Optimize',
+      category: 'testing',
+      description: 'Free A/B testing platform',
+      website: 'https://optimize.google.com',
+      pricing: {
+        model: 'free',
+        notes: 'Free to use'
+      },
+      features: ['A/B testing', 'Multivariate testing', 'Personalization', 'Google integration'],
+      pros: ['Free', 'Google integration', 'Easy to use', 'Good features'],
+      cons: ['Limited features', 'Google dependency', 'Basic analytics', 'Limited support'],
+      learningCurve: 'intermediate',
+      popularity: 7
     }
   ],
 
@@ -1453,6 +2483,366 @@ export const ecommerceSetupTemplate: FlowTemplate = {
       features: ['Store builder', 'Payment processing', 'Inventory management', 'Analytics'],
       pros: ['Easy to use', 'All-in-one solution', 'Good support', 'Mobile optimized'],
       cons: ['Transaction fees', 'Limited customization', 'Monthly costs', 'Platform lock-in'],
+      learningCurve: 'beginner',
+      popularity: 10
+    },
+    {
+      id: createId('woocommerce', 1),
+      name: 'WooCommerce',
+      category: 'development',
+      description: 'WordPress e-commerce plugin',
+      website: 'https://woocommerce.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free plugin'
+      },
+      features: ['WordPress integration', 'Customizable', 'Payment gateways', 'Extensions'],
+      pros: ['Free plugin', 'Highly customizable', 'WordPress ecosystem', 'No transaction fees'],
+      cons: ['Requires WordPress', 'Technical knowledge needed', 'Security concerns', 'Maintenance required'],
+      learningCurve: 'intermediate',
+      popularity: 9
+    },
+    {
+      id: createId('bigcommerce', 1),
+      name: 'BigCommerce',
+      category: 'development',
+      description: 'Enterprise e-commerce platform',
+      website: 'https://bigcommerce.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 29.95,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Multi-channel selling', 'B2B features', 'Advanced analytics', 'API access'],
+      pros: ['Enterprise features', 'Multi-channel', 'No transaction fees', 'Good API'],
+      cons: ['Expensive', 'Complex setup', 'Limited themes', 'Steep learning curve'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('magento', 1),
+      name: 'Magento',
+      category: 'development',
+      description: 'Enterprise e-commerce platform',
+      website: 'https://magento.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 2000,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Enterprise features', 'Multi-store', 'Advanced catalog', 'B2B features'],
+      pros: ['Enterprise features', 'Highly scalable', 'Advanced features', 'Multi-store'],
+      cons: ['Very expensive', 'Complex setup', 'Resource intensive', 'Steep learning curve'],
+      learningCurve: 'advanced',
+      popularity: 7
+    },
+    {
+      id: createId('stripe', 1),
+      name: 'Stripe',
+      category: 'payments',
+      description: 'Online payment processing platform',
+      website: 'https://stripe.com',
+      pricing: {
+        model: 'transaction',
+        startingPrice: 2.9,
+        currency: 'USD',
+        notes: 'Per transaction + 30¢'
+      },
+      features: ['Payment processing', 'Subscription billing', 'Fraud protection', 'Global payments'],
+      pros: ['Easy integration', 'Great documentation', 'Global support', 'Advanced features'],
+      cons: ['Transaction fees', 'Account holds', 'Complex pricing', 'Limited support'],
+      learningCurve: 'intermediate',
+      popularity: 10
+    },
+    {
+      id: createId('paypal', 1),
+      name: 'PayPal',
+      category: 'payments',
+      description: 'Online payment service',
+      website: 'https://paypal.com',
+      pricing: {
+        model: 'transaction',
+        startingPrice: 2.9,
+        currency: 'USD',
+        notes: 'Per transaction + 30¢'
+      },
+      features: ['Payment processing', 'Buyer protection', 'Global reach', 'Easy setup'],
+      pros: ['Trusted brand', 'Easy setup', 'Global reach', 'Buyer protection'],
+      cons: ['High fees', 'Account freezes', 'Limited customization', 'Poor support'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('square', 1),
+      name: 'Square',
+      category: 'payments',
+      description: 'Payment and business solutions',
+      website: 'https://square.com',
+      pricing: {
+        model: 'transaction',
+        startingPrice: 2.6,
+        currency: 'USD',
+        notes: 'Per transaction + 10¢'
+      },
+      features: ['Payment processing', 'Point of sale', 'Inventory management', 'Analytics'],
+      pros: ['Low fees', 'Easy setup', 'Good hardware', 'Integrated solutions'],
+      cons: ['Limited features', 'Account holds', 'Basic analytics', 'Limited customization'],
+      learningCurve: 'beginner',
+      popularity: 8
+    },
+    {
+      id: createId('klaviyo', 1),
+      name: 'Klaviyo',
+      category: 'email-marketing',
+      description: 'E-commerce focused email marketing platform',
+      website: 'https://klaviyo.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 20,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Email marketing', 'SMS marketing', 'Segmentation', 'E-commerce integration'],
+      pros: ['Great for e-commerce', 'Advanced segmentation', 'SMS marketing', 'Good analytics'],
+      cons: ['Expensive', 'Complex setup', 'Limited free tier', 'E-commerce focused'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('mailchimp', 1),
+      name: 'Mailchimp',
+      category: 'email-marketing',
+      description: 'Email marketing and automation platform',
+      website: 'https://mailchimp.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Email campaigns', 'Automation', 'Templates', 'Analytics'],
+      pros: ['Easy to use', 'Great templates', 'Free tier', 'Good analytics'],
+      cons: ['Limited free tier', 'Can be expensive', 'Limited customization', 'Basic CRM'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('yotpo', 1),
+      name: 'Yotpo',
+      category: 'reviews',
+      description: 'Customer reviews and loyalty platform',
+      website: 'https://yotpo.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 15,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Review management', 'Loyalty program', 'Referral marketing', 'Analytics'],
+      pros: ['Great reviews', 'Loyalty features', 'Easy integration', 'Good analytics'],
+      cons: ['Expensive', 'Limited free tier', 'Complex setup', 'Platform dependency'],
+      learningCurve: 'intermediate',
+      popularity: 7
+    },
+    {
+      id: createId('judge-me', 1),
+      name: 'Judge.me',
+      category: 'reviews',
+      description: 'Customer reviews and ratings platform',
+      website: 'https://judge.me',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Review management', 'Photo reviews', 'Q&A', 'Analytics'],
+      pros: ['Free tier', 'Photo reviews', 'Easy setup', 'Good features'],
+      cons: ['Limited free tier', 'Basic analytics', 'Limited customization', 'Platform dependency'],
+      learningCurve: 'beginner',
+      popularity: 7
+    },
+    {
+      id: createId('recharge', 1),
+      name: 'ReCharge',
+      category: 'subscriptions',
+      description: 'Subscription billing platform',
+      website: 'https://rechargepayments.com',
+      pricing: {
+        model: 'transaction',
+        startingPrice: 1,
+        currency: 'USD',
+        notes: 'Per transaction + 1%'
+      },
+      features: ['Subscription billing', 'Recurring orders', 'Customer portal', 'Analytics'],
+      pros: ['Great for subscriptions', 'Easy setup', 'Good features', 'Shopify integration'],
+      cons: ['Expensive', 'Platform dependency', 'Limited customization', 'Complex pricing'],
+      learningCurve: 'intermediate',
+      popularity: 7
+    },
+    {
+      id: createId('bold-subscriptions', 1),
+      name: 'Bold Subscriptions',
+      category: 'subscriptions',
+      description: 'Subscription and recurring orders app',
+      website: 'https://boldcommerce.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 10,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Subscription billing', 'Recurring orders', 'Customer portal', 'Analytics'],
+      pros: ['Affordable', 'Easy setup', 'Good features', 'Shopify integration'],
+      cons: ['Limited features', 'Platform dependency', 'Basic analytics', 'Limited customization'],
+      learningCurve: 'beginner',
+      popularity: 6
+    },
+    {
+      id: createId('shipstation', 1),
+      name: 'ShipStation',
+      category: 'shipping',
+      description: 'Shipping and order management platform',
+      website: 'https://shipstation.com',
+      pricing: {
+        model: 'subscription',
+        startingPrice: 9.99,
+        currency: 'USD',
+        notes: 'Per month'
+      },
+      features: ['Order management', 'Shipping labels', 'Carrier integration', 'Automation'],
+      pros: ['Great shipping', 'Multiple carriers', 'Automation', 'Good integration'],
+      cons: ['Expensive', 'Complex setup', 'Limited free tier', 'Platform dependency'],
+      learningCurve: 'intermediate',
+      popularity: 8
+    },
+    {
+      id: createId('easyship', 1),
+      name: 'EasyShip',
+      category: 'shipping',
+      description: 'International shipping platform',
+      website: 'https://easyship.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['International shipping', 'Rate comparison', 'Label generation', 'Tracking'],
+      pros: ['Great international', 'Rate comparison', 'Free tier', 'Easy setup'],
+      cons: ['Limited carriers', 'Basic features', 'Platform dependency', 'Limited support'],
+      learningCurve: 'beginner',
+      popularity: 6
+    },
+    {
+      id: createId('google-analytics', 1),
+      name: 'Google Analytics',
+      category: 'analytics',
+      description: 'Web analytics platform',
+      website: 'https://analytics.google.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Website analytics', 'Conversion tracking', 'Audience insights', 'Reporting'],
+      pros: ['Free', 'Comprehensive', 'Industry standard', 'Great integration'],
+      cons: ['Complex setup', 'Privacy concerns', 'Data sampling', 'Learning curve'],
+      learningCurve: 'intermediate',
+      popularity: 10
+    },
+    {
+      id: createId('hotjar', 1),
+      name: 'Hotjar',
+      category: 'analytics',
+      description: 'User behavior analytics platform',
+      website: 'https://hotjar.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Heatmaps', 'Session recordings', 'Feedback tools', 'Conversion funnels'],
+      pros: ['Great user insights', 'Easy to use', 'Free tier', 'Visual data'],
+      cons: ['Limited free tier', 'Privacy concerns', 'Data accuracy', 'Resource intensive'],
+      learningCurve: 'beginner',
+      popularity: 8
+    },
+    {
+      id: createId('google-ads', 1),
+      name: 'Google Ads',
+      category: 'advertising',
+      description: 'Google\'s advertising platform',
+      website: 'https://ads.google.com',
+      pricing: {
+        model: 'pay-per-click',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Pay for clicks'
+      },
+      features: ['Search ads', 'Display ads', 'Shopping ads', 'Video ads'],
+      pros: ['High intent traffic', 'Great targeting', 'Multiple formats', 'Good analytics'],
+      cons: ['Expensive clicks', 'Complex setup', 'Steep learning curve', 'Competition'],
+      learningCurve: 'advanced',
+      popularity: 10
+    },
+    {
+      id: createId('facebook-ads', 1),
+      name: 'Facebook Ads',
+      category: 'advertising',
+      description: 'Facebook and Instagram advertising platform',
+      website: 'https://facebook.com/business/ads',
+      pricing: {
+        model: 'pay-per-click',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Pay for clicks/impressions'
+      },
+      features: ['Targeted advertising', 'Multiple formats', 'Analytics', 'Retargeting'],
+      pros: ['Huge audience', 'Great targeting', 'Multiple formats', 'Good analytics'],
+      cons: ['Algorithm changes', 'Privacy concerns', 'Ad fatigue', 'Complex optimization'],
+      learningCurve: 'intermediate',
+      popularity: 10
+    },
+    {
+      id: createId('canva', 1),
+      name: 'Canva',
+      category: 'design',
+      description: 'Graphic design platform',
+      website: 'https://canva.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Templates', 'Design tools', 'Collaboration', 'Brand kit'],
+      pros: ['Easy to use', 'Free tier', 'Great templates', 'Collaboration'],
+      cons: ['Limited advanced features', 'Internet required', 'Template dependency'],
+      learningCurve: 'beginner',
+      popularity: 9
+    },
+    {
+      id: createId('figma', 1),
+      name: 'Figma',
+      category: 'design',
+      description: 'Collaborative design and prototyping tool',
+      website: 'https://figma.com',
+      pricing: {
+        model: 'freemium',
+        startingPrice: 0,
+        currency: 'USD',
+        notes: 'Free tier available'
+      },
+      features: ['Real-time collaboration', 'Prototyping', 'Design systems', 'Developer handoff'],
+      pros: ['Excellent collaboration', 'Web-based', 'Free tier', 'Great prototyping'],
+      cons: ['Internet required', 'Limited offline features', 'Performance with large files'],
       learningCurve: 'beginner',
       popularity: 10
     }
