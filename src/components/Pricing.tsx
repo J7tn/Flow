@@ -8,6 +8,11 @@ import { Link } from 'react-router-dom';
 import { useScrollToTop } from "@/lib/hooks/useScrollToTop";
 
 export function Pricing() {
+  // Scroll to top immediately before any rendering
+  if (typeof window !== 'undefined') {
+    window.scrollTo(0, 0);
+  }
+  
   // Scroll to top when component mounts
   useScrollToTop();
 

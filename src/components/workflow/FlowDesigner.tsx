@@ -89,6 +89,7 @@ import {
   Camera,
   Star,
   Check,
+  ExternalLink,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
@@ -2219,105 +2220,188 @@ Description: ${stepDescription}`
                                   ))}
                                 </div>
 
-                                {/* Custom Tool Form */}
+                                {/* Tools Display Section */}
                                 <div className="space-y-3">
-                                  <div className="flex items-center justify-between">
-                                    <h4 className="text-sm font-medium">Add Custom Tool</h4>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => setShowCustomToolForm(!showCustomToolForm)}
-                                      className="text-xs"
-                                    >
-                                      {showCustomToolForm ? "Cancel" : "Add Custom Tool"}
-                                    </Button>
-                                  </div>
-                                  
-                                  {showCustomToolForm && (
-                                    <Card className="p-4 space-y-3">
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div>
-                                          <label className="text-xs font-medium">Tool Name *</label>
-                                          <Input
-                                            value={customToolName}
-                                            onChange={(e) => setCustomToolName(e.target.value)}
-                                            placeholder="e.g., Copilot, Figma, etc."
-                                            className="mt-1 text-sm"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="text-xs font-medium">Category</label>
-                                          <select
-                                            value={customToolCategory}
-                                            onChange={(e) => setCustomToolCategory(e.target.value)}
-                                            className="mt-1 w-full px-3 py-2 border border-input bg-background text-sm rounded-md"
-                                          >
-                                            <option value="other">Other</option>
-                                            <option value="productivity">Productivity</option>
-                                            <option value="communication">Communication</option>
-                                            <option value="management">Management</option>
-                                            <option value="storage">Storage</option>
-                                            <option value="creative">Creative</option>
-                                            <option value="development">Development</option>
-                                            <option value="marketing">Marketing</option>
-                                            <option value="analytics">Analytics</option>
-                                          </select>
-                                        </div>
+                                  {isGeneratingTools ? (
+                                    <div className="space-y-3">
+                                      <div className="flex items-center space-x-2">
+                                        <RefreshCw className="h-4 w-4 animate-spin" />
+                                        <span className="text-sm text-muted-foreground">Generating tools...</span>
                                       </div>
-                                      
-                                      <div>
-                                        <label className="text-xs font-medium">Description *</label>
-                                        <Textarea
-                                          value={customToolDescription}
-                                          onChange={(e) => setCustomToolDescription(e.target.value)}
-                                          placeholder="Brief description of what this tool does..."
-                                          className="mt-1 text-sm"
-                                          rows={2}
-                                        />
+                                    </div>
+                                  ) : currentStepTools.length > 0 ? (
+                                    <div className="space-y-3">
+                                      <div className="grid grid-cols-1 gap-3">
+                                        {currentStepTools.map((tool, index) => (
+                                          <Card key={index} className="p-3 hover:shadow-md transition-shadow">
+                                            <div className="flex items-start justify-between">
+                                              <div className="flex items-start space-x-3 flex-1">
+                                                <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                                                  {tool.icon ? (
+                                                    <tool.icon className="h-4 w-4 text-primary" />
+                                                  ) : (
+                                                    <Wrench className="h-4 w-4 text-primary" />
+                                                  )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                  <div className="flex items-center space-x-2 mb-1">
+                                                    <h4 className="text-sm font-medium truncate">{tool.name}</h4>
+                                                    <Badge variant="secondary" className="text-xs">
+                                                      {tool.category}
+                                                    </Badge>
+                                                  </div>
+                                                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                                                    {tool.description}
+                                                  </p>
+                                                  {tool.pricing && (
+                                                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                                                      <DollarSign className="h-3 w-3" />
+                                                      <span>
+                                                        {tool.pricing.model === 'free' ? 'Free' : 
+                                                         tool.pricing.model === 'freemium' ? 'Freemium' : 
+                                                         tool.pricing.startingPrice ? 
+                                                           `Starting at $${tool.pricing.startingPrice}/${tool.pricing.currency}` : 
+                                                           'Paid'}
+                                                      </span>
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              </div>
+                                              <div className="flex items-center space-x-2 ml-3">
+                                                {tool.link && (
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => window.open(tool.link, '_blank')}
+                                                    className="h-8 w-8 p-0"
+                                                  >
+                                                    <ExternalLink className="h-3 w-3" />
+                                                  </Button>
+                                                )}
+                                                <Button
+                                                  variant="outline"
+                                                  size="sm"
+                                                  onClick={() => selectedStep && addToolToStep(selectedStep, tool)}
+                                                  className="text-xs"
+                                                >
+                                                  Add
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          </Card>
+                                        ))}
                                       </div>
-                                      
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div>
-                                          <label className="text-xs font-medium">Website Link (Optional)</label>
-                                          <Input
-                                            value={customToolLink}
-                                            onChange={(e) => setCustomToolLink(e.target.value)}
-                                            placeholder="https://..."
-                                            className="mt-1 text-sm"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="text-xs font-medium">Pricing</label>
-                                          <select
-                                            value={customToolPricing}
-                                            onChange={(e) => setCustomToolPricing(e.target.value)}
-                                            className="mt-1 w-full px-3 py-2 border border-input bg-background text-sm rounded-md"
-                                          >
-                                            <option value="free">Free</option>
-                                            <option value="paid">Paid</option>
-                                            <option value="freemium">Freemium</option>
-                                          </select>
-                                        </div>
-                                      </div>
-                                      
-                                      <div className="flex justify-end space-x-2 pt-2">
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          onClick={() => setShowCustomToolForm(false)}
-                                        >
-                                          Cancel
-                                        </Button>
-                                        <Button
-                                          size="sm"
-                                          onClick={() => selectedStep && addCustomToolToStep(selectedStep)}
-                                        >
-                                          Add Tool
-                                        </Button>
-                                      </div>
-                                    </Card>
+                                    </div>
+                                  ) : (
+                                    <div className="text-center py-8">
+                                      <Wrench className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                                      <p className="text-sm text-muted-foreground mb-2">No tools available</p>
+                                      <p className="text-xs text-muted-foreground">Click on a step to generate relevant tools</p>
+                                    </div>
                                   )}
                                 </div>
+
+                                {/* Custom Tool Form - Only show when tools are loaded */}
+                                {currentStepTools.length > 0 && (
+                                  <div className="space-y-3 border-t pt-4">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="text-sm font-medium">Add Custom Tool</h4>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setShowCustomToolForm(!showCustomToolForm)}
+                                        className="text-xs"
+                                      >
+                                        {showCustomToolForm ? "Cancel" : "Add Custom Tool"}
+                                      </Button>
+                                    </div>
+                                    
+                                    {showCustomToolForm && (
+                                      <Card className="p-4 space-y-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                          <div>
+                                            <label className="text-xs font-medium">Tool Name *</label>
+                                            <Input
+                                              value={customToolName}
+                                              onChange={(e) => setCustomToolName(e.target.value)}
+                                              placeholder="e.g., Copilot, Figma, etc."
+                                              className="mt-1 text-sm"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="text-xs font-medium">Category</label>
+                                            <select
+                                              value={customToolCategory}
+                                              onChange={(e) => setCustomToolCategory(e.target.value)}
+                                              className="mt-1 w-full px-3 py-2 border border-input bg-background text-sm rounded-md"
+                                            >
+                                              <option value="other">Other</option>
+                                              <option value="productivity">Productivity</option>
+                                              <option value="communication">Communication</option>
+                                              <option value="management">Management</option>
+                                              <option value="storage">Storage</option>
+                                              <option value="creative">Creative</option>
+                                              <option value="development">Development</option>
+                                              <option value="marketing">Marketing</option>
+                                              <option value="analytics">Analytics</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        
+                                        <div>
+                                          <label className="text-xs font-medium">Description *</label>
+                                          <Textarea
+                                            value={customToolDescription}
+                                            onChange={(e) => setCustomToolDescription(e.target.value)}
+                                            placeholder="Brief description of what this tool does..."
+                                            className="mt-1 text-sm"
+                                            rows={2}
+                                          />
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                          <div>
+                                            <label className="text-xs font-medium">Website Link (Optional)</label>
+                                            <Input
+                                              value={customToolLink}
+                                              onChange={(e) => setCustomToolLink(e.target.value)}
+                                              placeholder="https://..."
+                                              className="mt-1 text-sm"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="text-xs font-medium">Pricing</label>
+                                            <select
+                                              value={customToolPricing}
+                                              onChange={(e) => setCustomToolPricing(e.target.value)}
+                                              className="mt-1 w-full px-3 py-2 border border-input bg-background text-sm rounded-md"
+                                            >
+                                              <option value="free">Free</option>
+                                              <option value="paid">Paid</option>
+                                              <option value="freemium">Freemium</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        
+                                        <div className="flex justify-end space-x-2 pt-2">
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowCustomToolForm(false)}
+                                          >
+                                            Cancel
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            onClick={() => selectedStep && addCustomToolToStep(selectedStep)}
+                                          >
+                                            Add Tool
+                                          </Button>
+                                        </div>
+                                      </Card>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
