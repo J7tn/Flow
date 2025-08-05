@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { useRoutes } from "react-router-dom";
+import { useRoutes, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -160,6 +160,10 @@ function AppContent() {
           <TemplateTest />
         </ProtectedRoute>
       ),
+    },
+    {
+      path: "*",
+      element: <Navigate to="/" replace />,
     },
   ];
 

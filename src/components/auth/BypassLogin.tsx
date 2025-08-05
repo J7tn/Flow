@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,12 +6,29 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Shield, Users } from 'lucide-react';
 
 export const BypassLogin: React.FC = () => {
-  const { enableBypass, bypassMode } = useAuth();
+  const { enableBypass, bypassMode, user } = useAuth();
   const navigate = useNavigate();
 
+  // Auto-navigate when bypass mode is enabled and user is set
+  useEffect(() => {
+    if (bypassMode && user) {
+      console.log('BypassLogin: Bypass mode and user detected, navigating to dashboard...');
+      navigate('/dashboard');
+    }
+  }, [bypassMode, user, navigate]);
+
   const handleBypass = () => {
+    console.log('BypassLogin: Enabling bypass mode...');
     enableBypass();
-    navigate('/dashboard');
+  };
+
+  const handleDebug = () => {
+    console.log('BypassLogin: Debug info:', {
+      bypassMode,
+      user,
+      hasUser: !!user,
+      userEmail: user?.email
+    });
   };
 
   return (
@@ -45,6 +62,20 @@ export const BypassLogin: React.FC = () => {
           >
             Continue as Friend
             <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+          
+          <div className="text-xs text-muted-foreground text-center">
+            Current state: {bypassMode ? 'Bypass Mode: ON' : 'Bypass Mode: OFF'} | 
+            User: {user ? 'Logged In' : 'Not Logged In'}
+          </div>
+          
+          <Button 
+            variant="outline" 
+            onClick={handleDebug}
+            className="w-full text-xs"
+            size="sm"
+          >
+            Debug State
           </Button>
           
           <div className="text-center">

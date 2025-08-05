@@ -182,8 +182,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       aud: 'authenticated',
       created_at: new Date().toISOString(),
     } as User;
+    console.log('AuthProvider: Setting mock user:', mockUser);
     setUser(mockUser);
-    setSession({ user: mockUser, access_token: 'bypass-token', refresh_token: 'bypass-refresh', expires_at: Date.now() + 86400000 } as Session);
+    const mockSession = { user: mockUser, access_token: 'bypass-token', refresh_token: 'bypass-refresh', expires_at: Date.now() + 86400000 } as Session;
+    console.log('AuthProvider: Setting mock session:', mockSession);
+    setSession(mockSession);
+    console.log('AuthProvider: Bypass mode enabled successfully');
   };
 
   const disableBypass = () => {

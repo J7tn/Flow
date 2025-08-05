@@ -21,6 +21,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     path: location.pathname,
     requireAuth,
     user: user ? 'Authenticated' : 'Not authenticated',
+    bypassMode,
     loading,
     redirectTo
   });
@@ -39,6 +40,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   if (requireAuth && !user && !bypassMode) {
     console.log('ProtectedRoute: Requiring auth but no user and not in bypass mode, redirecting to:', redirectTo);
+    console.log('ProtectedRoute: Details - user:', user, 'bypassMode:', bypassMode);
     // Redirect to login page with return URL
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
