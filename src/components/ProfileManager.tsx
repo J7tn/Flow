@@ -8,14 +8,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2, Upload, User, Save, X } from 'lucide-react';
+import { Loader2, Upload, User, Save, X, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileManagerProps {
   className?: string;
+  onLogout?: () => void;
 }
 
-export function ProfileManager({ className }: ProfileManagerProps) {
+export function ProfileManager({ className, onLogout }: ProfileManagerProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -311,13 +312,25 @@ export function ProfileManager({ className }: ProfileManagerProps) {
               </Button>
             </>
           ) : (
-            <Button 
-              onClick={() => setIsEditing(true)}
-              className="flex items-center"
-            >
-              <User className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
+            <>
+              <Button 
+                onClick={() => setIsEditing(true)}
+                className="flex items-center"
+              >
+                <User className="h-4 w-4 mr-2" />
+                Edit Profile
+              </Button>
+              {onLogout && (
+                <Button 
+                  variant="destructive" 
+                  onClick={onLogout}
+                  className="flex items-center"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              )}
+            </>
           )}
         </div>
       </CardContent>

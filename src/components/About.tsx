@@ -235,16 +235,11 @@ export function About() {
             <p className="text-xl text-orange-100 mb-8">
               Join thousands of teams who've transformed their disorganized processes into streamlined workflows.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Link to="/signup">
                 <Button size="lg" className="bg-background text-foreground hover:bg-muted text-lg px-8 py-3">
                   Get Started Free
                   <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <Link to="/templates">
-                <Button size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-foreground text-lg px-8 py-3 font-semibold">
-                  Contact Us
                 </Button>
               </Link>
             </div>

@@ -7,6 +7,7 @@ import {
   Palette,
   Globe,
   Check,
+  LogOut,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -24,9 +25,22 @@ import { Label } from "./ui/label";
 import PermanentDashboard from "./shared/PermanentDashboard";
 import { ProfileManager } from "./ProfileManager";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
   const { theme, setTheme, accentColor, setAccentColor, isDark } = useTheme();
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
 
   const accentColors = [
     { name: 'blue', class: 'bg-blue-500', value: 'blue' as const },
@@ -59,7 +73,7 @@ const Settings = () => {
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
-            <ProfileManager />
+            <ProfileManager onLogout={handleLogout} />
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">

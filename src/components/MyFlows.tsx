@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Clock,
   Search,
@@ -196,9 +197,19 @@ const MyFlows = () => {
         </header>
 
         {/* Content */}
-        <main className="p-6">
+        <motion.main 
+          className="p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           {/* Search and Filters */}
-          <div className="mb-6">
+          <motion.div 
+            className="mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             <div className="flex items-center space-x-4 mb-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -226,12 +237,22 @@ const MyFlows = () => {
 
               <TabsContent value="all" className="mt-6">
                 {loading ? (
-                  <div className="flex items-center justify-center py-12">
+                  <motion.div 
+                    className="flex items-center justify-center py-12"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
                     <Loader2 className="h-8 w-8 animate-spin mr-2" />
                     <span>Loading flows...</span>
-                  </div>
+                  </motion.div>
                 ) : error ? (
-                  <div className="flex items-center justify-center py-12">
+                  <motion.div 
+                    className="flex items-center justify-center py-12"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
                     <div className="text-center">
                       <p className="text-destructive mb-2">{error}</p>
                       <Button 
@@ -241,9 +262,14 @@ const MyFlows = () => {
                         Try Again
                       </Button>
                     </div>
-                  </div>
+                  </motion.div>
                 ) : flows.length === 0 ? (
-                  <div className="flex items-center justify-center py-12">
+                  <motion.div 
+                    className="flex items-center justify-center py-12"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
                     <div className="text-center">
                       <p className="text-muted-foreground mb-4">No flows found</p>
                       <Button onClick={() => navigate("/workflow/new")}>
@@ -251,14 +277,46 @@ const MyFlows = () => {
                         Create Your First Flow
                       </Button>
                     </div>
-                  </div>
+                  </motion.div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {flows.map((flow) => (
-                    <Card
-                      key={flow.id}
-                      className="overflow-hidden hover:shadow-lg transition-shadow"
-                    >
+                  <motion.div 
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      hidden: { opacity: 0 },
+                      visible: {
+                        opacity: 1,
+                        transition: {
+                          staggerChildren: 0.1
+                        }
+                      }
+                    }}
+                  >
+                    <AnimatePresence>
+                      {flows.map((flow, index) => (
+                        <motion.div
+                          key={flow.id}
+                          variants={{
+                            hidden: { opacity: 0, y: 20, scale: 0.95 },
+                            visible: { 
+                              opacity: 1, 
+                              y: 0, 
+                              scale: 1,
+                              transition: {
+                                duration: 0.5,
+                                ease: "easeOut"
+                              }
+                            }
+                          }}
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <Card
+                            className="overflow-hidden hover:shadow-lg transition-shadow"
+                          >
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
@@ -368,18 +426,52 @@ const MyFlows = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </motion.div>
                 )}
               </TabsContent>
 
               <TabsContent value="active" className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filterFlows("active").map((flow) => (
-                    <Card
-                      key={flow.id}
-                      className="overflow-hidden hover:shadow-lg transition-shadow"
-                    >
+                <motion.div 
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.1
+                      }
+                    }
+                  }}
+                >
+                  <AnimatePresence>
+                    {filterFlows("active").map((flow, index) => (
+                      <motion.div
+                        key={flow.id}
+                        variants={{
+                          hidden: { opacity: 0, y: 20, scale: 0.95 },
+                          visible: { 
+                            opacity: 1, 
+                            y: 0, 
+                            scale: 1,
+                            transition: {
+                              duration: 0.5,
+                              ease: "easeOut"
+                            }
+                          }
+                        }}
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Card
+                          className="overflow-hidden hover:shadow-lg transition-shadow"
+                        >
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
@@ -476,8 +568,10 @@ const MyFlows = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </motion.div>
               </TabsContent>
 
               <TabsContent value="paused" className="mt-6">
@@ -694,8 +788,8 @@ const MyFlows = () => {
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
-        </main>
+          </motion.div>
+        </motion.main>
       </div>
 
       {/* Delete Confirmation Dialog */}
