@@ -24,6 +24,7 @@ import Analytics from "./components/Analytics";
 import WorkflowBuilder from "./components/workflow/WorkflowBuilder";
 import FlowDesigner from "./components/workflow/FlowDesigner";
 import SharedFlowViewer from "./components/workflow/SharedFlowViewer";
+import { TestNestedFlows } from "./components/workflow/TestNestedFlows";
 import { TemplateTest } from "./components/TemplateTest";
 import { Toaster } from "./components/ui/toaster";
 import { PageTransition } from "./components/PageTransition";
@@ -167,6 +168,14 @@ function AppContent() {
       element: (
         <ProtectedRoute>
           <TemplateTest />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/test-nested-flows",
+      element: (
+        <ProtectedRoute>
+          <TestNestedFlows />
         </ProtectedRoute>
       ),
     },

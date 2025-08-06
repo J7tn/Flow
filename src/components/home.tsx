@@ -138,7 +138,7 @@ const Home = () => {
       
       // Fetch workflows from database
       const { data: workflows, error } = await client
-        .from('workflows')
+        .from('workflow_instances')
         .select('*')
         .order('updated_at', { ascending: false })
         .limit(6); // Get 6 most recent flows
@@ -165,7 +165,7 @@ const Home = () => {
 
       // Calculate dashboard statistics
       const { data: allWorkflows } = await client
-        .from('workflows')
+        .from('workflow_instances')
         .select('*');
 
       if (allWorkflows) {

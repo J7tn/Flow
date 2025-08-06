@@ -66,7 +66,7 @@ const Analytics = () => {
       
       // Fetch workflows from database
       const { data: workflows, error } = await client
-        .from('workflows')
+        .from('workflow_instances')
         .select('*')
         .order('created_at', { ascending: false });
 
