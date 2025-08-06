@@ -175,16 +175,29 @@
     
     /* Enhanced sticky navigation */
     .sticky-nav {
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 9999 !important;
       transition: all 0.3s ease;
+      width: 100%;
+      background: hsl(var(--background) / 0.95);
+      backdrop-filter: blur(8px);
     }
     
     /* Ensure sticky works on all browsers */
     @supports (position: sticky) {
       .sticky-nav {
-        position: sticky;
+        position: sticky !important;
       }
+    }
+    
+    /* Additional sticky support */
+    body {
+      overflow-x: hidden;
+    }
+    
+    /* Ensure the main content doesn't overlap with fixed nav */
+    .main-content {
+      padding-top: 0;
     }
   }
