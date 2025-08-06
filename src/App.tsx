@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { useRoutes, Navigate } from "react-router-dom";
+import { useRoutes, Navigate, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -25,9 +26,17 @@ import FlowDesigner from "./components/workflow/FlowDesigner";
 import SharedFlowViewer from "./components/workflow/SharedFlowViewer";
 import { TemplateTest } from "./components/TemplateTest";
 import { Toaster } from "./components/ui/toaster";
+import { PageTransition } from "./components/PageTransition";
+import { LoadingSpinner } from "./components/LoadingSpinner";
+import { usePageTransition } from "./hooks/usePageTransition";
+import { useScrollToTop } from "./hooks/useScrollToTop";
 
 // Wrapper component that uses the scroll hook
 function AppContent() {
+  const location = useLocation();
+  const { transitionType } = usePageTransition();
+  useScrollToTop();
+  
   const appRoutes = [
     {
       path: "/",
@@ -172,9 +181,13 @@ function AppContent() {
   const element = useRoutes(allRoutes);
 
   return (
-    <Suspense fallback={<p>Loading...</p>}>
-      {element}
-    </Suspense>
+    <AnimatePresence mode="wait" initial={false}>
+      <PageTransition key={location.pathname} transitionType={transitionType}>
+        <Suspense fallback={<LoadingSpinner />}>
+          {element}
+        </Suspense>
+      </PageTransition>
+    </AnimatePresence>
   );
 }
 

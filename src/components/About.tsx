@@ -74,7 +74,7 @@ export function About() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
-      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-background/95 backdrop-blur-md sticky-nav shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -111,7 +111,7 @@ export function About() {
               <h1 className="text-5xl font-bold text-foreground mb-6">
                 About Flow
               </h1>
-                              <p className="text-xl text-muted-foreground max-w-4xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-4xl mx-auto">
                 Born from frustration with chaotic team processes, Flow transforms disorganized workflows 
                 into clear, actionable steps that everyone can follow.
               </p>
@@ -126,10 +126,10 @@ export function About() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold text-foreground mb-4">
                 The Problem We Solved
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
                 I was frustrated with a huge team that didn't have a pipeline that everyone followed. 
                 People uploaded documents as Word docs, PDFs, onto Discord forums, and stuff overlapped as well. 
                 Nobody knew what the process was and guidelines failed to be read or met.
@@ -144,13 +144,13 @@ export function About() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
                 >
-                  <Card className="h-full border-red-200 bg-red-50">
+                  <Card className="h-full border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-800">
                     <CardHeader>
                       <div className="mb-4">{problem.icon}</div>
-                      <CardTitle className="text-xl text-red-900">{problem.title}</CardTitle>
+                      <CardTitle className="text-xl text-red-900 dark:text-red-100">{problem.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription className="text-base text-red-700">
+                      <CardDescription className="text-base text-red-700 dark:text-red-300">
                         {problem.description}
                       </CardDescription>
                     </CardContent>
@@ -168,10 +168,10 @@ export function About() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold text-foreground mb-4">
                 The Flow Solution
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
                 I made this app so these idiots can follow a simple step-by-step process, 
                 written clearly in a user-friendly format.
               </p>
@@ -185,13 +185,13 @@ export function About() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
                 >
-                  <Card className="h-full border-green-200 bg-green-50">
+                  <Card className="h-full border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800">
                     <CardHeader>
                       <div className="mb-4">{solution.icon}</div>
-                      <CardTitle className="text-xl text-green-900">{solution.title}</CardTitle>
+                      <CardTitle className="text-xl text-green-900 dark:text-green-100">{solution.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription className="text-base text-green-700">
+                      <CardDescription className="text-base text-green-700 dark:text-green-300">
                         {solution.description}
                       </CardDescription>
                     </CardContent>
@@ -211,7 +211,7 @@ export function About() {
             <h2 className="text-3xl font-bold text-foreground mb-6">
               Our Mission
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               To eliminate the chaos of disorganized team processes by providing simple, 
               clear, and actionable workflows that anyone can follow. We believe that 
               great results come from great processes, and great processes come from 

@@ -154,5 +154,37 @@
     }
     body {
       @apply bg-background text-foreground;
+      scroll-behavior: smooth;
+    }
+    
+    /* Smooth page transitions */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Prevent layout shifts during transitions */
+    .page-transition-container {
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Ensure content doesn't jump during transitions */
+    .page-content {
+      will-change: transform, opacity;
+    }
+    
+    /* Enhanced sticky navigation */
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      transition: all 0.3s ease;
+    }
+    
+    /* Ensure sticky works on all browsers */
+    @supports (position: sticky) {
+      .sticky-nav {
+        position: sticky;
+      }
     }
   }

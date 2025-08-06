@@ -1,20 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
 import { 
-  Mail, 
-  MessageSquare, 
-  Phone, 
   Clock, 
   ArrowRight,
   Send,
-  MapPin
+  Loader2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useScrollToTop } from '@/lib/hooks/useScrollToTop';
+import { sendContactEmail } from '@/lib/emailService';
+
+interface ContactFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
 export function Contact() {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<ContactFormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
   // Scroll to top immediately before any rendering
   if (typeof window !== 'undefined') {
     window.scrollTo(0, 0);
@@ -25,35 +46,116 @@ export function Contact() {
 
   const contactMethods = [
     {
-      icon: <Mail className="h-8 w-8 text-orange-500" />,
-      title: "Email",
-      description: "Get in touch via email",
-      value: "jntnnn4@gmail.com",
-      action: "Send Email",
-      href: "mailto:jntnnn4@gmail.com"
-    },
-    {
-      icon: <MessageSquare className="h-8 w-8 text-purple-500" />,
-      title: "Support",
-      description: "Need help with Flow?",
-      value: "We're here to help",
-      action: "Get Support",
-      href: "mailto:jntnnn4@gmail.com?subject=Flow Support"
-    },
-    {
       icon: <Clock className="h-8 w-8 text-blue-500" />,
       title: "Response Time",
       description: "We typically respond within",
       value: "24 hours",
       action: null,
-      href: null
+      actionType: null
     }
   ];
+
+  const handleInputChange = (field: keyof ContactFormData, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const validateForm = (): boolean => {
+    if (!formData.firstName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter your first name.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (!formData.lastName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter your last name.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (!formData.subject) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a subject.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (!formData.message.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter your message.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await sendContactEmail(formData);
+      
+      if (response.success) {
+        toast({
+          title: "Success!",
+          description: response.message,
+        });
+        
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
-      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-background/95 backdrop-blur-md sticky-nav shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -90,14 +192,15 @@ export function Contact() {
               <h1 className="text-5xl font-bold text-foreground mb-6">
                 Get in Touch
               </h1>
-                              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
                 Have a question or need help? We're here to assist you.
               </p>
             </motion.div>
           </div>
 
           {/* Contact Methods */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="flex justify-center mb-16">
+            <div className="max-w-md">
             {contactMethods.map((method, index) => (
               <motion.div
                 key={method.title}
@@ -117,21 +220,20 @@ export function Contact() {
                     <p className="text-lg font-semibold text-foreground mb-4">
                       {method.value}
                     </p>
-                    {method.action && method.href && (
-                      <Button 
-                        className="w-full bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 hover:from-orange-600 hover:via-purple-700 hover:to-blue-700"
-                        asChild
-                      >
-                        <a href={method.href}>
-                          {method.action}
-                          <Send className="ml-2 h-4 w-4" />
-                        </a>
+                    {method.action && method.actionType && (
+                                              <Button 
+                          className="w-full bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 hover:from-orange-600 hover:via-purple-700 hover:to-blue-700"
+                          onClick={() => handleEmailButtonClick(method.actionType!)}
+                        >
+                        {method.action}
+                        <Send className="ml-2 h-4 w-4" />
                       </Button>
                     )}
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+                          ))}
+            </div>
           </div>
 
           {/* Contact Form */}
@@ -149,80 +251,93 @@ export function Contact() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form className="space-y-6">
+                <form onSubmit={handleFormSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                        First Name
-                      </label>
-                      <input
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input
                         type="text"
                         id="firstName"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        value={formData.firstName}
+                        onChange={(e) => handleInputChange('firstName', e.target.value)}
                         placeholder="Your first name"
+                        disabled={isSubmitting}
                       />
                     </div>
-                    <div>
-                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                        Last Name
-                      </label>
-                      <input
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input
                         type="text"
                         id="lastName"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        value={formData.lastName}
+                        onChange={(e) => handleInputChange('lastName', e.target.value)}
                         placeholder="Your last name"
+                        disabled={isSubmitting}
                       />
                     </div>
                   </div>
                   
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
-                    </label>
-                    <input
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input
                       type="email"
                       id="email"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
                       placeholder="your.email@example.com"
+                      disabled={isSubmitting}
                     />
                   </div>
                   
-                  <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                      Subject
-                    </label>
-                    <select
-                      id="subject"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  <div className="space-y-2">
+                    <Label htmlFor="subject">Subject</Label>
+                    <Select 
+                      value={formData.subject} 
+                      onValueChange={(value) => handleInputChange('subject', value)}
+                      disabled={isSubmitting}
                     >
-                      <option value="">Select a subject</option>
-                      <option value="general">General Inquiry</option>
-                      <option value="support">Technical Support</option>
-                      <option value="billing">Billing Question</option>
-                      <option value="feature">Feature Request</option>
-                      <option value="partnership">Partnership</option>
-                    </select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a subject" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General Inquiry</SelectItem>
+                        <SelectItem value="support">Technical Support</SelectItem>
+                        <SelectItem value="billing">Billing Question</SelectItem>
+                        <SelectItem value="feature">Feature Request</SelectItem>
+                        <SelectItem value="partnership">Partnership</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                      Message
-                    </label>
-                    <textarea
+                  <div className="space-y-2">
+                    <Label htmlFor="message">Message</Label>
+                    <Textarea
                       id="message"
                       rows={6}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      value={formData.message}
+                      onChange={(e) => handleInputChange('message', e.target.value)}
                       placeholder="Tell us how we can help you..."
-                    ></textarea>
+                      disabled={isSubmitting}
+                    />
                   </div>
                   
                   <Button 
                     type="submit" 
                     className="w-full bg-gradient-to-r from-orange-500 via-purple-600 to-blue-600 hover:from-orange-600 hover:via-purple-700 hover:to-blue-700"
                     size="lg"
+                    disabled={isSubmitting}
                   >
-                    Send Message
-                    <Send className="ml-2 h-4 w-4" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send Message
+                        <Send className="ml-2 h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                 </form>
               </CardContent>
@@ -255,33 +370,33 @@ export function Contact() {
               </p>
             </motion.div>
             
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-muted/50 p-6 rounded-lg"
-            >
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Do you offer technical support?
-              </h3>
-              <p className="text-muted-foreground">
-                Yes! We provide comprehensive technical support for all Flow users. Just send us an email.
-              </p>
-            </motion.div>
+                         <motion.div
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.6, delay: 0.1 }}
+               className="bg-muted/50 p-6 rounded-lg"
+             >
+               <h3 className="text-lg font-semibold text-foreground mb-2">
+                 Do you offer technical support?
+               </h3>
+               <p className="text-muted-foreground">
+                 No buddy, you're on your own.
+               </p>
+             </motion.div>
             
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-muted/50 p-6 rounded-lg"
-            >
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Can I request custom features?
-              </h3>
-              <p className="text-muted-foreground">
-                Absolutely! We love hearing from our users about new features. Send us your ideas and we'll consider them for future updates.
-              </p>
-            </motion.div>
+                         <motion.div
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.6, delay: 0.2 }}
+               className="bg-muted/50 p-6 rounded-lg"
+             >
+               <h3 className="text-lg font-semibold text-foreground mb-2">
+                 Can I request custom features?
+               </h3>
+               <p className="text-muted-foreground">
+                 Only if it makes sense. It better make sense or else-
+               </p>
+             </motion.div>
           </div>
         </div>
       </section>
