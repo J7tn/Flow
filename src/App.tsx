@@ -160,6 +160,14 @@ function AppContent() {
       ),
     },
     {
+      path: "/workflow/:id",
+      element: (
+        <ProtectedRoute>
+          <FlowDesigner />
+        </ProtectedRoute>
+      ),
+    },
+    {
       path: "/flow/share/:encodedData",
       element: <SharedFlowViewer />,
     },

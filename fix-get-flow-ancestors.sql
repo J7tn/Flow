@@ -10,31 +10,52 @@ RETURNS TABLE (
     path TEXT
 ) AS $$
 DECLARE
-    current_parent_id UUID;
-    current_depth INTEGER;
+    flow_path TEXT;
 BEGIN
-    -- Get the current flow's parent and depth
-    SELECT parent_flow_id, depth_level INTO current_parent_id, current_depth
+    -- Get the path of the current flow
+    SELECT path INTO flow_path
     FROM workflow_instances
     WHERE id = flow_id;
     
-    -- If no parent, return empty
-    IF current_parent_id IS NULL THEN
+    IF flow_path IS NULL THEN
         RETURN;
     END IF;
     
-    -- Return the immediate parent
+    -- Return all ancestors using a recursive CTE approach
     RETURN QUERY
+    WITH RECURSIVE ancestors AS (
+        -- Get the current flow
+        SELECT 
+            id,
+            name,
+            flow_type,
+            depth_level,
+            path,
+            parent_flow_id
+        FROM workflow_instances
+        WHERE id = flow_id
+        
+        UNION ALL
+        
+        -- Get parent flows
+        SELECT 
+            wi.id,
+            wi.name,
+            wi.flow_type,
+            wi.depth_level,
+            wi.path,
+            wi.parent_flow_id
+        FROM workflow_instances wi
+        INNER JOIN ancestors a ON wi.id = a.parent_flow_id
+    )
     SELECT 
-        wi.id as ancestor_id,
-        wi.name as ancestor_name,
-        wi.flow_type as ancestor_type,
-        wi.depth_level,
-        wi.path
-    FROM workflow_instances wi
-    WHERE wi.id = current_parent_id;
-    
-    -- For now, just return the immediate parent
-    -- We can expand this later if needed
+        a.id as ancestor_id,
+        a.name as ancestor_name,
+        a.flow_type as ancestor_type,
+        a.depth_level,
+        a.path
+    FROM ancestors a
+    WHERE a.id != flow_id
+    ORDER BY a.depth_level;
 END;
 $$ LANGUAGE plpgsql; 

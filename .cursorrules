@@ -126,6 +126,59 @@ import type { Workflow } from '@/types/supabase';
 - Keep functions small and focused
 - Avoid code duplication
 
+## Naming Conventions & Conflict Prevention
+
+### SQL Naming Conflicts
+**CRITICAL**: Always avoid naming conflicts between variables and column names in SQL functions:
+
+**Common Conflict Areas:**
+- `path` - Used as both column name and variable name
+- `depth_level` - Used in multiple table contexts
+- `id` - Common column name that can conflict
+- `name` - Common column name that can conflict
+- `type` - Can conflict with data types
+
+**SQL Function Best Practices:**
+1. **Variable Naming**: Use descriptive prefixes for variables:
+   - `current_flow_path` instead of `flow_path`
+   - `target_flow_id` instead of `flow_id`
+   - `parent_flow_depth` instead of `depth_level`
+
+2. **Table Aliases**: Always use explicit table aliases in complex queries:
+   ```sql
+   SELECT 
+       wi.id as workflow_id,
+       wi.name as workflow_name,
+       wi.path as workflow_path
+   FROM workflow_instances wi
+   ```
+
+3. **CTE Naming**: Use descriptive names for CTEs:
+   ```sql
+   WITH RECURSIVE flow_hierarchy AS (
+       -- base case
+   ),
+   ancestor_chain AS (
+       -- recursive case
+   )
+   ```
+
+4. **Function Parameters**: Use descriptive parameter names:
+   ```sql
+   CREATE FUNCTION get_flow_ancestors(target_flow_id UUID)
+   ```
+
+### TypeScript/JavaScript Naming
+- Use camelCase for variables and functions
+- Use PascalCase for components and types
+- Use UPPER_SNAKE_CASE for constants
+- Avoid single-letter variable names except in loops
+
+### Database Schema Naming
+- Use snake_case for table and column names
+- Use descriptive prefixes for related tables
+- Avoid reserved SQL keywords as names
+
 ## Specific Patterns for This Project
 
 ### Flow Block Types

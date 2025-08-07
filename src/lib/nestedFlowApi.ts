@@ -332,7 +332,7 @@ export const nestedFlowApi = {
       console.log('Calling get_flow_ancestors with flowId:', flowId);
       
       const { data, error } = await client
-        .rpc('get_flow_ancestors', { flow_id: flowId });
+        .rpc('get_flow_ancestors', { target_flow_id: flowId });
 
       if (error) {
         console.error('Error fetching flow ancestors:', error);

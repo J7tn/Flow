@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Plus,
@@ -94,6 +94,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
 import { flowApi } from "@/lib/api";
+import { nestedFlowApi } from "@/lib/nestedFlowApi";
 import { flowSchema, type FlowInput } from "@/lib/validation";
 import { allTemplates } from "@/data/templates";
 import type { FlowTemplate } from "@/types/templates";
@@ -118,6 +119,7 @@ const FlowDesigner = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
+  const { id: flowId } = useParams<{ id: string }>();
   const [workflowName, setWorkflowName] = useState("New Flow");
   const [workflowDescription, setWorkflowDescription] = useState("");
   const [workflowGoal, setWorkflowGoal] = useState("");
@@ -217,6 +219,53 @@ const FlowDesigner = () => {
       }
     }
   }, [toast]);
+
+  // Load existing flow data if flowId is provided
+  useEffect(() => {
+    const loadExistingFlow = async () => {
+      if (!flowId) return;
+      
+      try {
+        const result = await nestedFlowApi.getFlow(flowId);
+        if (result.success && result.data) {
+          const flow = result.data;
+          setWorkflowName(flow.name || "New Flow");
+          setWorkflowDescription(flow.description || "");
+          setWorkflowGoal(flow.goal || "");
+          setUserType(flow.user_type || "solo");
+          
+          // Convert flow data to steps format if needed
+          if (flow.steps && Array.isArray(flow.steps)) {
+            setSteps(flow.steps);
+          } else {
+            setSteps([]);
+          }
+          
+          setHasUnsavedChanges(false);
+          
+          toast({
+            title: "Flow Loaded",
+            description: `Flow "${flow.name}" loaded successfully`,
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: result.error || "Failed to load flow",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error loading flow:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load flow",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadExistingFlow();
+  }, [flowId, toast]);
 
   // Create a serializable version of the current flow data
   const getCurrentFlowData = useCallback(() => {
@@ -1337,7 +1386,21 @@ Description: ${stepDescription}`
       };
 
       console.log('Saving flow with data:', flowData);
-      const result = await flowApi.createFlow(flowData);
+      
+      let result;
+      if (flowId) {
+        // Update existing flow
+        result = await nestedFlowApi.updateFlow(flowId, {
+          name: workflowName,
+          description: workflowDescription,
+          goal: workflowGoal,
+          steps: steps,
+          user_type: userType,
+        });
+      } else {
+        // Create new flow
+        result = await flowApi.createFlow(flowData);
+      }
       
       if (result.success) {
         setLastSaved(new Date());
@@ -1346,7 +1409,7 @@ Description: ${stepDescription}`
         
         toast({
           title: "Success",
-          description: "Flow saved successfully to database and local storage!",
+          description: flowId ? "Flow updated successfully!" : "Flow saved successfully to database and local storage!",
         });
       } else {
         throw new Error(result.error || "Failed to save flow");
