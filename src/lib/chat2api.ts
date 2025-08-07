@@ -4,6 +4,17 @@ import { getCurrentUser } from './supabase';
 const CHAT2API_BASE_URL = import.meta.env.VITE_CHAT2API_URL || 'http://127.0.0.1:5005';
 const CHAT2API_AUTHORIZATION = import.meta.env.VITE_CHAT2API_AUTHORIZATION || '';
 
+// Check if Chat2API is available in production
+const isChat2APIAvailable = () => {
+  if (import.meta.env.PROD) {
+    // In production, only use Chat2API if it's not localhost
+    return CHAT2API_BASE_URL && 
+           !CHAT2API_BASE_URL.includes('localhost') && 
+           !CHAT2API_BASE_URL.includes('127.0.0.1');
+  }
+  return true; // Always available in development
+};
+
 // Rate limiting and retry configuration
 const MAX_RETRIES = 3;
 const RETRY_DELAYS = [1000, 2000, 5000]; // Delays in milliseconds
@@ -181,6 +192,15 @@ export class Chat2APIService {
   static async createChatCompletion(
     request: ChatCompletionRequest
   ): Promise<ChatCompletionResponse> {
+    // Check if Chat2API is available
+    if (!isChat2APIAvailable()) {
+      throw new Chat2APIError(
+        'Chat2API is not available in production. Please configure a public Chat2API URL.',
+        503,
+        false
+      );
+    }
+
     return retryWithBackoff(async () => {
       // Check rate limiting
       if (!checkRateLimit()) {
@@ -220,6 +240,15 @@ export class Chat2APIService {
     onComplete?: () => void,
     onError?: (error: Error) => void
   ): Promise<void> {
+    // Check if Chat2API is available
+    if (!isChat2APIAvailable()) {
+      throw new Chat2APIError(
+        'Chat2API is not available in production. Please configure a public Chat2API URL.',
+        503,
+        false
+      );
+    }
+
     return retryWithBackoff(async () => {
       // Check rate limiting
       if (!checkRateLimit()) {
@@ -296,6 +325,15 @@ export class Chat2APIService {
 
   // Get available models with enhanced error handling
   static async getModels(): Promise<{ id: string; object: string }[]> {
+    // Check if Chat2API is available
+    if (!isChat2APIAvailable()) {
+      throw new Chat2APIError(
+        'Chat2API is not available in production. Please configure a public Chat2API URL.',
+        503,
+        false
+      );
+    }
+
     return retryWithBackoff(async () => {
       await this.validateUser();
       const headers = await this.getAuthHeaders();
