@@ -186,6 +186,7 @@ Please suggest 3-5 workflow steps that would be appropriate for this type of pro
               type: "task",
               duration: 60,
               dependencies: [],
+              progress: 0,
             });
           }
         }

@@ -26,6 +26,7 @@ export interface WorkflowInstance extends BaseFlow {
   is_template: boolean;
   current_step: number;
   completed_steps: string[];
+  customizations?: Record<string, any>;
   actual_costs?: Record<string, any>;
   performance_metrics?: Record<string, any>;
   notes: any[];
@@ -131,6 +132,7 @@ export interface UpdateFlowPayload {
   description?: string;
   status?: 'draft' | 'active' | 'completed' | 'archived';
   parent_flow_id?: string;
+  customizations?: Record<string, any>;
 }
 
 // Flow template creation/update payloads

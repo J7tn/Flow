@@ -227,21 +227,27 @@ const FlowDesigner = () => {
     const loadExistingFlow = async () => {
       if (!flowId) return;
       
+      console.log('Loading flow with ID:', flowId);
+      
       try {
         const result = await nestedFlowApi.getFlow(flowId);
+        console.log('Flow load result:', result);
+        
         if (result.success && result.data) {
           const flow = result.data;
+          console.log('Flow data:', flow);
+          
           setWorkflowName(flow.name || "New Flow");
           setWorkflowDescription(flow.description || "");
-          setWorkflowGoal(flow.goal || "");
-          setUserType(flow.user_type || "solo");
+          // Note: goal and user_type fields don't exist in the current schema
+          // We'll need to extract these from customizations or set defaults
+          setWorkflowGoal(flow.customizations?.goal || "");
+          setUserType(flow.customizations?.user_type || "solo");
           
           // Convert flow data to steps format if needed
-          if (flow.steps && Array.isArray(flow.steps)) {
-            setSteps(flow.steps);
-          } else {
-            setSteps([]);
-          }
+          // Steps are stored in a separate table, so we'll need to fetch them
+          // For now, we'll use an empty array and implement step fetching later
+          setSteps([]);
           
           setHasUnsavedChanges(false);
           
@@ -250,6 +256,7 @@ const FlowDesigner = () => {
             description: `Flow "${flow.name}" loaded successfully`,
           });
         } else {
+          console.error('Failed to load flow:', result.error);
           toast({
             title: "Error",
             description: result.error || "Failed to load flow",
@@ -952,6 +959,7 @@ Description: ${stepDescription}`
           type: subStep.type,
           status: "pending",
           dependencies: [],
+          progress: 0,
           subFlow: step.subFlow || []
         };
         return {
@@ -1397,9 +1405,12 @@ Description: ${stepDescription}`
         result = await nestedFlowApi.updateFlow(flowId, {
           name: workflowName,
           description: workflowDescription,
-          goal: workflowGoal,
-          steps: steps,
-          user_type: userType,
+          // Store goal and user_type in customizations since they don't exist in the schema
+          customizations: {
+            goal: workflowGoal,
+            user_type: userType,
+            steps: steps,
+          },
         });
       } else {
         // Create new flow

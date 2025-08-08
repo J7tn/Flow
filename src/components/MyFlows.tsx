@@ -234,7 +234,10 @@ const MyFlows = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => navigate(`/workflow/${flow.id}`)}>
+                <DropdownMenuItem onClick={() => {
+                  console.log('Edit button clicked for flow (card view):', flow.id);
+                  navigate(`/workflow/${flow.id}`);
+                }}>
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
@@ -334,7 +337,10 @@ const MyFlows = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate(`/workflow/${flow.id}`)}>
+                  <DropdownMenuItem onClick={() => {
+                    console.log('Edit button clicked for flow (list view):', flow.id);
+                    navigate(`/workflow/${flow.id}`);
+                  }}>
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>

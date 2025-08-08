@@ -12,7 +12,7 @@ const isChat2APIAvailable = () => {
            !CHAT2API_BASE_URL.includes('localhost') && 
            !CHAT2API_BASE_URL.includes('127.0.0.1');
   }
-  return true; // Always available in development
+  return CHAT2API_BASE_URL && CHAT2API_BASE_URL.includes('localhost'); // Available in development if localhost
 };
 
 // Rate limiting and retry configuration
@@ -147,8 +147,8 @@ export class Chat2APIService {
     };
 
     // Add authorization if configured
-    if (CHAT2API_AUTHORIZATION) {
-      headers['Authorization'] = `Bearer ${CHAT2API_AUTHORIZATION}`;
+    if (CHAT2API_AUTHORIZATION && !import.meta.env.DEV) {
+      headers['X-API-Key'] = CHAT2API_AUTHORIZATION;
     }
 
     return headers;
