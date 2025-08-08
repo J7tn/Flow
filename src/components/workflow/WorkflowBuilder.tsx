@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -40,6 +42,7 @@ interface WorkflowStep {
   type: string;
   duration: number;
   dependencies: string[];
+  progress: number;
 }
 
 interface WorkflowBuilderProps {
@@ -109,6 +112,7 @@ const WorkflowBuilder = ({
       type: "task",
       duration: 60, // minutes
       dependencies: [],
+      progress: 0,
     };
 
     setWorkflow({
@@ -548,6 +552,13 @@ Please suggest 3-5 workflow steps that would be appropriate for this type of pro
                               <p className="text-sm mt-2 line-clamp-2">
                                 {step.description}
                               </p>
+                              <div className="mt-3">
+                                <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                                  <span>Progress</span>
+                                  <span>{step.progress}%</span>
+                                </div>
+                                <Progress value={step.progress} className="h-2" />
+                              </div>
                               {step.dependencies.length > 0 && (
                                 <div className="mt-2 text-xs text-muted-foreground">
                                   Dependencies: {step.dependencies.length}
@@ -611,6 +622,25 @@ Please suggest 3-5 workflow steps that would be appropriate for this type of pro
                           }
                           rows={4}
                         />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium">Progress</label>
+                        <div className="mt-2 flex items-center gap-3">
+                          <Slider
+                            value={[selectedStepData?.progress ?? 0]}
+                            min={0}
+                            max={100}
+                            step={1}
+                            onValueChange={(value) =>
+                              updateStep(selectedStep, { progress: value[0] })
+                            }
+                            className="w-48"
+                          />
+                          <span className="text-sm w-10 text-right">
+                            {selectedStepData?.progress ?? 0}%
+                          </span>
+                        </div>
                       </div>
 
                       <div>
@@ -689,8 +719,12 @@ Please suggest 3-5 workflow steps that would be appropriate for this type of pro
                     steps={workflow.steps.map((step) => ({
                       id: step.id,
                       title: step.title,
-                      status: "pending" as const,
-                      progress: 0,
+                      status: (step.progress >= 100
+                        ? "completed"
+                        : step.progress > 0
+                          ? "in-progress"
+                          : "pending") as const,
+                      progress: step.progress,
                       dependencies: step.dependencies,
                       resources: [],
                       dueDate: new Date(Date.now() + step.duration * 60000)
@@ -786,7 +820,8 @@ Please suggest 3-5 workflow steps that would be appropriate for this type of pro
                     description: suggestion.description,
                     type: "task",
                     duration: 60,
-                    dependencies: [],
+                        dependencies: [],
+                        progress: 0,
                   };
                   
                   setWorkflow(prev => ({

@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -113,6 +114,7 @@ interface FlowStep {
   subFlow?: FlowStep[]; // New: nested flow within this step
   selectedCategory?: string; // New: selected tool category for this step
   addedTools?: Array<{ name: string; description: string; category: string; icon: any; link?: string; pricing: { model: string; startingPrice?: number; currency: string; notes?: string } }>; // New: tools added to this step
+  progress?: number;
 }
 
 const FlowDesigner = () => {
@@ -375,6 +377,7 @@ const FlowDesigner = () => {
           description: step.description,
           type: step.type as FlowStep["type"],
           status: "pending" as const,
+          progress: 0,
           estimatedTime: step.estimatedDuration.min,
           cost: step.costEstimate.min,
           dependencies: step.dependencies || [],
@@ -921,6 +924,7 @@ Description: ${stepDescription}`
       type: suggestedStep.type,
       status: "pending",
       dependencies: [],
+      progress: 0,
       subFlow: [], // Initialize empty sub-flow
       selectedCategory: "all"
     };
@@ -2043,6 +2047,13 @@ Description: ${stepDescription}`
                                   <CardDescription className="text-sm break-words overflow-hidden leading-relaxed">
                                     {step.description || "No description"}
                                   </CardDescription>
+                                  <div className="mt-2">
+                                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                                      <span>Progress</span>
+                                      <span>{step.progress ?? 0}%</span>
+                                    </div>
+                                    <Progress value={step.progress ?? 0} className="h-2" />
+                                  </div>
                                   
                                   <div className="space-y-1 text-xs text-muted-foreground pt-2 border-t">
                                     {step.estimatedTime && (
