@@ -94,6 +94,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PermanentDashboard from "../shared/PermanentDashboard";
+import StepComments from "./StepComments";
+import StepTasks from "./StepTasks";
 import { flowApi } from "@/lib/api";
 import { nestedFlowApi } from "@/lib/nestedFlowApi";
 import { flowSchema, type FlowInput } from "@/lib/validation";
@@ -2102,6 +2104,20 @@ Description: ${stepDescription}`
                                       </div>
                                     </div>
                                   )}
+
+                                  {/* Tasks & Comments */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t">
+                                    <StepTasks
+                                      workflowInstanceId={flowId || ""}
+                                      stepId={step.id}
+                                      nextStepId={steps[index + 1]?.id}
+                                      prevStepId={steps[index - 1]?.id}
+                                    />
+                                    <StepComments
+                                      workflowInstanceId={flowId || ""}
+                                      stepId={step.id}
+                                    />
+                                  </div>
                                 </CardContent>
                               </Card>
                             </div>

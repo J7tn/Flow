@@ -239,11 +239,55 @@ CREATE INDEX idx_analytics_events_user_id ON public.analytics_events(user_id);
 CREATE INDEX idx_analytics_events_type ON public.analytics_events(event_type);
 CREATE INDEX idx_analytics_events_created_at ON public.analytics_events(created_at);
 
--- Enable Row Level Security (RLS)
+  -- Step comments table
+  CREATE TABLE public.step_comments (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    workflow_instance_id UUID NOT NULL REFERENCES public.workflow_instances(id) ON DELETE CASCADE,
+    workflow_step_id UUID NOT NULL REFERENCES public.workflow_steps(id) ON DELETE CASCADE,
+    author_id UUID NOT NULL REFERENCES public.user_profiles(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  );
+
+  CREATE INDEX idx_step_comments_instance_id ON public.step_comments(workflow_instance_id);
+  CREATE INDEX idx_step_comments_step_id ON public.step_comments(workflow_step_id);
+  CREATE INDEX idx_step_comments_author_id ON public.step_comments(author_id);
+
+  -- Step tasks table
+  CREATE TABLE public.step_tasks (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    workflow_instance_id UUID NOT NULL REFERENCES public.workflow_instances(id) ON DELETE CASCADE,
+    current_step_id UUID NOT NULL REFERENCES public.workflow_steps(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    status TEXT NOT NULL DEFAULT 'todo', -- 'todo' | 'in_progress' | 'done' | 'blocked' | 'returned'
+    priority TEXT DEFAULT 'normal', -- 'low' | 'normal' | 'high' | 'urgent'
+    order_index INTEGER DEFAULT 0,
+    assignee_id UUID REFERENCES public.user_profiles(id) ON DELETE SET NULL,
+    created_by UUID NOT NULL REFERENCES public.user_profiles(id) ON DELETE CASCADE,
+    due_date DATE,
+    started_at TIMESTAMP WITH TIME ZONE,
+    completed_at TIMESTAMP WITH TIME ZONE,
+    last_transferred_at TIMESTAMP WITH TIME ZONE,
+    previous_step_id UUID REFERENCES public.workflow_steps(id) ON DELETE SET NULL,
+    transfer_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  );
+
+  CREATE INDEX idx_step_tasks_instance_id ON public.step_tasks(workflow_instance_id);
+  CREATE INDEX idx_step_tasks_current_step_id ON public.step_tasks(current_step_id);
+  CREATE INDEX idx_step_tasks_status ON public.step_tasks(status);
+
+  -- Enable Row Level Security (RLS)
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workflow_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workflow_instances ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workflow_steps ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE public.step_comments ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE public.step_tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tools ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.template_reviews ENABLE ROW LEVEL SECURITY;
@@ -358,6 +402,62 @@ CREATE POLICY "Users can delete own workflow steps" ON public.workflow_steps
     )
   );
 
+  -- Step comments policies
+  CREATE POLICY "Users can view step comments in own workflows" ON public.step_comments
+    FOR SELECT USING (
+      EXISTS (
+        SELECT 1 FROM public.workflow_instances wi 
+        WHERE wi.id = workflow_instance_id AND wi.user_id = auth.uid()
+      )
+    );
+
+  CREATE POLICY "Users can create step comments in own workflows" ON public.step_comments
+    FOR INSERT WITH CHECK (
+      EXISTS (
+        SELECT 1 FROM public.workflow_instances wi 
+        WHERE wi.id = workflow_instance_id AND wi.user_id = auth.uid()
+      ) AND author_id = auth.uid()
+    );
+
+  CREATE POLICY "Users can update own step comments" ON public.step_comments
+    FOR UPDATE USING (author_id = auth.uid());
+
+  CREATE POLICY "Users can delete own step comments" ON public.step_comments
+    FOR DELETE USING (author_id = auth.uid());
+
+  -- Step tasks policies
+  CREATE POLICY "Users can view step tasks in own workflows" ON public.step_tasks
+    FOR SELECT USING (
+      EXISTS (
+        SELECT 1 FROM public.workflow_instances wi 
+        WHERE wi.id = workflow_instance_id AND wi.user_id = auth.uid()
+      )
+    );
+
+  CREATE POLICY "Users can create step tasks in own workflows" ON public.step_tasks
+    FOR INSERT WITH CHECK (
+      EXISTS (
+        SELECT 1 FROM public.workflow_instances wi 
+        WHERE wi.id = workflow_instance_id AND wi.user_id = auth.uid()
+      ) AND created_by = auth.uid()
+    );
+
+  CREATE POLICY "Users can update step tasks in own workflows" ON public.step_tasks
+    FOR UPDATE USING (
+      EXISTS (
+        SELECT 1 FROM public.workflow_instances wi 
+        WHERE wi.id = workflow_instance_id AND wi.user_id = auth.uid()
+      )
+    );
+
+  CREATE POLICY "Users can delete step tasks in own workflows" ON public.step_tasks
+    FOR DELETE USING (
+      EXISTS (
+        SELECT 1 FROM public.workflow_instances wi 
+        WHERE wi.id = workflow_instance_id AND wi.user_id = auth.uid()
+      )
+    );
+
 -- Tools: all tools are viewable by all users
 CREATE POLICY "Tools are viewable by all" ON public.tools
   FOR SELECT USING (true);
@@ -411,6 +511,12 @@ CREATE TRIGGER update_template_reviews_updated_at BEFORE UPDATE ON public.templa
 
 CREATE TRIGGER update_template_uploads_updated_at BEFORE UPDATE ON public.template_uploads
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+  CREATE TRIGGER update_step_comments_updated_at BEFORE UPDATE ON public.step_comments
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+  CREATE TRIGGER update_step_tasks_updated_at BEFORE UPDATE ON public.step_tasks
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Function to handle user creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
